@@ -20,6 +20,7 @@ import org.royaldev.thehumanity.commands.impl.KickCommand;
 import org.royaldev.thehumanity.commands.impl.LeaveGameCommand;
 import org.royaldev.thehumanity.commands.impl.PacksCommand;
 import org.royaldev.thehumanity.commands.impl.PickCardCommand;
+import org.royaldev.thehumanity.commands.impl.SkipCommand;
 import org.royaldev.thehumanity.commands.impl.StartGameCommand;
 import org.royaldev.thehumanity.commands.impl.StopGameCommand;
 import org.royaldev.thehumanity.commands.impl.WhoCommand;
@@ -105,6 +106,7 @@ public class TheHumanity {
         this.getCommandHandler().register(new PacksCommand(this));
         this.getCommandHandler().register(new WhoCommand(this));
         this.getCommandHandler().register(new KickCommand(this));
+        this.getCommandHandler().register(new SkipCommand(this));
     }
 
     private void parseArguments(final String[] args) {

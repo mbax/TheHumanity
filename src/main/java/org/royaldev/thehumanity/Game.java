@@ -20,8 +20,6 @@ import java.util.concurrent.TimeUnit;
 
 // TODO: Skip timeout
 // TODO: Skip command
-// TODO: Fix quits
-// TODO: If czar left, don't display plays
 
 public class Game {
 
@@ -34,6 +32,7 @@ public class Game {
     private final Map<User, List<WhiteCard>> hands = new HashMap<>();
     private final Map<User, List<BlackCard>> winnings = new HashMap<>();
     private final List<Play> plays = new ArrayList<>();
+    private final List<User> skipping = new ArrayList<>();
     private int roundNumber = 0;
     private User host = null;
     private User czar = null;
@@ -157,11 +156,36 @@ public class Game {
             return;
         }
         if (this.czar == null || this.czar.equals(u)) return; // don't doubly advance the stage
-        if (this.getPlays().size() >= this.users.size() - 1) this.advanceStage();
+        if (this.allPlaysMade()) this.advanceStage();
     }
 
     public void removeUser(final String name) {
         this.removeUser(this.channel.getBot().getUserChannelDao().getUser(name));
+    }
+
+    public void skip(String name) {
+        this.skip(this.channel.getBot().getUserChannelDao().getUser(name));
+    }
+
+    public void skip(User u) {
+        u = this.getUser(u);
+        if (this.skipping.contains(u)) return;
+        this.skipping.add(u);
+    }
+
+    public boolean isSkipping(String name) {
+        return this.isSkipping(this.channel.getBot().getUserChannelDao().getUser(name));
+    }
+
+    public boolean isSkipping(User u) {
+        u = this.getUser(u);
+        return this.skipping.contains(u);
+    }
+
+    public boolean allPlaysMade() {
+        final List<User> usersTakingPart = new ArrayList<>(this.users);
+        usersTakingPart.removeAll(this.skipping);
+        return this.getPlays().size() >= usersTakingPart.size() - 1;
     }
 
     public Status getStatus() {
@@ -199,7 +223,7 @@ public class Game {
         this.hands.put(u, hand);
         this.plays.add(new Play(u, wc));
         u.send().notice("Card" + (wc.size() == 1 ? "" : "s") + " played!");
-        if (this.getPlays().size() >= this.users.size() - 1) this.advanceStage();
+        if (this.allPlaysMade()) this.advanceStage();
     }
 
     public boolean hasPlayed(User u) {
@@ -379,6 +403,7 @@ public class Game {
                 this.sendMessage(Colors.BOLD + this.currentBlackCard.getText());
                 break;
             case WAITING_FOR_CZAR:
+                this.skipping.clear();
                 if (this.czar == null) break;
                 Collections.shuffle(this.plays);
                 this.displayPlays();
