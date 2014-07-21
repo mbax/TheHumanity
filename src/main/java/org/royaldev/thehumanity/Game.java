@@ -171,6 +171,7 @@ public class Game {
         u = this.getUser(u);
         if (this.skipping.contains(u)) return;
         this.skipping.add(u);
+        if (this.allPlaysMade()) this.advanceStage();
     }
 
     public boolean isSkipping(String name) {
