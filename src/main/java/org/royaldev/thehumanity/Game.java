@@ -126,6 +126,11 @@ public class Game {
             if (this.hasUser(u)) return;
             this.users.add(u);
         }
+        if (this.users.size() * 7 < this.whiteCards.size()) {
+            this.sendMessage(Colors.BOLD + "Not enough white cards to play!");
+            this.stop();
+            return;
+        }
         this.deal(u);
         if (this.status != Status.JOINING) this.showCards(u);
         this.sendMessage(Colors.BOLD + u.getNick() + Colors.NORMAL + " has joined the game!");
