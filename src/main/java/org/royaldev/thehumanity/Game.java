@@ -46,15 +46,6 @@ public class Game {
         this.cardPacks.addAll(cardPacks);
         this.repopulateWhiteCards();
         this.repopulateBlackCards();
-        if (this.whiteCards.size() <= 21) { // a hand for all players + 1
-            this.sendMessage(Colors.BOLD + "Not enough white cards to play!");
-            this.stop();
-            return;
-        }
-        if (this.blackCards.size() < 1) {
-            this.sendMessage(Colors.BOLD + "Not enough black cards to play!");
-            this.stop();
-        }
     }
 
     public void repopulateWhiteCards() {
