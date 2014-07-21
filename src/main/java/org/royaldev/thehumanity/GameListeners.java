@@ -24,6 +24,9 @@ public class GameListeners extends ListenerAdapter<PircBotX> {
 
     @Override
     public void onQuit(QuitEvent<PircBotX> event) throws Exception {
-        this.onPart(new PartEvent<>(event.getBot(), event.getDaoSnapshot(), null, event.getUser(), event.getReason()));
+        final User u = event.getUser();
+        final Game g = this.humanity.getGameFor(u);
+        if (g == null || !g.hasUser(u)) return;
+        g.removeUser(event.getUser());
     }
 }
