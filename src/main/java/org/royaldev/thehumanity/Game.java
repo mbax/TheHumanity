@@ -19,6 +19,10 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 // TODO: Skip timeout
+// TODO: Skip command
+// TODO: Fix quits
+// TODO: Kick/leave and rejoin creating multiple scores
+// TODO: Keep cards on leave, keep wins, allow adding back to pick up where you left off
 
 public class Game {
 
@@ -64,6 +68,25 @@ public class Game {
         }
     }
 
+    public void setOldUserData(User newUser) {
+        final List<WhiteCard> hand = new ArrayList<>();
+        for (Map.Entry<User, List<WhiteCard>> entry : this.hands.entrySet()) {
+            if (!this.humanity.usersMatch(entry.getKey(), newUser)) continue;
+            hand.addAll(entry.getValue());
+            this.hands.remove(entry.getKey());
+            break;
+        }
+        final List<BlackCard> wins = new ArrayList<>();
+        for (Map.Entry<User, List<BlackCard>> entry : this.winnings.entrySet()) {
+            if (!this.humanity.usersMatch(entry.getKey(), newUser)) continue;
+            wins.addAll(entry.getValue());
+            this.winnings.remove(entry.getKey());
+            break;
+        }
+        this.hands.put(newUser, hand);
+        this.winnings.put(newUser, wins);
+    }
+
     public List<User> getUsers() {
         synchronized (this.users) {
             return new ArrayList<>(this.users);
@@ -100,6 +123,7 @@ public class Game {
     }
 
     public void addUser(final User u) {
+        this.setOldUserData(u); // in case we have data from before
         synchronized (this.users) {
             if (this.hasUser(u)) return;
             this.users.add(u);
