@@ -20,6 +20,8 @@ import java.util.concurrent.TimeUnit;
 
 // TODO: Skip timeout
 // TODO: Skip command
+// TODO: Fix skip when someone leaves during WAITING_FOR_CZAR
+// TODO: Fix only one card being removed for multi-card plays (aesthetically, apparently)
 
 public class Game {
 
