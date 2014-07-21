@@ -126,7 +126,9 @@ public class Game {
             if (this.hasUser(u)) return;
             this.users.add(u);
         }
-        if (this.users.size() * 7 < this.whiteCards.size()) {
+        int totalCards = 0;
+        for (final CardPack cp : this.cardPacks) totalCards += cp.getWhiteCards().size();
+        if (this.users.size() * 7 < totalCards) {
             this.sendMessage(Colors.BOLD + "Not enough white cards to play!");
             this.stop();
             return;
