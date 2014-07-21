@@ -406,6 +406,7 @@ public class Game {
                 this.currentBlackCard = this.getRandomBlackCard();
                 if (this.currentBlackCard == null) return;
                 this.showCards();
+                this.sendMessage(" ");
                 this.sendMessage(Colors.BOLD + "Round " + this.roundNumber + Colors.NORMAL + "!");
                 this.sendMessage(Colors.BOLD + this.czar.getNick() + Colors.NORMAL + " is the card czar.");
                 this.sendMessage(Colors.BOLD + this.currentBlackCard.getText());
