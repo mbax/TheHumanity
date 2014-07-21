@@ -15,6 +15,7 @@ import org.pircbotx.exception.IrcException;
 import org.royaldev.thehumanity.cards.Card.BlackCard;
 import org.royaldev.thehumanity.cards.Card.WhiteCard;
 import org.royaldev.thehumanity.cards.CardPack;
+import org.royaldev.thehumanity.commands.impl.CardsCommand;
 import org.royaldev.thehumanity.commands.impl.HelpCommand;
 import org.royaldev.thehumanity.commands.impl.JoinGameCommand;
 import org.royaldev.thehumanity.commands.impl.KickCommand;
@@ -109,6 +110,7 @@ public class TheHumanity {
         this.getCommandHandler().register(new KickCommand(this));
         this.getCommandHandler().register(new SkipCommand(this));
         this.getCommandHandler().register(new HelpCommand(this));
+        this.getCommandHandler().register(new CardsCommand(this));
     }
 
     private void parseArguments(final String[] args) {
