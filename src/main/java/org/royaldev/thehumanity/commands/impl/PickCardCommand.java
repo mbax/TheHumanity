@@ -35,7 +35,7 @@ public class PickCardCommand extends NoticeableCommand {
         }
         if (g.getStatus() == Status.WAITING_FOR_CZAR) {
             if (!g.getCzar().equals(u)) {
-                u.send().message("You can't pick any cards right now.");
+                this.notice(u, "You can't pick any cards right now.");
                 return;
             }
             final int winningPlay;
