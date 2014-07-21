@@ -44,12 +44,12 @@ public class StartGameCommand extends NoticeableCommand {
 
     @Override
     public String getName() {
-        return "startgame (packs)";
+        return "startgame";
     }
 
     @Override
     public String getUsage() {
-        return "<command>";
+        return "<command> (packs)";
     }
 
     @Override
