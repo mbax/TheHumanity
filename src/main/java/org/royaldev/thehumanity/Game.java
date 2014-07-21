@@ -21,8 +21,6 @@ import java.util.concurrent.TimeUnit;
 // TODO: Skip timeout
 // TODO: Skip command
 // TODO: Fix quits
-// TODO: Kick/leave and rejoin creating multiple scores
-// TODO: Keep cards on leave, keep wins, allow adding back to pick up where you left off
 
 public class Game {
 
@@ -148,7 +146,8 @@ public class Game {
                 hand.addAll(p.getWhiteCards());
                 this.hands.put(p.getPlayer(), hand);
             }
-            this.advanceStage();
+            if (this.status == Status.WAITING_FOR_PLAYERS) this.advanceStage();
+            if (this.status == Status.WAITING_FOR_CZAR) this.advanceStage();
         }
         if (this.users.size() < 3) {
             this.sendMessage(Colors.BOLD + "Not enough players to continue!");
