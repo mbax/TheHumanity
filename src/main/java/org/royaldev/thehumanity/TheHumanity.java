@@ -153,6 +153,7 @@ public class TheHumanity {
                 boolean isBlack = false;
                 while ((line = br.readLine()) != null) {
                     line = line.trim();
+                    if (line.isEmpty() || line.startsWith("#")) continue;
                     if (line.equalsIgnoreCase("___WHITE___")) {
                         isBlack = false;
                         continue;
@@ -160,7 +161,6 @@ public class TheHumanity {
                         isBlack = true;
                         continue;
                     }
-                    if (line.isEmpty()) continue;
                     if (isBlack) cp.addCard(new BlackCard(cp, line));
                     else cp.addCard(new WhiteCard(cp, line));
                 }
