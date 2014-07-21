@@ -33,7 +33,8 @@ public class WhoCommand extends NoticeableCommand {
         sb.append(Colors.BOLD).append("Czar: ").append(Colors.NORMAL).append(g.getCzar().getNick()).append(", ").append(Colors.BOLD).append("Players: ").append(Colors.NORMAL);
         for (final User player : g.getUsers()) {
             if (player.equals(g.getCzar())) continue;
-            sb.append(g.hasPlayed(player) ? Colors.GREEN : Colors.RED).append(player.getNick()).append(Colors.NORMAL).append(", ");
+            final String c = g.hasPlayed(player) ? Colors.GREEN : g.getStatus() == Status.WAITING_FOR_CZAR ? Colors.BLUE : Colors.RED;
+            sb.append(c).append(player.getNick()).append(Colors.NORMAL).append(", ");
         }
         event.respond(g.antiPing(sb.substring(0, sb.length() - 2)));
     }
