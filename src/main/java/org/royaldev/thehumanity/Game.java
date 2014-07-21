@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 // TODO: Skip timeout
 // TODO: Skip command
 // TODO: Fix quits
+// TODO: If czar left, don't display plays
 
 public class Game {
 
@@ -139,6 +140,7 @@ public class Game {
         this.sendMessage(Colors.BOLD + u.getNick() + Colors.NORMAL + " has left the game.");
         if (this.host.equals(u)) this.nextHost();
         if (this.czar.equals(u)) {
+            this.czar = null;
             this.sendMessage(Colors.BOLD + "The czar has left!" + Colors.NORMAL + " Returning your cards and starting a new round.");
             for (final Play p : this.plays) {
                 if (p.getPlayer() == null) continue;
@@ -154,7 +156,7 @@ public class Game {
             this.stop();
             return;
         }
-        if (this.czar.equals(u)) return; // don't doubly advance the stage
+        if (this.czar == null || this.czar.equals(u)) return; // don't doubly advance the stage
         if (this.getPlays().size() >= this.users.size() - 1) this.advanceStage();
     }
 
@@ -377,6 +379,7 @@ public class Game {
                 this.sendMessage(Colors.BOLD + this.currentBlackCard.getText());
                 break;
             case WAITING_FOR_CZAR:
+                if (this.czar == null) break;
                 Collections.shuffle(this.plays);
                 this.displayPlays();
                 this.sendMessage(Colors.BOLD + this.czar.getNick() + Colors.NORMAL + " is picking a winner.");
