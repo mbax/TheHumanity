@@ -329,6 +329,7 @@ public class Game {
         if (this.host != null) this.channel.send().setMode("-v " + this.host.getNick());
         if (this.countdownTask != null) this.countdownTask.cancel(true);
         if (this.status != Status.IDLE) {
+            this.status = Status.IDLE;
             this.sendMessage(Colors.BOLD + "The game has ended.");
             if (this.status != Status.JOINING) this.displayScores();
         }
