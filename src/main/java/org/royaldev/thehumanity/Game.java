@@ -19,7 +19,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 // TODO: Skip timeout
-// TODO: Fix skip when someone leaves during WAITING_FOR_CZAR
 // TODO: Fix only one card being removed for multi-card plays (aesthetically, apparently)
 
 public class Game {
@@ -215,11 +214,11 @@ public class Game {
 
     public void addPlay(User u, int... indices) {
         final List<WhiteCard> hand = this.hands.get(u);
-        if (hand == null) return; // TODO: Something about this
+        if (hand == null) return;
         final List<WhiteCard> play = new ArrayList<>();
         for (int i : indices) {
             i--;
-            if (i < 0 || i >= hand.size()) return; // TODO: Handle better
+            if (i < 0 || i >= hand.size()) return;
             play.add(hand.get(i));
         }
         this.addPlay(u, play);
