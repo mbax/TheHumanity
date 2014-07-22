@@ -397,6 +397,11 @@ public class Game {
                 this.sendMessage("Use " + Colors.BOLD + this.humanity.getPrefix() + "join" + Colors.NORMAL + " to join.");
                 break;
             case WAITING_FOR_PLAYERS:
+                if (this.users.size() < 3) {
+                    this.sendMessage(Colors.BOLD + "Not enough players to continue!");
+                    this.stop();
+                    return;
+                }
                 this.roundNumber++;
                 if (this.roundNumber != 1) this.displayScores();
                 this.plays.clear();
@@ -413,6 +418,11 @@ public class Game {
                 this.sendMessage(Colors.BOLD + this.currentBlackCard.getText());
                 break;
             case WAITING_FOR_CZAR:
+                if (this.users.size() < 3) {
+                    this.sendMessage(Colors.BOLD + "Not enough players to continue!");
+                    this.stop();
+                    return;
+                }
                 this.skipping.clear();
                 if (this.czar == null) break;
                 Collections.shuffle(this.plays);
