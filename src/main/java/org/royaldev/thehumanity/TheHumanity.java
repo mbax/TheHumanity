@@ -9,6 +9,7 @@ import org.kohsuke.args4j.spi.StringArrayOptionHandler;
 import org.kohsuke.args4j.spi.StringOptionHandler;
 import org.pircbotx.Channel;
 import org.pircbotx.Configuration;
+import org.pircbotx.IdentServer;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.exception.IrcException;
@@ -76,8 +77,9 @@ public class TheHumanity {
         this.parseArguments(args);
         this.loadCardPacks();
         this.registerCommands();
+        IdentServer.startServer();
         final Configuration.Builder<PircBotX> cb = new Configuration.Builder<>();
-        cb.setAutoNickChange(true).setAutoReconnect(true).setLogin(this.nickname).setMessageDelay(0L).setName(this.nickname).setRealName(this.nickname).setServer(this.server, this.serverPort);
+        cb.setAutoNickChange(true).setAutoReconnect(true).setLogin(this.nickname).setMessageDelay(0L).setName(this.nickname).setRealName(this.nickname).setServer(this.server, this.serverPort).setIdentServerEnabled(true);
         for (final String channel : this.channels) cb.addAutoJoinChannel(channel);
         cb.addListener(new BaseListeners(this)).addListener(new GameListeners(this));
         if (!this.nickserv.isEmpty()) cb.setNickservPassword(this.nickserv);
