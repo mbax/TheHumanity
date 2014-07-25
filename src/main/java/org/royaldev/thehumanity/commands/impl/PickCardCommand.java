@@ -4,11 +4,15 @@ import org.pircbotx.Colors;
 import org.pircbotx.User;
 import org.pircbotx.hooks.types.GenericMessageEvent;
 import org.royaldev.thehumanity.Game;
-import org.royaldev.thehumanity.Game.Status;
+import org.royaldev.thehumanity.Round;
+import org.royaldev.thehumanity.Round.RoundStage;
 import org.royaldev.thehumanity.TheHumanity;
-import org.royaldev.thehumanity.cards.Card.WhiteCard;
+import org.royaldev.thehumanity.cards.Play;
+import org.royaldev.thehumanity.cards.types.WhiteCard;
 import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
+import org.royaldev.thehumanity.player.Hand;
+import org.royaldev.thehumanity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +23,31 @@ public class PickCardCommand extends NoticeableCommand {
 
     public PickCardCommand(final TheHumanity humanity) {
         this.humanity = humanity;
+    }
+
+    @Override
+    public String[] getAliases() {
+        return new String[]{"pickcard", "p", "pc", "play", "playcard"};
+    }
+
+    @Override
+    public CommandType getCommandType() {
+        return CommandType.BOTH;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Chooses a card.";
+    }
+
+    @Override
+    public String getName() {
+        return "pick";
+    }
+
+    @Override
+    public String getUsage() {
+        return "<command> [number]";
     }
 
     @Override
@@ -33,8 +62,10 @@ public class PickCardCommand extends NoticeableCommand {
             this.notice(u, "You're not in any game!");
             return;
         }
-        if (g.getStatus() == Status.WAITING_FOR_CZAR) {
-            if (!g.getCzar().equals(u)) {
+        final Player p = g.getPlayer(u);
+        final Round r = g.getCurrentRound();
+        if (r.getCurrentStage() == RoundStage.WAITING_FOR_CZAR) {
+            if (!r.getCzar().equals(p)) {
                 this.notice(u, "You can't pick any cards right now.");
                 return;
             }
@@ -46,27 +77,23 @@ public class PickCardCommand extends NoticeableCommand {
                 return;
             }
             this.notice(u, "Play picked!");
-            g.chooseWinningPlay(winningPlay);
-        } else if (g.getStatus() == Status.WAITING_FOR_PLAYERS) {
-            if (g.getCzar().equals(u)) {
+            r.chooseWinningPlay(winningPlay);
+        } else if (r.getCurrentStage() == RoundStage.WAITING_FOR_PLAYERS) {
+            if (r.getCzar().equals(p)) {
                 this.notice(u, "You're the card czar! Wait until all the players have chosen their cards.");
                 return;
             }
-            if (g.hasPlayed(u)) {
+            if (r.hasPlayed(p)) {
                 this.notice(u, "You've already played!");
                 return;
             }
-            if (args.length != g.getCurrentBlackCard().getBlanks()) {
-                this.notice(u, Colors.BOLD + "Wrong amount of cards!" + Colors.NORMAL + " You need to pick exactly " + g.getCurrentBlackCard().getBlanks() + " cards.");
+            if (args.length != r.getBlackCard().getBlanks()) {
+                this.notice(u, Colors.BOLD + "Wrong amount of cards!" + Colors.NORMAL + " You need to pick exactly " + r.getBlackCard().getBlanks() + " cards.");
                 return;
             }
-            final List<WhiteCard> hand = g.getHand(u);
-            if (hand == null) {
-                this.notice(u, "You have no hand!");
-                return;
-            }
+            final Hand<WhiteCard> hand = p.getHand();
             final List<WhiteCard> play = new ArrayList<>();
-            for (String number : args) {
+            for (final String number : args) {
                 int card;
                 try {
                     card = Integer.parseInt(number);
@@ -75,45 +102,21 @@ public class PickCardCommand extends NoticeableCommand {
                     return;
                 }
                 card--;
-                if (card < 0 || card >= hand.size()) {
+                if (card < 0 || card >= hand.getSize()) {
                     this.notice(u, (card + 1) + " is not a valid choice.");
                     return;
                 }
-                final WhiteCard toPlay = hand.get(card);
+                final WhiteCard toPlay = hand.getCard(card);
                 if (play.contains(toPlay)) {
                     this.notice(u, "You cannot play the same card twice!");
                     return;
                 }
                 play.add(toPlay);
             }
-            g.addPlay(u, play);
+            this.notice(u, "Card" + (play.size() == 1 ? "" : "s") + " picked.");
+            r.addPlay(new Play(p, play));
         } else {
             this.notice(u, "You cannot pick a card right now.");
         }
-    }
-
-    @Override
-    public String getName() {
-        return "pick";
-    }
-
-    @Override
-    public String getUsage() {
-        return "<command> [number]";
-    }
-
-    @Override
-    public String getDescription() {
-        return "Chooses a card.";
-    }
-
-    @Override
-    public String[] getAliases() {
-        return new String[]{"pickcard", "p", "pc", "play", "playcard"};
-    }
-
-    @Override
-    public CommandType getCommandType() {
-        return CommandType.BOTH;
     }
 }

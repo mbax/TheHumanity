@@ -16,12 +16,18 @@ public class PacksCommand implements IRCCommand {
     }
 
     @Override
-    public void onCommand(GenericMessageEvent event, CallInfo ci, String[] args) {
-        final StringBuilder sb = new StringBuilder();
-        for (final CardPack cp : this.humanity.getLoadedCardPacks()) {
-            sb.append(Colors.BOLD).append(cp.getName()).append(Colors.NORMAL).append(", ");
-        }
-        event.respond(sb.substring(0, sb.length() - 2));
+    public String[] getAliases() {
+        return new String[0];
+    }
+
+    @Override
+    public CommandType getCommandType() {
+        return CommandType.BOTH;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Shows the loaded card packs.";
     }
 
     @Override
@@ -35,17 +41,11 @@ public class PacksCommand implements IRCCommand {
     }
 
     @Override
-    public String getDescription() {
-        return "Shows the loaded card packs.";
-    }
-
-    @Override
-    public String[] getAliases() {
-        return new String[0];
-    }
-
-    @Override
-    public CommandType getCommandType() {
-        return CommandType.BOTH;
+    public void onCommand(GenericMessageEvent event, CallInfo ci, String[] args) {
+        final StringBuilder sb = new StringBuilder();
+        for (final CardPack cp : this.humanity.getLoadedCardPacks()) {
+            sb.append(Colors.BOLD).append(cp.getName()).append(Colors.NORMAL).append(", ");
+        }
+        event.respond(sb.substring(0, sb.length() - 2));
     }
 }

@@ -6,6 +6,7 @@ import org.royaldev.thehumanity.Game;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
+import org.royaldev.thehumanity.player.Player;
 
 public class KickCommand extends NoticeableCommand {
 
@@ -13,6 +14,31 @@ public class KickCommand extends NoticeableCommand {
 
     public KickCommand(final TheHumanity instance) {
         this.humanity = instance;
+    }
+
+    @Override
+    public String[] getAliases() {
+        return new String[]{"k"};
+    }
+
+    @Override
+    public CommandType getCommandType() {
+        return CommandType.BOTH;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Kicks a player from the game.";
+    }
+
+    @Override
+    public String getName() {
+        return "kick";
+    }
+
+    @Override
+    public String getUsage() {
+        return "<command> [player]";
     }
 
     @Override
@@ -27,35 +53,11 @@ public class KickCommand extends NoticeableCommand {
             this.notice(u, "You're not in a game.");
             return;
         }
-        if (!g.getChannel().getOps().contains(u) && !g.getHost().equals(u)) {
+        final Player p = g.getPlayer(u);
+        if (!g.getChannel().getOps().contains(u) && !g.getHost().equals(p)) {
             this.notice(u, "You're not an op or the host!");
             return;
         }
-        g.removeUser(args[0]);
-    }
-
-    @Override
-    public String getName() {
-        return "kick";
-    }
-
-    @Override
-    public String getUsage() {
-        return "<command> [player]";
-    }
-
-    @Override
-    public String getDescription() {
-        return "Kicks a player from the game.";
-    }
-
-    @Override
-    public String[] getAliases() {
-        return new String[]{"k"};
-    }
-
-    @Override
-    public CommandType getCommandType() {
-        return CommandType.BOTH;
+        g.removePlayer(args[0]);
     }
 }

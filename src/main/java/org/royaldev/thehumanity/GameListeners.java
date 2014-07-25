@@ -18,15 +18,15 @@ public class GameListeners extends ListenerAdapter<PircBotX> {
     public void onPart(PartEvent<PircBotX> event) throws Exception {
         final User u = event.getUser();
         final Game g = this.humanity.getGameFor(u);
-        if (g == null || !g.hasUser(u)) return;
-        g.removeUser(event.getUser());
+        if (g == null) return;
+        g.removePlayer(g.getPlayer(event.getUser()));
     }
 
     @Override
     public void onQuit(QuitEvent<PircBotX> event) throws Exception {
         final User u = event.getUser();
         final Game g = this.humanity.getGameFor(u);
-        if (g == null || !g.hasUser(u)) return;
-        g.removeUser(event.getUser());
+        if (g == null) return;
+        g.removePlayer(g.getPlayer(event.getUser()));
     }
 }

@@ -12,6 +12,21 @@ import java.util.Collection;
 public interface Handler<T, U> {
 
     /**
+     * Gets a registered object in this Handler by its identifier.
+     *
+     * @param identifier Identifier attached to a registered object
+     * @return Object if an object was registered with the supplied identifier, null if otherwise
+     */
+    public T get(U identifier);
+
+    /**
+     * Gets all registered objects in this Handler.
+     *
+     * @return Collection of all registered objects in this Handler. Never null
+     */
+    public Collection<T> getAll();
+
+    /**
      * Registers the object in this Handler.
      *
      * @param obj Object to register
@@ -26,20 +41,5 @@ public interface Handler<T, U> {
      * @return If object was unregistered
      */
     public boolean unregister(T obj);
-
-    /**
-     * Gets a registered object in this Handler by its identifier.
-     *
-     * @param identifier Identifier attached to a registered object
-     * @return Object if an object was registered with the supplied identifier, null if otherwise
-     */
-    public T get(U identifier);
-
-    /**
-     * Gets all registered objects in this Handler.
-     *
-     * @return Collection of all registered objects in this Handler. Never null
-     */
-    public Collection<T> getAll();
 
 }

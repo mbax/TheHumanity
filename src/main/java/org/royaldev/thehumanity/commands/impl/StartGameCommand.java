@@ -21,25 +21,18 @@ public class StartGameCommand extends NoticeableCommand {
     }
 
     @Override
-    public void onCommand(GenericMessageEvent event, CallInfo ci, String[] args) {
-        if (!(event instanceof MessageEvent)) return;
-        final User u = event.getUser();
-        final MessageEvent e = (MessageEvent) event;
-        if (this.humanity.getGames().containsKey(e.getChannel())) {
-            this.notice(u, "There is already a game in this channel.");
-            return;
-        }
-        final List<CardPack> cardPacks = new ArrayList<>();
-        for (final String cardPack : args) {
-            final CardPack cp = this.humanity.getCardPack(cardPack);
-            if (cp == null) continue;
-            cardPacks.add(cp);
-        }
-        if (cardPacks.isEmpty()) cardPacks.addAll(this.humanity.getLoadedCardPacks());
-        final Game g = new Game(this.humanity, e.getChannel(), cardPacks);
-        g.setHost(event.getUser());
-        this.humanity.getGames().put(e.getChannel(), g);
-        g.start();
+    public String[] getAliases() {
+        return new String[]{"start"};
+    }
+
+    @Override
+    public CommandType getCommandType() {
+        return CommandType.MESSAGE;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Starts a new game of Cards Against Humanity.";
     }
 
     @Override
@@ -53,17 +46,25 @@ public class StartGameCommand extends NoticeableCommand {
     }
 
     @Override
-    public String getDescription() {
-        return "Starts a new game of Cards Against Humanity.";
-    }
-
-    @Override
-    public String[] getAliases() {
-        return new String[]{"start"};
-    }
-
-    @Override
-    public CommandType getCommandType() {
-        return CommandType.MESSAGE;
+    public void onCommand(GenericMessageEvent event, CallInfo ci, String[] args) {
+        if (!(event instanceof MessageEvent)) return;
+        final User u = event.getUser();
+        final MessageEvent e = (MessageEvent) event;
+        if (this.humanity.getGames().containsKey(e.getChannel())) {
+            this.notice(u, "There is already a game in this channel.");
+            return;
+        }
+        // TODO: Implement default packs
+        final List<CardPack> cardPacks = new ArrayList<>();
+        for (final String cardPack : args) {
+            final CardPack cp = this.humanity.getCardPack(cardPack);
+            if (cp == null) continue;
+            cardPacks.add(cp);
+        }
+        if (cardPacks.isEmpty()) cardPacks.addAll(this.humanity.getLoadedCardPacks());
+        final Game g = new Game(this.humanity, e.getChannel(), cardPacks);
+        this.humanity.getGames().put(e.getChannel(), g);
+        g.start();
+        g.setHost(g.createPlayer(event.getUser()));
     }
 }

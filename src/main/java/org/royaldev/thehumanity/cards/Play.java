@@ -1,23 +1,23 @@
 package org.royaldev.thehumanity.cards;
 
 import org.pircbotx.Colors;
-import org.pircbotx.User;
-import org.royaldev.thehumanity.cards.Card.WhiteCard;
+import org.royaldev.thehumanity.cards.types.WhiteCard;
+import org.royaldev.thehumanity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Play {
 
-    private final User player;
+    private final Player player;
     private final List<WhiteCard> whiteCards = new ArrayList<>();
 
-    public Play(final User player, final List<WhiteCard> whiteCards) {
+    public Play(final Player player, final List<WhiteCard> whiteCards) {
         this.player = player;
         this.whiteCards.addAll(whiteCards);
     }
 
-    public User getPlayer() {
+    public Player getPlayer() {
         return this.player;
     }
 

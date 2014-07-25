@@ -20,14 +20,18 @@ public class HelpCommand extends NoticeableCommand {
     }
 
     @Override
-    public void onCommand(GenericMessageEvent event, CallInfo ci, String[] args) {
-        final User u = event.getUser();
-        if (!(event instanceof PrivateMessageEvent)) this.notice(u, "Check your private messages.");
-        for (final IRCCommand ic : this.humanity.getCommandHandler().getAll()) {
-            u.send().message(Colors.BOLD + this.humanity.getPrefix() + ic.getName() + Colors.NORMAL+ " – " + ic.getDescription());
-            u.send().message("  Usage: " + ic.getUsage().replaceAll("<command>", ic.getName()));
-            u.send().message("  Aliases: " + Arrays.toString(ic.getAliases()));
-        }
+    public String[] getAliases() {
+        return new String[0];
+    }
+
+    @Override
+    public CommandType getCommandType() {
+        return CommandType.BOTH;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Gets the help for all commands.";
     }
 
     @Override
@@ -41,17 +45,13 @@ public class HelpCommand extends NoticeableCommand {
     }
 
     @Override
-    public String getDescription() {
-        return "Gets the help for all commands.";
-    }
-
-    @Override
-    public String[] getAliases() {
-        return new String[0];
-    }
-
-    @Override
-    public CommandType getCommandType() {
-        return CommandType.BOTH;
+    public void onCommand(GenericMessageEvent event, CallInfo ci, String[] args) {
+        final User u = event.getUser();
+        if (!(event instanceof PrivateMessageEvent)) this.notice(u, "Check your private messages.");
+        for (final IRCCommand ic : this.humanity.getCommandHandler().getAll()) {
+            u.send().message(Colors.BOLD + this.humanity.getPrefix() + ic.getName() + Colors.NORMAL + " – " + ic.getDescription());
+            u.send().message("  Usage: " + ic.getUsage().replaceAll("<command>", ic.getName()));
+            u.send().message("  Aliases: " + Arrays.toString(ic.getAliases()));
+        }
     }
 }

@@ -8,15 +8,25 @@ import org.pircbotx.hooks.types.GenericMessageEvent;
 public interface IRCCommand {
 
     /**
-     * This method is called when a command is received. Depending on what {@link #getCommandType()} returns, the event
-     * passed to this method will either be a {@link org.pircbotx.hooks.events.MessageEvent} or a
-     * {@link org.pircbotx.hooks.events.PrivateMessageEvent}.
+     * Gets an array of names that can be used for this command.
      *
-     * @param event Event of receiving command
-     * @param ci    Information received when this command was called
-     * @param args  Arguments passed to the command
+     * @return Array, not null
      */
-    public void onCommand(GenericMessageEvent event, CallInfo ci, String[] args);
+    public String[] getAliases();
+
+    /**
+     * This should return what type of command this is.
+     *
+     * @return CommandType
+     */
+    public CommandType getCommandType();
+
+    /**
+     * Gets a brief description of the command.
+     *
+     * @return <em>Brief</em> description
+     */
+    public String getDescription();
 
     /**
      * This should return the name of the command. An example would be "ping"
@@ -37,25 +47,15 @@ public interface IRCCommand {
     public String getUsage();
 
     /**
-     * Gets a brief description of the command.
+     * This method is called when a command is received. Depending on what {@link #getCommandType()} returns, the event
+     * passed to this method will either be a {@link org.pircbotx.hooks.events.MessageEvent} or a
+     * {@link org.pircbotx.hooks.events.PrivateMessageEvent}.
      *
-     * @return <em>Brief</em> description
+     * @param event Event of receiving command
+     * @param ci    Information received when this command was called
+     * @param args  Arguments passed to the command
      */
-    public String getDescription();
-
-    /**
-     * Gets an array of names that can be used for this command.
-     *
-     * @return Array, not null
-     */
-    public String[] getAliases();
-
-    /**
-     * This should return what type of command this is.
-     *
-     * @return CommandType
-     */
-    public CommandType getCommandType();
+    public void onCommand(GenericMessageEvent event, CallInfo ci, String[] args);
 
     /**
      * CommandType defines where a command can be used.

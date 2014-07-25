@@ -53,29 +53,6 @@ public class CommandHandler implements Handler<IRCCommand, String> {
     }
 
     /**
-     * Removes a registered command by its name. Case does not matter.
-     * <br/>
-     * If no command is registered under the provided name, this method does nothing.
-     *
-     * @param name Name to remove
-     * @return If command was unregistered
-     */
-    public boolean unregister(String name) {
-        name = name.toLowerCase();
-        boolean wasRemoved = false;
-        synchronized (commands) {
-            if (commands.containsKey(name)) {
-                commands.remove(name);
-                wasRemoved = true;
-            }
-        }
-        synchronized (aliasCommands) {
-            if (aliasCommands.containsKey(name)) aliasCommands.remove(name);
-        }
-        return wasRemoved;
-    }
-
-    /**
      * Gets a command for the command name. Case does not matter.
      *
      * @param name Name of the command to get
@@ -101,5 +78,28 @@ public class CommandHandler implements Handler<IRCCommand, String> {
         synchronized (commands) {
             return commands.values();
         }
+    }
+
+    /**
+     * Removes a registered command by its name. Case does not matter.
+     * <br/>
+     * If no command is registered under the provided name, this method does nothing.
+     *
+     * @param name Name to remove
+     * @return If command was unregistered
+     */
+    public boolean unregister(String name) {
+        name = name.toLowerCase();
+        boolean wasRemoved = false;
+        synchronized (commands) {
+            if (commands.containsKey(name)) {
+                commands.remove(name);
+                wasRemoved = true;
+            }
+        }
+        synchronized (aliasCommands) {
+            if (aliasCommands.containsKey(name)) aliasCommands.remove(name);
+        }
+        return wasRemoved;
     }
 }

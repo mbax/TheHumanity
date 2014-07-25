@@ -1,7 +1,7 @@
 package org.royaldev.thehumanity.cards;
 
-import org.royaldev.thehumanity.cards.Card.BlackCard;
-import org.royaldev.thehumanity.cards.Card.WhiteCard;
+import org.royaldev.thehumanity.cards.types.BlackCard;
+import org.royaldev.thehumanity.cards.types.WhiteCard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,23 +29,23 @@ public class CardPack {
         else throw new IllegalArgumentException("Unknown card type!");
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public List<BlackCard> getBlackCards() {
-        return new ArrayList<>(this.blackCards);
-    }
-
-    public List<WhiteCard> getWhiteCards() {
-        return new ArrayList<>(this.whiteCards);
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof CardPack)) return false;
         final CardPack cp = (CardPack) obj;
         return cp.getName().equals(this.getName());
+    }
+
+    public List<BlackCard> getBlackCards() {
+        return new ArrayList<>(this.blackCards);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<WhiteCard> getWhiteCards() {
+        return new ArrayList<>(this.whiteCards);
     }
 }

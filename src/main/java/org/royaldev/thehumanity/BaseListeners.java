@@ -75,10 +75,7 @@ final class BaseListeners extends ListenerAdapter<PircBotX> {
         if (message.charAt(0) != this.humanity.getPrefix() && !isPrivateMessage) return;
         final String[] split = message.trim().split(" ");
         final String commandString = (!isPrivateMessage) ? split[0].substring(1, split[0].length()) : split[0];
-        IRCCommand command = this.humanity.getCommandHandler().get(commandString);
-        if (command == null && !isPrivateMessage) { // search for channel-specific commands
-            command = this.humanity.getCommandHandler().get(commandString + ":" + ((MessageEvent) e).getChannel().getName());
-        }
+        final IRCCommand command = this.humanity.getCommandHandler().get(commandString);
         if (command == null) {
             if (isPrivateMessage) e.respond("No such command.");
             return;

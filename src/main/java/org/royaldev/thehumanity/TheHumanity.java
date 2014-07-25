@@ -12,9 +12,9 @@ import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.exception.IrcException;
-import org.royaldev.thehumanity.cards.Card.BlackCard;
-import org.royaldev.thehumanity.cards.Card.WhiteCard;
 import org.royaldev.thehumanity.cards.CardPack;
+import org.royaldev.thehumanity.cards.types.BlackCard;
+import org.royaldev.thehumanity.cards.types.WhiteCard;
 import org.royaldev.thehumanity.commands.impl.CardsCommand;
 import org.royaldev.thehumanity.commands.impl.HelpCommand;
 import org.royaldev.thehumanity.commands.impl.JoinGameCommand;
@@ -99,43 +99,6 @@ public class TheHumanity {
         new TheHumanity(args);
     }
 
-    private void registerCommands() {
-        this.getCommandHandler().register(new StartGameCommand(this));
-        this.getCommandHandler().register(new JoinGameCommand(this));
-        this.getCommandHandler().register(new PickCardCommand(this));
-        this.getCommandHandler().register(new StopGameCommand(this));
-        this.getCommandHandler().register(new LeaveGameCommand(this));
-        this.getCommandHandler().register(new PacksCommand(this));
-        this.getCommandHandler().register(new WhoCommand(this));
-        this.getCommandHandler().register(new KickCommand(this));
-        this.getCommandHandler().register(new SkipCommand(this));
-        this.getCommandHandler().register(new HelpCommand(this));
-        this.getCommandHandler().register(new CardsCommand(this));
-    }
-
-    private void parseArguments(final String[] args) {
-        final CmdLineParser clp = new CmdLineParser(this);
-        try {
-            clp.parseArgument(args);
-        } catch (CmdLineException e) {
-            this.getLogger().info(e.getMessage());
-            e.getParser().printUsage(System.out);
-            System.exit(1);
-        }
-    }
-
-    private void setUpLogger() {
-        final ConsoleHandler ch = new ConsoleHandler();
-        ch.setFormatter(new Formatter() {
-            @Override
-            public String format(LogRecord logRecord) {
-                return "[" + logRecord.getLevel().getLocalizedName() + "] " + logRecord.getMessage() + "\n";
-            }
-        });
-        this.getLogger().setUseParentHandlers(false);
-        this.getLogger().addHandler(ch);
-    }
-
     private void loadCardPacks() {
         for (final String cardPack : this.cardPacks) {
             final File f = new File("cardpacks", cardPack);
@@ -182,14 +145,51 @@ public class TheHumanity {
         }
     }
 
-    public Logger getLogger() {
-        return this.l;
+    private void parseArguments(final String[] args) {
+        final CmdLineParser clp = new CmdLineParser(this);
+        try {
+            clp.parseArgument(args);
+        } catch (CmdLineException e) {
+            this.getLogger().info(e.getMessage());
+            e.getParser().printUsage(System.out);
+            System.exit(1);
+        }
+    }
+
+    private void registerCommands() {
+        this.getCommandHandler().register(new StartGameCommand(this));
+        this.getCommandHandler().register(new JoinGameCommand(this));
+        this.getCommandHandler().register(new PickCardCommand(this));
+        this.getCommandHandler().register(new StopGameCommand(this));
+        this.getCommandHandler().register(new LeaveGameCommand(this));
+        this.getCommandHandler().register(new PacksCommand(this));
+        this.getCommandHandler().register(new WhoCommand(this));
+        this.getCommandHandler().register(new KickCommand(this));
+        this.getCommandHandler().register(new SkipCommand(this));
+        this.getCommandHandler().register(new HelpCommand(this));
+        this.getCommandHandler().register(new CardsCommand(this));
+    }
+
+    private void setUpLogger() {
+        final ConsoleHandler ch = new ConsoleHandler();
+        ch.setFormatter(new Formatter() {
+            @Override
+            public String format(LogRecord logRecord) {
+                return "[" + logRecord.getLevel().getLocalizedName() + "] " + logRecord.getMessage() + "\n";
+            }
+        });
+        this.getLogger().setUseParentHandlers(false);
+        this.getLogger().addHandler(ch);
     }
 
     public void addCardPack(final CardPack cp) {
         synchronized (this.loadedCardPacks) {
             this.loadedCardPacks.add(cp);
         }
+    }
+
+    public PircBotX getBot() {
+        return this.bot;
     }
 
     public CardPack getCardPack(final String name) {
@@ -201,53 +201,45 @@ public class TheHumanity {
         return null;
     }
 
-    public List<CardPack> getLoadedCardPacks() {
-        synchronized (this.loadedCardPacks) {
-            return this.loadedCardPacks;
-        }
-    }
-
-    public Game getGameFor(String nickname) {
-        for (final Game game : this.getGames().values()) {
-            if (!game.hasUser(nickname)) continue;
-            return game;
-        }
-        return null;
+    public CommandHandler getCommandHandler() {
+        return this.ch;
     }
 
     public Game getGameFor(User u) {
         for (final Game game : this.getGames().values()) {
-            if (!game.hasUser(u)) continue;
+            if (!game.hasPlayer(u.getNick())) continue;
             return game;
         }
         return null;
-    }
-
-    public boolean usersMatch(User u, User u2) {
-        return u.getNick().equals(u2.getNick()); // because PircBotX doesn't know how to use UUIDs because OOHHHHH NO
     }
 
     public Game getGameFor(Channel c) {
         return this.getGames().get(c);
     }
 
-    public char getPrefix() {
-        return this.prefix;
-    }
-
-    public PircBotX getBot() {
-        return this.bot;
-    }
-
-    public CommandHandler getCommandHandler() {
-        return this.ch;
-    }
-
     public Map<Channel, Game> getGames() {
         return this.games;
     }
 
+    public List<CardPack> getLoadedCardPacks() {
+        synchronized (this.loadedCardPacks) {
+            return this.loadedCardPacks;
+        }
+    }
+
+    public Logger getLogger() {
+        return this.l;
+    }
+
+    public char getPrefix() {
+        return this.prefix;
+    }
+
     public ScheduledThreadPoolExecutor getThreadPool() {
         return this.stpe;
+    }
+
+    public boolean usersMatch(User u, User u2) {
+        return u.getNick().equals(u2.getNick()); // because PircBotX doesn't know how to use UUIDs because OOHHHHH NO
     }
 }

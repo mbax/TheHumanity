@@ -3,9 +3,11 @@ package org.royaldev.thehumanity.commands.impl;
 import org.pircbotx.User;
 import org.pircbotx.hooks.types.GenericMessageEvent;
 import org.royaldev.thehumanity.Game;
+import org.royaldev.thehumanity.Round;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
+import org.royaldev.thehumanity.player.Player;
 
 public class SkipCommand extends NoticeableCommand {
 
@@ -13,6 +15,31 @@ public class SkipCommand extends NoticeableCommand {
 
     public SkipCommand(TheHumanity instance) {
         this.humanity = instance;
+    }
+
+    @Override
+    public String[] getAliases() {
+        return new String[0];
+    }
+
+    @Override
+    public CommandType getCommandType() {
+        return CommandType.BOTH;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Skips a player for the round.";
+    }
+
+    @Override
+    public String getName() {
+        return "skip";
+    }
+
+    @Override
+    public String getUsage() {
+        return "<command> [player]";
     }
 
     @Override
@@ -27,44 +54,22 @@ public class SkipCommand extends NoticeableCommand {
             this.notice(u, "You're not in any game.");
             return;
         }
-        if (!g.getChannel().getOps().contains(u) && !g.getHost().equals(u) && !u.getNick().equalsIgnoreCase(args[0])) {
+        final Player p = g.getPlayer(u);
+        final Player t = g.getPlayer(args[0]);
+        if (t == null) {
+            this.notice(u, "That person is not playing in this game.");
+            return;
+        }
+        final Round r = g.getCurrentRound();
+        if (!g.getChannel().getOps().contains(u) && !g.getHost().equals(p) && !u.getNick().equalsIgnoreCase(args[0])) {
             this.notice(u, "You're not an op, the host, or skipping yourself!");
             return;
         }
-        if (!g.hasUser(args[0])) {
-            this.notice(u, "No such user to skip!");
-            return;
-        }
-        if (g.isSkipping(args[0])) {
+        if (r.isSkipped(t)) {
             this.notice(u, "That user is already skipped.");
             return;
         }
-        g.skip(args[0]);
+        r.skip(t);
         this.notice(u, "User skipped.");
-    }
-
-    @Override
-    public String getName() {
-        return "skip";
-    }
-
-    @Override
-    public String getUsage() {
-        return "<command> [player]";
-    }
-
-    @Override
-    public String getDescription() {
-        return "Skips a player for the round.";
-    }
-
-    @Override
-    public String[] getAliases() {
-        return new String[0];
-    }
-
-    @Override
-    public CommandType getCommandType() {
-        return CommandType.BOTH;
     }
 }

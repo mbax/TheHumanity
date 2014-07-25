@@ -16,14 +16,18 @@ public class CardsCommand extends NoticeableCommand {
     }
 
     @Override
-    public void onCommand(GenericMessageEvent event, CallInfo ci, String[] args) {
-        final User u = event.getUser();
-        final Game g = this.humanity.getGameFor(u);
-        if (g == null) {
-            this.notice(u, "You're not in a game.");
-            return;
-        }
-        g.showCards(u);
+    public String[] getAliases() {
+        return new String[0];
+    }
+
+    @Override
+    public CommandType getCommandType() {
+        return CommandType.BOTH;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Shows your your cards.";
     }
 
     @Override
@@ -37,17 +41,13 @@ public class CardsCommand extends NoticeableCommand {
     }
 
     @Override
-    public String getDescription() {
-        return "Shows your your cards.";
-    }
-
-    @Override
-    public String[] getAliases() {
-        return new String[0];
-    }
-
-    @Override
-    public CommandType getCommandType() {
-        return CommandType.BOTH;
+    public void onCommand(GenericMessageEvent event, CallInfo ci, String[] args) {
+        final User u = event.getUser();
+        final Game g = this.humanity.getGameFor(u);
+        if (g == null) {
+            this.notice(u, "You're not in a game.");
+            return;
+        }
+        g.showCards(g.getPlayer(u));
     }
 }
