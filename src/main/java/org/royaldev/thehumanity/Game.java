@@ -284,8 +284,8 @@ public class Game {
 
     public void showScores() {
         final Map<Player, Integer> scores = new HashMap<>();
-        synchronized (this.players) {
-            for (final Player p : this.players) scores.put(p, p.getScore());
+        synchronized (this.allPlayers) {
+            for (final Player p : this.allPlayers) scores.put(p, p.getScore());
         }
         final Map<Player, Integer> sortedScores = new TreeMap<>(new DescendingValueComparator(scores));
         sortedScores.putAll(scores);
