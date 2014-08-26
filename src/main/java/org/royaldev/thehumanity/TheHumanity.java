@@ -67,6 +67,8 @@ public class TheHumanity {
     private char prefix = '!';
     @Option(name = "-N", usage = "NickServ password to identify with.", handler = StringOptionHandler.class)
     private String nickserv = "";
+    @Option(name = "-d", usage = "Default packs to use on !start.", handler = StringArrayOptionHandler.class)
+    private String[] defaultPacks = new String[0];
 
     private Logger l = Logger.getLogger("org.royaldev.thehumanity");
     private ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(1);
@@ -203,6 +205,10 @@ public class TheHumanity {
 
     public CommandHandler getCommandHandler() {
         return this.ch;
+    }
+
+    public String[] getDefaultPacks() {
+        return this.defaultPacks.clone();
     }
 
     public Game getGameFor(User u) {

@@ -54,14 +54,20 @@ public class StartGameCommand extends NoticeableCommand {
             this.notice(u, "There is already a game in this channel.");
             return;
         }
-        // TODO: Implement default packs
         final List<CardPack> cardPacks = new ArrayList<>();
         for (final String cardPack : args) {
             final CardPack cp = this.humanity.getCardPack(cardPack);
             if (cp == null) continue;
             cardPacks.add(cp);
         }
-        if (cardPacks.isEmpty()) cardPacks.addAll(this.humanity.getLoadedCardPacks());
+        if (cardPacks.isEmpty()) {
+            for (String cardPack : this.humanity.getDefaultPacks()) {
+                final CardPack cp = this.humanity.getCardPack(cardPack);
+                if (cp == null) continue;
+                cardPacks.add(cp);
+            }
+            if (cardPacks.isEmpty()) cardPacks.addAll(this.humanity.getLoadedCardPacks());
+        }
         final Game g = new Game(this.humanity, e.getChannel(), cardPacks);
         this.humanity.getGames().put(e.getChannel(), g);
         g.start();
