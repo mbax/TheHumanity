@@ -26,38 +26,39 @@ final class BaseListeners extends ListenerAdapter<PircBotX> {
     }
 
     @Override
-    public void onConnect(ConnectEvent<PircBotX> event) throws Exception {
+    public void onConnect(final ConnectEvent<PircBotX> event) throws Exception {
         event.getBot().sendIRC().mode(event.getBot().getNick(), "+B");
     }
 
     @Override
-    public void onInvite(InviteEvent e) {
+    public void onInvite(final InviteEvent<PircBotX> e) {
         e.getBot().sendIRC().joinChannel(e.getChannel());
         this.humanity.getLogger().info("Invited to " + e.getChannel() + " by " + e.getUser() + ".");
     }
 
     @Override
-    public void onJoin(JoinEvent e) {
+    public void onJoin(final JoinEvent<PircBotX> e) {
+        if (e.getChannel().getUsers().size() < 1) e.getChannel().send().part("Alone.");
         if (!e.getUser().getNick().equals(this.humanity.getBot().getUserBot().getNick())) return;
         this.humanity.getLogger().info("Joined " + e.getChannel().getName() + ".");
     }
 
     @Override
-    public void onKick(KickEvent e) {
+    public void onKick(final KickEvent<PircBotX> e) {
         if (!e.getUser().getNick().equals(this.humanity.getBot().getUserBot().getNick())) return;
         this.humanity.getLogger().info("Kicked from " + e.getChannel().getName() + ".");
     }
 
     @Override
-    public void onPart(PartEvent e) {
-        if (e.getChannel().getUsers().size() < 2) e.getChannel().send().part("Alone.");
+    public void onPart(final PartEvent<PircBotX> e) {
+        if (e.getDaoSnapshot().getUsers(e.getChannel()).size() <= 2) e.getChannel().send().part("Alone.");
         if (!e.getUser().getNick().equals(this.humanity.getBot().getUserBot().getNick())) return;
         this.humanity.getLogger().info("Parted from " + e.getChannel().getName() + ".");
     }
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    public void onGenericMessage(GenericMessageEvent e) {
+    public void onGenericMessage(final GenericMessageEvent<PircBotX> e) {
         if (!(e instanceof MessageEvent) && !(e instanceof PrivateMessageEvent)) return;
         final boolean isPrivateMessage = e instanceof PrivateMessageEvent;
         String message = e.getMessage();
