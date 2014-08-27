@@ -50,6 +50,7 @@ final class BaseListeners extends ListenerAdapter<PircBotX> {
 
     @Override
     public void onPart(PartEvent e) {
+        if (e.getChannel().getUsers().size() < 2) e.getChannel().send().part("Alone.");
         if (!e.getUser().getNick().equals(this.humanity.getBot().getUserBot().getNick())) return;
         this.humanity.getLogger().info("Parted from " + e.getChannel().getName() + ".");
     }
