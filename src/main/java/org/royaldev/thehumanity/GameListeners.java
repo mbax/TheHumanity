@@ -18,7 +18,7 @@ public class GameListeners extends ListenerAdapter<PircBotX> {
     public void onPart(PartEvent<PircBotX> event) throws Exception {
         final User u = event.getUser();
         final Game g = this.humanity.getGameFor(u);
-        if (g == null) return;
+        if (g == null || g.getChannel().getName().equalsIgnoreCase(event.getChannel().getName())) return;
         g.removePlayer(g.getPlayer(event.getUser()));
     }
 
