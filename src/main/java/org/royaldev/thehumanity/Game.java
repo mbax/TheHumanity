@@ -47,15 +47,15 @@ public class Game {
         this.deck = new Deck(cardPacks);
     }
 
-    public void addPlayer(Player player) {
+    public void addPlayer(final Player player) {
         if (this.hasPlayer(player)) return;
         if (!this.setOldUserData(player)) {
             synchronized (this.players) {
                 this.players.add(player);
             }
-        }
-        synchronized (this.allPlayers) {
-            this.allPlayers.add(player);
+            synchronized (this.allPlayers) {
+                this.allPlayers.add(player);
+            }
         }
         int totalCards = 0;
         for (final CardPack cp : this.getDeck().getCardPacks()) totalCards += cp.getWhiteCards().size();
@@ -222,7 +222,7 @@ public class Game {
         }
     }
 
-    public void removePlayer(Player p) {
+    public void removePlayer(final Player p) {
         synchronized (this.players) {
             if (!this.players.remove(p)) return;
         }
@@ -241,7 +241,7 @@ public class Game {
         this.removePlayer(this.getPlayer(this.channel.getBot().getUserChannelDao().getUser(name)));
     }
 
-    public void sendMessage(String message) {
+    public void sendMessage(final String message) {
         this.channel.send().message(this.antiPing(message));
     }
 
@@ -282,9 +282,13 @@ public class Game {
     }
 
     public void showScores() {
+        System.out.println("Game.showScores");
         final Map<Player, Integer> scores = new HashMap<>();
         synchronized (this.allPlayers) {
-            for (final Player p : this.allPlayers) scores.put(p, p.getScore());
+            for (final Player p : this.allPlayers) {
+                System.out.println(p.getUser().getNick() + ":" + p);
+                scores.put(p, p.getScore());
+            }
         }
         final Map<Player, Integer> sortedScores = new TreeMap<>(new DescendingValueComparator(scores));
         sortedScores.putAll(scores);
@@ -321,6 +325,7 @@ public class Game {
     }
 
     private class GameCountdown implements Runnable {
+
         private int runCount = 3; // 3 default
 
         @Override
