@@ -282,13 +282,9 @@ public class Game {
     }
 
     public void showScores() {
-        System.out.println("Game.showScores");
         final Map<Player, Integer> scores = new HashMap<>();
         synchronized (this.allPlayers) {
-            for (final Player p : this.allPlayers) {
-                System.out.println(p.getUser().getNick() + ":" + p);
-                scores.put(p, p.getScore());
-            }
+            for (final Player p : this.allPlayers) scores.put(p, p.getScore());
         }
         final Map<Player, Integer> sortedScores = new TreeMap<>(new DescendingValueComparator(scores));
         sortedScores.putAll(scores);
