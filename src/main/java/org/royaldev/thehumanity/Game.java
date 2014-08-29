@@ -250,7 +250,6 @@ public class Game {
         synchronized (this.allPlayers) {
             if (this.allPlayers.contains(newPlayer)) {
                 oldPlayer = this.allPlayers.get(this.allPlayers.indexOf(newPlayer));
-                this.allPlayers.remove(oldPlayer);
             } else return false;
         }
         final Hand<WhiteCard> hand = newPlayer.getHand();
@@ -291,7 +290,7 @@ public class Game {
         sortedScores.putAll(scores);
         final StringBuilder sb = new StringBuilder();
         sb.append(Colors.BOLD + "Scores:").append(Colors.NORMAL).append(" ");
-        for (Map.Entry<Player, Integer> entry : sortedScores.entrySet()) {
+        for (final Map.Entry<Player, Integer> entry : sortedScores.entrySet()) {
             sb.append(entry.getKey().getUser().getNick()).append(": ").append(entry.getValue() == null ? 0 : entry.getValue()).append(", ");
         }
         this.sendMessage(sb.toString().substring(0, sb.length() - 2));
