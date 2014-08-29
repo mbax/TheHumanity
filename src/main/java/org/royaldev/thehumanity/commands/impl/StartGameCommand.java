@@ -55,12 +55,17 @@ public class StartGameCommand extends NoticeableCommand {
             return;
         }
         final List<CardPack> cardPacks = new ArrayList<>();
+        boolean useDefaults = false;
         for (final String cardPack : args) {
+            if (cardPack.equalsIgnoreCase("default")) {
+                useDefaults = true;
+                continue;
+            }
             final CardPack cp = this.humanity.getCardPack(cardPack);
             if (cp == null) continue;
             cardPacks.add(cp);
         }
-        if (cardPacks.isEmpty()) {
+        if (cardPacks.isEmpty() || useDefaults) {
             for (String cardPack : this.humanity.getDefaultPacks()) {
                 final CardPack cp = this.humanity.getCardPack(cardPack);
                 if (cp == null) continue;
