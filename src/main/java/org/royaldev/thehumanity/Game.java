@@ -3,6 +3,7 @@ package org.royaldev.thehumanity;
 import org.pircbotx.Channel;
 import org.pircbotx.Colors;
 import org.pircbotx.User;
+import org.royaldev.thehumanity.Round.RoundStage;
 import org.royaldev.thehumanity.cards.CardPack;
 import org.royaldev.thehumanity.cards.Deck;
 import org.royaldev.thehumanity.cards.types.BlackCard;
@@ -219,6 +220,7 @@ public class Game {
                 this.sendMessage(Colors.BOLD + this.getCurrentRound().getBlackCard().getText());
                 this.showCards();
                 this.getCurrentRound().advanceStage();
+                break;
         }
     }
 
@@ -234,7 +236,9 @@ public class Game {
             this.advanceStage();
             return;
         }
-        if (this.getCurrentRound().hasAllPlaysMade()) this.getCurrentRound().advanceStage();
+        if (this.getCurrentRound().hasAllPlaysMade() && this.getCurrentRound().getCurrentStage() != RoundStage.WAITING_FOR_CZAR) {
+            this.getCurrentRound().advanceStage();
+        }
     }
 
     public void removePlayer(final String name) {

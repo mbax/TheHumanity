@@ -91,7 +91,7 @@ public class TheHumanity {
             public void run() {
                 try {
                     bot.startBot();
-                } catch (IOException | IrcException ex) {
+                } catch (final IOException | IrcException ex) {
                     ex.printStackTrace();
                 }
             }
@@ -114,9 +114,7 @@ public class TheHumanity {
                 continue;
             }
             final CardPack cp = new CardPack(CardPack.getNameFromFileName(f.getName()));
-            BufferedReader br = null;
-            try {
-                br = new BufferedReader(new FileReader(f));
+            try (final BufferedReader br = new BufferedReader(new FileReader(f))) {
                 String line;
                 boolean isBlack = false;
                 while ((line = br.readLine()) != null) {
@@ -135,14 +133,6 @@ public class TheHumanity {
             } catch (IOException ex) {
                 this.getLogger().warning(ex.getMessage());
                 continue;
-            } finally {
-                if (br != null) {
-                    try {
-                        br.close();
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                }
             }
             this.addCardPack(cp);
         }
@@ -212,7 +202,7 @@ public class TheHumanity {
         return this.defaultPacks.clone();
     }
 
-    public Game getGameFor(User u) {
+    public Game getGameFor(final User u) {
         for (final Game game : this.getGames().values()) {
             if (!game.hasPlayer(u.getNick())) continue;
             return game;
@@ -220,7 +210,7 @@ public class TheHumanity {
         return null;
     }
 
-    public Game getGameFor(Channel c) {
+    public Game getGameFor(final Channel c) {
         return this.getGames().get(c);
     }
 
@@ -246,7 +236,7 @@ public class TheHumanity {
         return this.stpe;
     }
 
-    public boolean usersMatch(User u, User u2) {
+    public boolean usersMatch(final User u, final User u2) {
         return u.getNick().equals(u2.getNick()); // because PircBotX doesn't know how to use UUIDs because OOHHHHH NO
     }
 }

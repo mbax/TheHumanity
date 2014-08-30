@@ -30,7 +30,7 @@ public class CardPack {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof CardPack)) return false;
         final CardPack cp = (CardPack) obj;
@@ -42,7 +42,7 @@ public class CardPack {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public List<WhiteCard> getWhiteCards() {
