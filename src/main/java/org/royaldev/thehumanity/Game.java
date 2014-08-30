@@ -236,7 +236,7 @@ public class Game {
             this.advanceStage();
             return;
         }
-        if (this.getCurrentRound().hasAllPlaysMade() && this.getCurrentRound().getCurrentStage() != RoundStage.WAITING_FOR_CZAR) {
+        if (this.getCurrentRound().hasAllPlaysMade() && this.getCurrentRound().getCurrentStage() == RoundStage.WAITING_FOR_PLAYERS) {
             this.getCurrentRound().advanceStage();
         }
     }
