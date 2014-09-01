@@ -54,6 +54,11 @@ public class StartGameCommand extends NoticeableCommand {
             this.notice(u, "There is already a game in this channel.");
             return;
         }
+        for (final Game game : this.humanity.getGames().values()) {
+            if (!game.hasPlayer(e.getUser().getNick())) continue;
+            this.notice(u, "You can't be in more than one game at a time!");
+            return;
+        }
         final List<CardPack> cardPacks = new ArrayList<>();
         boolean useDefaults = false;
         for (final String cardPack : args) {

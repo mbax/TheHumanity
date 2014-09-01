@@ -19,7 +19,7 @@ public class StopGameCommand extends NoticeableCommand {
 
     @Override
     public String[] getAliases() {
-        return new String[]{"stopgame"};
+        return new String[]{"stop"};
     }
 
     @Override
@@ -34,7 +34,7 @@ public class StopGameCommand extends NoticeableCommand {
 
     @Override
     public String getName() {
-        return "stop";
+        return "stopgame";
     }
 
     @Override

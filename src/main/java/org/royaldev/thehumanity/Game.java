@@ -22,7 +22,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 // TODO: Skip timeout
-// TODO: Fix only one card being removed for multi-card plays (aesthetically, apparently)
 
 public class Game {
 
@@ -348,14 +347,14 @@ public class Game {
 
     private class DescendingValueComparator implements Comparator<Player> {
 
-        private Map<Player, Integer> base;
+        private final Map<Player, Integer> base;
 
-        private DescendingValueComparator(Map<Player, Integer> base) {
+        private DescendingValueComparator(final Map<Player, Integer> base) {
             this.base = base;
         }
 
         @Override
-        public int compare(Player o1, Player o2) {
+        public int compare(final Player o1, final Player o2) {
             if (this.base.get(o1) >= this.base.get(o2)) return -1;
             else return 1;
         }

@@ -69,7 +69,7 @@ public class SkipCommand extends NoticeableCommand {
             this.notice(u, "That user is already skipped.");
             return;
         }
-        r.skip(t);
-        this.notice(u, "User skipped.");
+        if (r.skip(t)) this.notice(u, "User skipped.");
+        else this.notice(u, "User could not be skipped.");
     }
 }

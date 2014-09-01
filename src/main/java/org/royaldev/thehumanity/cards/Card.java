@@ -6,14 +6,14 @@ public abstract class Card {
     protected final String rawText;
     protected final String processedText;
 
-    protected Card(CardPack cardPack, String rawText) {
+    protected Card(final CardPack cardPack, final String rawText) {
         this.cardPack = cardPack;
         this.rawText = rawText;
         this.processedText = this.processText(this.rawText);
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof Card)) return false;
         final Card c = (Card) obj;

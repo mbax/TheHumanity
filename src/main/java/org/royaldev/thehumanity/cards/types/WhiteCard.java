@@ -5,12 +5,12 @@ import org.royaldev.thehumanity.cards.CardPack;
 
 public class WhiteCard extends Card {
 
-    public WhiteCard(CardPack cardPack, String rawText) {
+    public WhiteCard(final CardPack cardPack, final String rawText) {
         super(cardPack, rawText);
     }
 
     @Override
-    protected String processText(String rawText) {
+    protected String processText(final String rawText) {
         return rawText;
     }
 }

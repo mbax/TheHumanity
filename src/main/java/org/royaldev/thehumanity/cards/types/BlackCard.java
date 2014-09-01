@@ -12,11 +12,11 @@ public class BlackCard extends Card {
 
     private final static Pattern blankPattern = Pattern.compile("((?<!\\\\)_)");
 
-    public BlackCard(CardPack cardPack, String rawText) {
+    public BlackCard(final CardPack cardPack, final String rawText) {
         super(cardPack, rawText);
     }
 
-    private int countMatches(Pattern p, String toCount) {
+    private int countMatches(final Pattern p, final String toCount) {
         final Matcher m = p.matcher(toCount);
         int count = 0;
         while (m.find()) count++;
@@ -29,7 +29,7 @@ public class BlackCard extends Card {
             final Matcher m = BlackCard.blankPattern.matcher(filled);
             try {
                 filled = m.replaceFirst(Colors.BOLD + Pattern.quote(wc.getText()) + Colors.NORMAL);
-            } catch (IndexOutOfBoundsException ex) {
+            } catch (final IndexOutOfBoundsException ex) {
                 ex.printStackTrace();
             }
         }
@@ -41,7 +41,7 @@ public class BlackCard extends Card {
     }
 
     @Override
-    protected String processText(String rawText) {
+    protected String processText(final String rawText) {
         return BlackCard.blankPattern.matcher(rawText).replaceAll("<BLANK>").replace("\\_", "_");
     }
 }

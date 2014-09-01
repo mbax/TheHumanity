@@ -223,11 +223,24 @@ public class Round {
      *
      * @param p Player to skip
      */
-    public void skip(final Player p) {
-        if (!this.isSkipped(p)) return;
+    public boolean skip(final Player p) {
+        if (this.isSkipped(p)) return false;
         synchronized (this.skippedPlayers) {
             this.skippedPlayers.add(p);
         }
+        switch (this.getCurrentStage()) {
+            case WAITING_FOR_PLAYERS:
+                if (this.hasAllPlaysMade()) this.advanceStage();
+                break;
+            case WAITING_FOR_CZAR:
+                if (p.equals(this.getCzar())) {
+                    this.getGame().sendMessage(Colors.BOLD + "The czar has been skipped!" + Colors.NORMAL + " Returning your cards and starting a new round.");
+                    this.returnCards();
+                    this.advanceStage();
+                }
+                break;
+        }
+        return true;
     }
 
     public enum RoundStage {
