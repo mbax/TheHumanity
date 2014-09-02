@@ -98,7 +98,7 @@ public class Game {
 
     public void deal(final Player player) {
         final Hand<WhiteCard> hand = player.getHand();
-        while (hand.getSize() < 7) hand.addCard(this.getDeck().getRandomWhiteCard(null));
+        while (hand.getSize() < 10) hand.addCard(this.getDeck().getRandomWhiteCard(null));
     }
 
     public void deal() {
