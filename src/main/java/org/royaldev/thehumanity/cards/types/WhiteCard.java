@@ -11,6 +11,6 @@ public class WhiteCard extends Card {
 
     @Override
     protected String processText(final String rawText) {
-        return rawText.replaceAll("\\\\#", "#");
+        return rawText.replace("\\#", "#");
     }
 }
