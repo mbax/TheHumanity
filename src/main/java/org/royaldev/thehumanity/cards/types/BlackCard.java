@@ -28,7 +28,7 @@ public class BlackCard extends Card {
         for (final WhiteCard wc : p.getWhiteCards()) {
             final Matcher m = BlackCard.blankPattern.matcher(filled);
             try {
-                filled = m.replaceFirst(Colors.BOLD + Pattern.quote(wc.getText()) + Colors.NORMAL);
+                filled = m.replaceFirst(Colors.BOLD + wc.getText().replaceAll("([\\\\\\$])", "\\\\$1") + Colors.NORMAL);
             } catch (final IndexOutOfBoundsException ex) {
                 ex.printStackTrace();
             }
