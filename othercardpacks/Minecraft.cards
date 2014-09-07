@@ -14,6 +14,7 @@ In order to submit a Bukkit PR, it must have _, _, and _.
 In the new CraftBukkit build, the method that _ is now ambiguous.
 lDucks abuses lol768 whenever _.
 The DBO staff will love reviewing my latest upload. I put more _ in it!
+The PR for _ got closed with a link to the CONTRIBUTING.md right away.
 There are more posts about _ in the resources section than _.
 We will eventually all realize that hawkfalcon has really been _ in disguise all along.
 What do you need to do to get your PR on CraftBukkit accepted without having to make any changes? _
@@ -26,6 +27,7 @@ ___WHITE___
 \#nextstep
 A forceop plugin
 A kid from Planet Minecraft
+A leaky ticket
 An event list thread
 Angry child server owners
 baxfax
@@ -33,6 +35,7 @@ Bukkit
 Bukkit's downfall
 BukkitDev
 Chester
+CONTRIBUTING.md
 CraftBukkit
 Curse
 CurseForge
@@ -42,6 +45,7 @@ Forge
 Glowstone
 Grum
 Indev
+leaky.bukkit.org
 lol768
 mbaxter
 md_5
@@ -65,3 +69,4 @@ TheMogMiner
 turt2live
 Twitter fiascoes
 Using NMS for API things
+Versioned packages
