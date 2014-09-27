@@ -316,7 +316,7 @@ public class Game {
         if (this.gameStatus != GameStatus.IDLE) {
             this.gameStatus = GameStatus.IDLE;
             PrettyTime p = new PrettyTime();
-            this.sendMessage(Colors.BOLD + "The game has ended. " + Colors.RESET + "Start time: " + p.format(new Date(System.currentTimeMillis() - this.startTime)));
+            this.sendMessage(Colors.BOLD + "The game has ended. " + Colors.NORMAL + "Start time: " + p.format(new Date(System.currentTimeMillis() - this.startTime)));
             if (this.gameStatus != GameStatus.JOINING) this.showScores();
         }
         this.gameStatus = GameStatus.ENDED;
