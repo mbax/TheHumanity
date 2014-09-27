@@ -14,12 +14,15 @@ import org.royaldev.thehumanity.player.Player;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import org.ocpsoft.prettytime.PrettyTime;
 
 // TODO: Skip timeout
 
@@ -40,6 +43,7 @@ public class Game {
     private Player host = null;
     private ScheduledFuture countdownTask;
     private GameStatus gameStatus = GameStatus.IDLE;
+    private long startTime;
 
     public Game(final TheHumanity humanity, final Channel channel, final List<CardPack> cardPacks) {
         this.humanity = humanity;
@@ -302,6 +306,7 @@ public class Game {
     public void start() {
         if (this.gameStatus != GameStatus.IDLE) return;
         this.advanceStage();
+        this.startTime = System.currentTimeMillis();
     }
 
     public void stop() {
@@ -310,7 +315,8 @@ public class Game {
         if (this.countdownTask != null) this.countdownTask.cancel(true);
         if (this.gameStatus != GameStatus.IDLE) {
             this.gameStatus = GameStatus.IDLE;
-            this.sendMessage(Colors.BOLD + "The game has ended.");
+            PrettyTime p = new PrettyTime();
+            this.sendMessage(Colors.BOLD + "The game has ended. " + Colors.NORMAL + "Start time: " + p.format(new Date(System.currentTimeMillis() - this.startTime)));
             if (this.gameStatus != GameStatus.JOINING) this.showScores();
         }
         this.gameStatus = GameStatus.ENDED;
