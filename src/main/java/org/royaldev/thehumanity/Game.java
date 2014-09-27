@@ -80,6 +80,7 @@ public class Game {
                 break;
             case JOINING:
                 this.gameStatus = GameStatus.PLAYING;
+                this.startTime = System.currentTimeMillis();
                 break;
         }
         this.processStatus(this.gameStatus);
@@ -306,7 +307,6 @@ public class Game {
     public void start() {
         if (this.gameStatus != GameStatus.IDLE) return;
         this.advanceStage();
-        this.startTime = System.currentTimeMillis();
     }
 
     public void stop() {
