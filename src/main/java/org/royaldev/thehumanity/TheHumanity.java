@@ -130,7 +130,7 @@ public class TheHumanity {
                     if (isBlack) cp.addCard(new BlackCard(cp, line));
                     else cp.addCard(new WhiteCard(cp, line));
                 }
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 this.getLogger().warning(ex.getMessage());
                 continue;
             }
@@ -142,7 +142,7 @@ public class TheHumanity {
         final CmdLineParser clp = new CmdLineParser(this);
         try {
             clp.parseArgument(args);
-        } catch (CmdLineException e) {
+        } catch (final CmdLineException e) {
             this.getLogger().info(e.getMessage());
             e.getParser().printUsage(System.out);
             System.exit(1);

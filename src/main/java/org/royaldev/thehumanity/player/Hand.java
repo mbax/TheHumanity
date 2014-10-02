@@ -20,7 +20,7 @@ public class Hand<T extends Card> implements Iterable<T> {
      *
      * @param card Card to add
      */
-    public void addCard(T card) {
+    public void addCard(final T card) {
         synchronized (this.hand) {
             this.hand.add(card);
         }
@@ -31,7 +31,7 @@ public class Hand<T extends Card> implements Iterable<T> {
      *
      * @param cards Cards to add
      */
-    public void addCards(Collection<? extends T> cards) {
+    public void addCards(final Collection<? extends T> cards) {
         synchronized (this.hand) {
             this.hand.addAll(cards);
         }
@@ -71,7 +71,7 @@ public class Hand<T extends Card> implements Iterable<T> {
      * @return Card
      * @throws java.lang.IllegalArgumentException If the index is invalid
      */
-    public T getCard(int index) {
+    public T getCard(final int index) {
         synchronized (this.hand) {
             if (index < 0 || index >= this.hand.size()) {
                 throw new IllegalArgumentException("The given index was invalid.");
@@ -115,7 +115,7 @@ public class Hand<T extends Card> implements Iterable<T> {
      * @param card Card to remove
      * @return true if successful, false if otherwise
      */
-    public boolean removeCard(T card) {
+    public boolean removeCard(final T card) {
         synchronized (this.hand) {
             return this.hand.remove(card);
         }
@@ -127,7 +127,7 @@ public class Hand<T extends Card> implements Iterable<T> {
      * @param cards Cards to remove
      * @return true if the hand changed, false if otherwise
      */
-    public boolean removeCards(Collection<? extends T> cards) {
+    public boolean removeCards(final Collection<? extends T> cards) {
         synchronized (this.hand) {
             return this.hand.removeAll(cards);
         }
