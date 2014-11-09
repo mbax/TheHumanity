@@ -9,12 +9,22 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Deck class. Each game should have one deck, which contains both white and black cards. Decks are repopulating,
+ * meaning that if cards of either type run out, that type of card will be replenished from the card pack sources. This
+ * happens automatically for white cards when drawing randomly. Black cards must be manually repopulated.
+ */
 public class Deck {
 
     private final List<CardPack> cardPacks = Collections.synchronizedList(new ArrayList<CardPack>());
     private final List<WhiteCard> whiteCards = Collections.synchronizedList(new ArrayList<WhiteCard>());
     private final List<BlackCard> blackCards = Collections.synchronizedList(new ArrayList<BlackCard>());
 
+    /**
+     * Creates a new Deck with the given card packs as sources.
+     *
+     * @param cardPacks Card packs to add to this deck
+     */
     public Deck(final Collection<CardPack> cardPacks) {
         synchronized (this.cardPacks) {
             this.cardPacks.addAll(cardPacks);
@@ -23,6 +33,11 @@ public class Deck {
         this.repopulateWhiteCards();
     }
 
+    /**
+     * Gets the card packs that this Deck was created with.
+     *
+     * @return List of CardPacks
+     */
     public List<CardPack> getCardPacks() {
         synchronized (this.cardPacks) {
             return new ArrayList<>(this.cardPacks);
@@ -60,12 +75,21 @@ public class Deck {
         }
     }
 
+    /**
+     * Adds all the black cards from the card packs back into the draw pile.
+     */
     public void repopulateBlackCards() {
         for (final CardPack cp : this.cardPacks) {
             this.blackCards.addAll(cp.getBlackCards());
         }
     }
 
+    /**
+     * Adds all the white cards from the card packs back into the draw pile, excluding any in the given collection of
+     * Hands.
+     *
+     * @param exclude Hands of Cards to exclude
+     */
     public void repopulateWhiteCards(final Collection<Hand> exclude) {
         synchronized (this.cardPacks) {
             synchronized (this.whiteCards) {
@@ -84,6 +108,9 @@ public class Deck {
         }
     }
 
+    /**
+     * Adds all the white cards from the card packs back into the draw pile.
+     */
     public void repopulateWhiteCards() {
         this.repopulateWhiteCards(null);
     }
