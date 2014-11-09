@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity;
 
+import org.ocpsoft.prettytime.PrettyTime;
 import org.pircbotx.Channel;
 import org.pircbotx.Colors;
 import org.pircbotx.User;
@@ -21,8 +22,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
-import org.ocpsoft.prettytime.PrettyTime;
 
 // TODO: Skip timeout
 
