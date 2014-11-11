@@ -333,6 +333,12 @@ public class Game {
                         this.sendMessage("Black card " + Colors.BOLD + blackCard.getText() + Colors.NORMAL + " was skipped because it is invalid.");
                     }
                     blackCard = this.getDeck().getRandomBlackCard();
+                    if (blackCard == null) {
+                        this.sendMessage(" ");
+                        this.sendMessage(Colors.BOLD + "There are no more black cards!");
+                        this.stop();
+                        return;
+                    }
                 } while (blackCard.getBlanks() > 10 || blackCard.getBlanks() < 1);
                 this.currentRound = new Round(this, this.getCurrentRound() == null ? 1 : this.getCurrentRound().getNumber() + 1, blackCard, this.getPlayers().get(index));
                 this.deal();
