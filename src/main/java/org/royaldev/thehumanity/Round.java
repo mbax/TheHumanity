@@ -104,6 +104,21 @@ public class Round {
     }
 
     /**
+     * Gets the plays that have been made by players still taking part in the game. Modifying this list will not change
+     * it in the round.
+     *
+     * @return Cloned list of active-player plays
+     */
+    public List<Play> getActivePlayerPlays() { // TODO: Rename method?
+        final List<Play> activePlays = new ArrayList<>();
+        for (final Play p : this.plays) {
+            if (!this.getGame().getPlayers().contains(p.getPlayer())) continue;
+            activePlays.add(p);
+        }
+        return activePlays;
+    }
+
+    /**
      * Gets the black card for this round.
      *
      * @return Black card
@@ -181,7 +196,7 @@ public class Round {
     public boolean hasAllPlaysMade() {
         final List<Player> usersTakingPart = new ArrayList<>(this.getGame().getPlayers());
         usersTakingPart.removeAll(this.getSkippedPlayers());
-        return this.getPlays().size() >= usersTakingPart.size() - 1;
+        return this.getActivePlayerPlays().size() >= usersTakingPart.size() - 1;
     }
 
     /**
