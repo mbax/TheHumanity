@@ -1,6 +1,5 @@
 package org.royaldev.thehumanity;
 
-import org.ocpsoft.prettytime.PrettyTime;
 import org.pircbotx.Channel;
 import org.pircbotx.Colors;
 import org.pircbotx.User;
@@ -15,7 +14,6 @@ import org.royaldev.thehumanity.player.Player;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,12 +36,10 @@ public class Game {
      */
     private final List<Player> allPlayers = Collections.synchronizedList(new ArrayList<Player>());
     private final Deck deck;
-    private final PrettyTime prettyTime = new PrettyTime();
     private Round currentRound = null;
     private Player host = null;
     private ScheduledFuture countdownTask;
     private GameStatus gameStatus = GameStatus.IDLE;
-    private long startTime;
 
     public Game(final TheHumanity humanity, final Channel channel, final List<CardPack> cardPacks) {
         this.humanity = humanity;
@@ -89,7 +85,6 @@ public class Game {
                 break;
             case JOINING:
                 this.gameStatus = GameStatus.PLAYING;
-                this.startTime = System.currentTimeMillis();
                 break;
         }
         this.processStatus(this.gameStatus);
@@ -477,7 +472,7 @@ public class Game {
         if (this.countdownTask != null) this.countdownTask.cancel(true);
         if (this.gameStatus != GameStatus.IDLE) {
             this.gameStatus = GameStatus.IDLE;
-            this.sendMessage(Colors.BOLD + "The game has ended. " + Colors.NORMAL + "Start time: " + this.prettyTime.format(new Date(System.currentTimeMillis() - this.startTime)));
+            this.sendMessage(Colors.BOLD + "The game has ended.");
             if (this.gameStatus != GameStatus.JOINING) this.showScores();
         }
         this.gameStatus = GameStatus.ENDED;
