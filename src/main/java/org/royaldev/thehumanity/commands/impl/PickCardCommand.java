@@ -4,6 +4,7 @@ import org.pircbotx.Colors;
 import org.pircbotx.User;
 import org.pircbotx.hooks.types.GenericMessageEvent;
 import org.royaldev.thehumanity.Game;
+import org.royaldev.thehumanity.Game.GameStatus;
 import org.royaldev.thehumanity.Round;
 import org.royaldev.thehumanity.Round.RoundStage;
 import org.royaldev.thehumanity.TheHumanity;
@@ -60,6 +61,10 @@ public class PickCardCommand extends NoticeableCommand {
         final Game g = this.humanity.getGameFor(u);
         if (g == null) {
             this.notice(u, "You're not in any game!");
+            return;
+        }
+        if (g.getGameStatus() != GameStatus.PLAYING) {
+            this.notice(u, "The game has not started!");
             return;
         }
         final Player p = g.getPlayer(u);
