@@ -4,7 +4,7 @@ import org.pircbotx.User;
 
 public abstract class NoticeableCommand implements IRCCommand {
 
-    public void notice(User u, String message) {
+    public void notice(final User u, final String message) {
         u.send().notice(message);
     }
 

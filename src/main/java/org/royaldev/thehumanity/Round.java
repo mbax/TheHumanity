@@ -151,7 +151,7 @@ public class Round {
      * @return Game
      */
     public Game getGame() {
-        return game;
+        return this.game;
     }
 
     /**
