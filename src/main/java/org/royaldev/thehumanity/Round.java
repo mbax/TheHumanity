@@ -181,7 +181,7 @@ public class Round {
     public boolean hasAllPlaysMade() {
         final List<Player> usersTakingPart = new ArrayList<>(this.getGame().getPlayers());
         usersTakingPart.removeAll(this.getSkippedPlayers());
-        return this.getPlays().size() >= usersTakingPart.size() - 1;
+        return this.getPlays().size() >= usersTakingPart.size();
     }
 
     /**
