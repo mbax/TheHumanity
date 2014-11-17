@@ -52,10 +52,6 @@
             <id>royal-repo</id>
             <url>http://minor.royaldev.org:8081/nexus/content/groups/public/</url>
         </repository>
-        <repository>
-            <id>sonatype-snapshots</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        </repository>
     </repositories>
     <dependencies>
         <dependency>
@@ -72,11 +68,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-nop</artifactId>
             <version>1.7.7</version>
-        </dependency>
-        <dependency>
-            <groupId>org.ocpsoft.prettytime</groupId>
-            <artifactId>prettytime</artifactId>
-            <version>3.2.5.Final</version>
         </dependency>
     </dependencies>
     <properties>
