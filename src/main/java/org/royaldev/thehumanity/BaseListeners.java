@@ -21,7 +21,7 @@ final class BaseListeners extends ListenerAdapter<PircBotX> {
 
     private final TheHumanity humanity;
 
-    BaseListeners(TheHumanity instance) {
+    BaseListeners(final TheHumanity instance) {
         this.humanity = instance;
     }
 

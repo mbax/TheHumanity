@@ -48,7 +48,7 @@ import java.util.logging.Logger;
 @SuppressWarnings("MismatchedReadAndWriteOfArray")
 public class TheHumanity {
 
-    private final List<CardPack> loadedCardPacks = Collections.synchronizedList(new ArrayList<CardPack>());
+    private final List<CardPack> loadedCardPacks = Collections.synchronizedList(new ArrayList<>());
     private final PircBotX bot;
     private final CommandHandler ch = new CommandHandler();
     private final Map<Channel, Game> games = new HashMap<>();
@@ -87,14 +87,11 @@ public class TheHumanity {
         if (!this.nickserv.isEmpty()) cb.setNickservPassword(this.nickserv);
         if (!this.serverPassword.isEmpty()) cb.setServerPassword(this.serverPassword);
         this.bot = new PircBotX(cb.buildConfiguration());
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    bot.startBot();
-                } catch (final IOException | IrcException ex) {
-                    ex.printStackTrace();
-                }
+        new Thread(() -> {
+            try {
+                TheHumanity.this.bot.startBot();
+            } catch (final IOException | IrcException ex) {
+                ex.printStackTrace();
             }
         }).start();
     }

@@ -30,11 +30,11 @@ public class Game {
     /**
      * A list of the current players in this game.
      */
-    private final List<Player> players = Collections.synchronizedList(new ArrayList<Player>());
+    private final List<Player> players = Collections.synchronizedList(new ArrayList<>());
     /**
      * A list of all the players that have ever played in this game.
      */
-    private final List<Player> allPlayers = Collections.synchronizedList(new ArrayList<Player>());
+    private final List<Player> allPlayers = Collections.synchronizedList(new ArrayList<>());
     private final Deck deck;
     private Round currentRound = null;
     private Player host = null;
@@ -63,8 +63,7 @@ public class Game {
                 this.allPlayers.add(player);
             }
         }
-        int totalCards = 0;
-        for (final CardPack cp : this.getDeck().getCardPacks()) totalCards += cp.getWhiteCards().size();
+        final int totalCards = this.getDeck().getCardPacks().stream().mapToInt(cp -> cp.getWhiteCards().size()).sum();
         if (this.players.size() * 7 >= totalCards) {
             this.sendMessage(Colors.BOLD + "Not enough white cards to play!");
             this.stop();
@@ -132,7 +131,7 @@ public class Game {
      */
     public void deal() {
         synchronized (this.players) {
-            for (final Player p : this.players) this.deal(p);
+            this.players.stream().forEach(this::deal);
         }
     }
 
@@ -312,7 +311,7 @@ public class Game {
             case JOINING:
                 final StringBuilder sb = new StringBuilder();
                 sb.append(Colors.BOLD).append("Card packs for this game:").append(Colors.NORMAL).append(" ");
-                for (final CardPack cp : this.getDeck().getCardPacks()) sb.append(cp.getName()).append(", ");
+                this.getDeck().getCardPacks().stream().forEach(cp -> sb.append(cp.getName()).append(", "));
                 this.sendMessage(Colors.BOLD + "A new game is starting!");
                 this.sendMessage(sb.toString().substring(0, sb.length() - 2));
                 this.sendMessage("Use " + Colors.BOLD + this.humanity.getPrefix() + "join" + Colors.NORMAL + " to join.");
@@ -431,10 +430,7 @@ public class Game {
      * Shows each Player his hand.
      */
     public void showCards() {
-        for (final Player p : this.players) {
-            if (p.equals(this.getCurrentRound().getCzar())) continue;
-            this.showCards(p);
-        }
+        this.players.stream().filter(p -> !p.equals(this.getCurrentRound().getCzar())).forEach(this::showCards);
     }
 
     /**
@@ -443,7 +439,7 @@ public class Game {
     public void showScores() {
         final Map<Player, Integer> scores = new HashMap<>();
         synchronized (this.allPlayers) {
-            for (final Player p : this.allPlayers) scores.put(p, p.getScore());
+            this.allPlayers.stream().forEach(p -> scores.put(p, p.getScore()));
         }
         final Map<Player, Integer> sortedScores = new TreeMap<>(new DescendingValueComparator(scores));
         sortedScores.putAll(scores);
@@ -511,7 +507,7 @@ public class Game {
                 if (Game.this.getPlayers().size() >= 3) {
                     Game.this.advanceStage();
                 } else {
-                    Game.this.sendMessage(Colors.BOLD + "Not enough players. " + Colors.NORMAL + "At least three people are required for the game to begin.");
+                    Game.this.sendMessage(Colors.BOLD + "Not enough players." + Colors.NORMAL + " At least three people are required for the game to begin.");
                     Game.this.stop();
                 }
                 Game.this.countdownTask.cancel(true);
@@ -529,8 +525,7 @@ public class Game {
 
         @Override
         public int compare(final Player o1, final Player o2) {
-            if (this.base.get(o1) >= this.base.get(o2)) return -1;
-            else return 1;
+            return this.base.get(o1) >= this.base.get(o2) ? -1 : 1;
         }
     }
 }

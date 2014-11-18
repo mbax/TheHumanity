@@ -25,17 +25,17 @@ public class CommandHandler implements Handler<IRCCommand, String> {
      * @return If command was registered
      */
     @Override
-    public boolean register(IRCCommand command) {
+    public boolean register(final IRCCommand command) {
         final String name = command.getName().toLowerCase();
-        synchronized (commands) {
-            if (commands.containsKey(name)) return false;
-            commands.put(name, command);
+        synchronized (this.commands) {
+            if (this.commands.containsKey(name)) return false;
+            this.commands.put(name, command);
         }
         for (String alias : command.getAliases()) {
             alias = alias.toLowerCase();
-            synchronized (aliasCommands) {
-                if (aliasCommands.containsKey(alias)) continue;
-                aliasCommands.put(alias, name);
+            synchronized (this.aliasCommands) {
+                if (this.aliasCommands.containsKey(alias)) continue;
+                this.aliasCommands.put(alias, name);
             }
         }
         return true;
@@ -48,8 +48,8 @@ public class CommandHandler implements Handler<IRCCommand, String> {
      * @return If command was removed
      */
     @Override
-    public boolean unregister(IRCCommand command) {
-        return unregister(command.getName());
+    public boolean unregister(final IRCCommand command) {
+        return this.unregister(command.getName());
     }
 
     /**
@@ -60,10 +60,10 @@ public class CommandHandler implements Handler<IRCCommand, String> {
      */
     public IRCCommand get(String name) {
         name = name.toLowerCase();
-        synchronized (commands) {
-            if (commands.containsKey(name)) return commands.get(name);
-            synchronized (aliasCommands) {
-                if (aliasCommands.containsKey(name)) return get(aliasCommands.get(name));
+        synchronized (this.commands) {
+            if (this.commands.containsKey(name)) return this.commands.get(name);
+            synchronized (this.aliasCommands) {
+                if (this.aliasCommands.containsKey(name)) return this.get(this.aliasCommands.get(name));
             }
         }
         return null;
@@ -75,8 +75,8 @@ public class CommandHandler implements Handler<IRCCommand, String> {
      * @return Collection
      */
     public Collection<IRCCommand> getAll() {
-        synchronized (commands) {
-            return commands.values();
+        synchronized (this.commands) {
+            return this.commands.values();
         }
     }
 
@@ -91,14 +91,14 @@ public class CommandHandler implements Handler<IRCCommand, String> {
     public boolean unregister(String name) {
         name = name.toLowerCase();
         boolean wasRemoved = false;
-        synchronized (commands) {
-            if (commands.containsKey(name)) {
-                commands.remove(name);
+        synchronized (this.commands) {
+            if (this.commands.containsKey(name)) {
+                this.commands.remove(name);
                 wasRemoved = true;
             }
         }
-        synchronized (aliasCommands) {
-            if (aliasCommands.containsKey(name)) aliasCommands.remove(name);
+        synchronized (this.aliasCommands) {
+            if (this.aliasCommands.containsKey(name)) this.aliasCommands.remove(name);
         }
         return wasRemoved;
     }

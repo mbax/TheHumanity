@@ -16,9 +16,9 @@ import java.util.List;
  */
 public class Deck {
 
-    private final List<CardPack> cardPacks = Collections.synchronizedList(new ArrayList<CardPack>());
-    private final List<WhiteCard> whiteCards = Collections.synchronizedList(new ArrayList<WhiteCard>());
-    private final List<BlackCard> blackCards = Collections.synchronizedList(new ArrayList<BlackCard>());
+    private final List<CardPack> cardPacks = Collections.synchronizedList(new ArrayList<>());
+    private final List<WhiteCard> whiteCards = Collections.synchronizedList(new ArrayList<>());
+    private final List<BlackCard> blackCards = Collections.synchronizedList(new ArrayList<>());
 
     /**
      * Creates a new Deck with the given card packs as sources.

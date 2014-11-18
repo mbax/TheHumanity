@@ -3,7 +3,6 @@ package org.royaldev.thehumanity;
 import org.pircbotx.Colors;
 import org.royaldev.thehumanity.cards.Play;
 import org.royaldev.thehumanity.cards.types.BlackCard;
-import org.royaldev.thehumanity.cards.types.WhiteCard;
 import org.royaldev.thehumanity.player.Player;
 
 import java.util.ArrayList;
@@ -11,6 +10,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Round {
 
@@ -57,7 +57,7 @@ public class Round {
         synchronized (this.plays) {
             this.plays.add(play);
         }
-        for (final WhiteCard wc : play.getWhiteCards()) play.getPlayer().getHand().removeCard(wc);
+        play.getWhiteCards().stream().forEach(play.getPlayer().getHand()::removeCard);
         if (this.hasAllPlaysMade()) this.advanceStage();
     }
 
@@ -110,12 +110,9 @@ public class Round {
      * @return Cloned list of active-player plays
      */
     public List<Play> getActivePlayerPlays() { // TODO: Rename method?
-        final List<Play> activePlays = new ArrayList<>();
-        for (final Play p : this.plays) {
-            if (!this.getGame().getPlayers().contains(p.getPlayer())) continue;
-            activePlays.add(p);
-        }
-        return activePlays;
+        return this.plays.stream()
+            .filter(p -> this.getGame().getPlayers().contains(p.getPlayer()))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -226,11 +223,7 @@ public class Round {
      * Returns all the played cards back to the hands of the players.
      */
     public void returnCards() {
-        for (final Play p : this.getPlays()) {
-            for (final WhiteCard wc : p.getWhiteCards()) {
-                p.getPlayer().getHand().addCard(wc);
-            }
-        }
+        this.getPlays().stream().forEach(p -> p.getWhiteCards().stream().forEach(p.getPlayer().getHand()::addCard));
     }
 
     /**
