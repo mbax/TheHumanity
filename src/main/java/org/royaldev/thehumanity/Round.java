@@ -18,8 +18,8 @@ public class Round {
     private final int number;
     private final BlackCard blackCard;
     private final Player czar;
-    private final Set<Player> skippedPlayers = Collections.synchronizedSet(new HashSet<Player>());
-    private final List<Play> plays = Collections.synchronizedList(new ArrayList<Play>());
+    private final Set<Player> skippedPlayers = Collections.synchronizedSet(new HashSet<>());
+    private final List<Play> plays = Collections.synchronizedList(new ArrayList<>());
     private RoundStage currentStage = RoundStage.IDLE;
 
     Round(final Game game, final int number, final BlackCard blackCard, final Player czar) {
@@ -203,10 +203,7 @@ public class Round {
      * @return true if played,false if otherwise
      */
     public boolean hasPlayed(final Player p) {
-        for (final Play play : this.plays) {
-            if (play.getPlayer().equals(p)) return true;
-        }
-        return false;
+        return this.plays.stream().anyMatch(play -> play.getPlayer().equals(p));
     }
 
     /**

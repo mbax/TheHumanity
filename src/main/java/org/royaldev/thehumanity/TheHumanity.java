@@ -35,6 +35,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -82,7 +83,7 @@ public class TheHumanity {
         this.registerCommands();
         final Builder<PircBotX> cb = new Builder<>();
         cb.setAutoNickChange(true).setAutoReconnect(true).setLogin(this.nickname).setMessageDelay(0L).setName(this.nickname).setRealName(this.nickname).setServer(this.server, this.serverPort).setEncoding(Charset.forName("UTF-8"));
-        for (final String channel : this.channels) cb.addAutoJoinChannel(channel);
+        Arrays.stream(this.channels).forEach(cb::addAutoJoinChannel);
         cb.addListener(new BaseListeners(this)).addListener(new GameListeners(this));
         if (!this.nickserv.isEmpty()) cb.setNickservPassword(this.nickserv);
         if (!this.serverPassword.isEmpty()) cb.setServerPassword(this.serverPassword);
