@@ -215,10 +215,7 @@ public class Game {
      * @return Corresponding Player
      */
     public Player getPlayer(final User u) {
-        for (final Player p : this.getPlayers()) {
-            if (this.humanity.usersMatch(u, p.getUser())) return p;
-        }
-        return null;
+        return this.getPlayers().stream().filter(p -> this.humanity.usersMatch(u, p.getUser())).findFirst().orElse(null);
     }
 
     /**

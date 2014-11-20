@@ -187,11 +187,8 @@ public class TheHumanity {
 
     public CardPack getCardPack(final String name) {
         synchronized (this.loadedCardPacks) {
-            for (final CardPack cp : this.loadedCardPacks) {
-                if (cp.getName().equalsIgnoreCase(name)) return cp;
-            }
+            return this.loadedCardPacks.stream().filter(cp -> cp.getName().equals(name)).findFirst().orElse(null);
         }
-        return null;
     }
 
     public CommandHandler getCommandHandler() {
@@ -203,11 +200,7 @@ public class TheHumanity {
     }
 
     public Game getGameFor(final User u) {
-        for (final Game game : this.getGames().values()) {
-            if (!game.hasPlayer(u.getNick())) continue;
-            return game;
-        }
-        return null;
+        return this.getGames().values().stream().filter(g -> g.hasPlayer(u.getNick())).findFirst().orElse(null);
     }
 
     public Game getGameFor(final Channel c) {
