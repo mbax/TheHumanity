@@ -8,7 +8,7 @@ import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
 import org.royaldev.thehumanity.player.Player;
 
-public class KickCommand extends NoticeableCommand {
+public class KickCommand implements NoticeableCommand {
 
     private final TheHumanity humanity;
 

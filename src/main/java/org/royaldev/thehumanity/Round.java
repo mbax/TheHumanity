@@ -110,9 +110,7 @@ public class Round {
      * @return Cloned list of active-player plays
      */
     public List<Play> getActivePlayerPlays() { // TODO: Rename method?
-        return this.plays.stream()
-            .filter(p -> this.getGame().getPlayers().contains(p.getPlayer()))
-            .collect(Collectors.toList());
+        return this.plays.stream().filter(p -> this.getGame().getPlayers().contains(p.getPlayer())).collect(Collectors.toList());
     }
 
     /**

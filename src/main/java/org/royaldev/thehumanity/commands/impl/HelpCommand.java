@@ -11,7 +11,7 @@ import org.royaldev.thehumanity.commands.NoticeableCommand;
 
 import java.util.Arrays;
 
-public class HelpCommand extends NoticeableCommand {
+public class HelpCommand implements NoticeableCommand {
 
     private final TheHumanity humanity;
 

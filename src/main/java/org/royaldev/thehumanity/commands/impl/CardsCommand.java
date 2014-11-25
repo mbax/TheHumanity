@@ -7,7 +7,7 @@ import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
 
-public class CardsCommand extends NoticeableCommand {
+public class CardsCommand implements NoticeableCommand {
 
     final TheHumanity humanity;
 

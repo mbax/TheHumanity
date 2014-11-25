@@ -9,7 +9,7 @@ import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
 import org.royaldev.thehumanity.player.Player;
 
-public class StopGameCommand extends NoticeableCommand {
+public class StopGameCommand implements NoticeableCommand {
 
     private final TheHumanity humanity;
 

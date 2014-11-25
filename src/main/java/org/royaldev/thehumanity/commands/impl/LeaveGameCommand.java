@@ -8,7 +8,7 @@ import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
 import org.royaldev.thehumanity.player.Player;
 
-public class LeaveGameCommand extends NoticeableCommand {
+public class LeaveGameCommand implements NoticeableCommand {
 
     private TheHumanity humanity;
 

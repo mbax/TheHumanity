@@ -12,7 +12,7 @@ import org.royaldev.thehumanity.commands.NoticeableCommand;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StartGameCommand extends NoticeableCommand {
+public class StartGameCommand implements NoticeableCommand {
 
     private final TheHumanity humanity;
 

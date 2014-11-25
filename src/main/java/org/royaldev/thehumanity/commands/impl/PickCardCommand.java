@@ -18,7 +18,7 @@ import org.royaldev.thehumanity.player.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PickCardCommand extends NoticeableCommand {
+public class PickCardCommand implements NoticeableCommand {
 
     private final TheHumanity humanity;
 

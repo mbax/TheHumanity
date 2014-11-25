@@ -9,7 +9,7 @@ import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
 import org.royaldev.thehumanity.player.Player;
 
-public class SkipCommand extends NoticeableCommand {
+public class SkipCommand implements NoticeableCommand {
 
     private final TheHumanity humanity;
 

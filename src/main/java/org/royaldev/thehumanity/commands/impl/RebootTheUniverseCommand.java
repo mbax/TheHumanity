@@ -12,7 +12,7 @@ import org.royaldev.thehumanity.player.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RebootTheUniverseCommand extends NoticeableCommand {
+public class RebootTheUniverseCommand implements NoticeableCommand {
 
     private final TheHumanity humanity;
 

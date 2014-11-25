@@ -167,7 +167,7 @@ public class TheHumanity {
         final ConsoleHandler ch = new ConsoleHandler();
         ch.setFormatter(new Formatter() {
             @Override
-            public String format(LogRecord logRecord) {
+            public String format(final LogRecord logRecord) {
                 return "[" + logRecord.getLevel().getLocalizedName() + "] " + logRecord.getMessage() + "\n";
             }
         });

@@ -9,7 +9,7 @@ import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
 
-public class JoinGameCommand extends NoticeableCommand {
+public class JoinGameCommand implements NoticeableCommand {
 
     private final TheHumanity humanity;
 
