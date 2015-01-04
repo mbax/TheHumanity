@@ -6,6 +6,7 @@ import org.pircbotx.hooks.types.GenericMessageEvent;
 import org.royaldev.thehumanity.Game;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.cards.CardPack;
+import org.royaldev.thehumanity.cards.cardcast.CardcastFetcher;
 import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
 
@@ -62,11 +63,17 @@ public class StartGameCommand implements NoticeableCommand {
         final List<CardPack> cardPacks = new ArrayList<>();
         boolean useDefaults = false;
         for (final String cardPack : args) {
-            if (cardPack.equalsIgnoreCase("default")) {
+            if ("default".equalsIgnoreCase(cardPack)) {
                 useDefaults = true;
                 continue;
             }
-            final CardPack cp = this.humanity.getCardPack(cardPack);
+            final CardPack cp;
+            if (cardPack.startsWith("cc:")) {
+                final CardcastFetcher cf = new CardcastFetcher(cardPack.substring(3));
+                cp = cf.getCardPack();
+            } else {
+                cp = this.humanity.getCardPack(cardPack);
+            }
             if (cp == null) continue;
             cardPacks.add(cp);
         }

@@ -46,7 +46,7 @@ import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-@SuppressWarnings("MismatchedReadAndWriteOfArray")
+@SuppressWarnings({"MismatchedReadAndWriteOfArray", "FieldMayBeFinal"})
 public class TheHumanity {
 
     private final List<CardPack> loadedCardPacks = Collections.synchronizedList(new ArrayList<>());
@@ -119,10 +119,10 @@ public class TheHumanity {
                 while ((line = br.readLine()) != null) {
                     line = line.trim();
                     if (line.isEmpty() || line.startsWith("#")) continue;
-                    if (line.equalsIgnoreCase("___WHITE___")) {
+                    if ("___WHITE___".equalsIgnoreCase(line)) {
                         isBlack = false;
                         continue;
-                    } else if (line.equalsIgnoreCase("___BLACK___")) {
+                    } else if ("___BLACK___".equalsIgnoreCase(line)) {
                         isBlack = true;
                         continue;
                     }
