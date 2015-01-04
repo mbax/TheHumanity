@@ -78,7 +78,7 @@ public class CardcastFetcher {
         final List<Card> whiteCards = new ArrayList<>();
         for (int i = 0; i < responses.length(); i++) {
             final JSONObject response = responses.getJSONObject(i);
-            whiteCards.add(new WhiteCard(cp, response.getJSONArray("text").getString(0)));
+            whiteCards.add(new WhiteCard(cp, response.getJSONArray("text").getString(0).replaceAll("\\.$", "")));
         }
         return whiteCards;
     }
