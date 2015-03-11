@@ -32,3 +32,7 @@ package
 *.ipr
 *.iws
 .idea/
+
+# Files for testing
+/start.sh
+jssecacerts
