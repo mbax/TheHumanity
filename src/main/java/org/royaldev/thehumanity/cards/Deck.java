@@ -34,6 +34,15 @@ public class Deck {
     }
 
     /**
+     * Gets the total amount of black cards contained in this deck.
+     *
+     * @return Total amount of black cards
+     */
+    public int getBlackCardCount() {
+        return this.cardPacks.stream().mapToInt(cp -> cp.getBlackCards().size()).sum();
+    }
+
+    /**
      * Gets the card packs that this Deck was created with.
      *
      * @return List of CardPacks
@@ -73,6 +82,33 @@ public class Deck {
             Collections.shuffle(this.whiteCards);
             return this.whiteCards.remove(0);
         }
+    }
+
+    /**
+     * Gets the amount of unused black cards contained in this deck.
+     *
+     * @return Total amount of unused black cards
+     */
+    public int getUnusedBlackCardCount() {
+        return this.blackCards.size();
+    }
+
+    /**
+     * Gets the amount of unused white cards contained in this deck.
+     *
+     * @return Total amount of unused white cards
+     */
+    public int getUnusedWhiteCardCount() {
+        return this.whiteCards.size();
+    }
+
+    /**
+     * Gets the total amount of white cards contained in this deck.
+     *
+     * @return Total amount of white cards
+     */
+    public int getWhiteCardCount() {
+        return this.cardPacks.stream().mapToInt(cp -> cp.getWhiteCards().size()).sum();
     }
 
     /**

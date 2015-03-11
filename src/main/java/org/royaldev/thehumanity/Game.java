@@ -136,6 +136,17 @@ public class Game {
     }
 
     /**
+     * Creates a String with the current card counts.
+     *
+     * @return String
+     */
+    public String getCardCounts() {
+        return Colors.BOLD + "Card counts: "
+            + Colors.NORMAL + this.getDeck().getUnusedBlackCardCount() + " unused/" + this.getDeck().getBlackCardCount() + " black cards, "
+            + this.getDeck().getUnusedWhiteCardCount() + " unused/" + this.getDeck().getWhiteCardCount() + " white cards";
+    }
+
+    /**
      * Gets the Channel that this game is taking place in.
      *
      * @return Channel
@@ -311,11 +322,15 @@ public class Game {
                 this.getDeck().getCardPacks().stream().forEach(cp -> sb.append(cp.getName()).append(", "));
                 this.sendMessage(Colors.BOLD + "A new game is starting!");
                 this.sendMessage(sb.toString().substring(0, sb.length() - 2));
+                this.showCardCounts();
                 this.sendMessage("Use " + Colors.BOLD + this.humanity.getPrefix() + "join" + Colors.NORMAL + " to join.");
                 break;
             case PLAYING:
                 if (!this.hasEnoughPlayers()) return;
-                if (this.getCurrentRound() != null) this.showScores();
+                if (this.getCurrentRound() != null) {
+                    this.showScores();
+                    this.showCardCounts();
+                }
                 int index = this.getCurrentRound() == null ? 0 : this.getPlayers().indexOf(this.getCurrentRound().getCzar()) + 1;
                 if (index >= this.getPlayers().size()) index = 0;
                 BlackCard blackCard = null;
@@ -406,6 +421,13 @@ public class Game {
             this.players.add(oldPlayer);
         }
         return true;
+    }
+
+    /**
+     * Displays the current card counts.
+     */
+    public void showCardCounts() {
+        this.sendMessage(this.getCardCounts());
     }
 
     /**

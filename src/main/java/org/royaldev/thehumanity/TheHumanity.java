@@ -15,6 +15,7 @@ import org.pircbotx.exception.IrcException;
 import org.royaldev.thehumanity.cards.CardPack;
 import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
+import org.royaldev.thehumanity.commands.impl.CardCountsCommand;
 import org.royaldev.thehumanity.commands.impl.CardsCommand;
 import org.royaldev.thehumanity.commands.impl.HelpCommand;
 import org.royaldev.thehumanity.commands.impl.JoinGameCommand;
@@ -161,6 +162,7 @@ public class TheHumanity {
         this.getCommandHandler().register(new HelpCommand(this));
         this.getCommandHandler().register(new CardsCommand(this));
         this.getCommandHandler().register(new RebootTheUniverseCommand(this));
+        this.getCommandHandler().register(new CardCountsCommand(this));
     }
 
     private void setUpLogger() {
