@@ -14,13 +14,24 @@ import org.royaldev.thehumanity.commands.NoticeableCommand;
 
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class HelpCommand implements NoticeableCommand {
 
+    @SuppressWarnings("StaticNonFinalField")
+    private static HelpGist currentGist;
     private final TheHumanity humanity;
 
     public HelpCommand(final TheHumanity instance) {
         this.humanity = instance;
+    }
+
+    private String getNames() {
+        return this.humanity.getCommandHandler().getAll().stream().map(IRCCommand::getName).sorted().collect(Collectors.joining());
+    }
+
+    private boolean isNewGistNeeded() {
+        return HelpCommand.currentGist == null || !HelpCommand.currentGist.getNames().equals(this.getNames());
     }
 
     @Override
@@ -62,20 +73,45 @@ public class HelpCommand implements NoticeableCommand {
                 sb.append("**Aliases:** ").append(Arrays.toString(ic.getAliases())).append("\n");
             }
         }
-        final StringWriter sw = new StringWriter();
-        final JSONWriter jw = new JSONWriter(sw);
-        jw.object().key("files")
-            .object().key("help.md")
-            .object().key("content").value(sb.toString())
-            .endObject().endObject().endObject();
-        try {
-            final HttpResponse<JsonNode> response = Unirest
-                .post("https://api.github.com/gists")
-                .body(sw.toString())
-                .asJson();
-            this.notice(u, response.getBody().getObject().getString("html_url"));
-        } catch (final UnirestException ex) {
-            this.notice(u, "An error occurred: " + ex.getMessage());
+        if (this.isNewGistNeeded()) {
+            final StringWriter sw = new StringWriter();
+            final JSONWriter jw = new JSONWriter(sw);
+            jw.object().key("files")
+                .object().key("help.md")
+                .object().key("content").value(sb.toString())
+                .endObject().endObject().endObject();
+            try {
+                final HttpResponse<JsonNode> response = Unirest
+                    .post("https://api.github.com/gists")
+                    .body(sw.toString())
+                    .asJson();
+                final String gist = response.getBody().getObject().getString("html_url");
+                HelpCommand.currentGist = new HelpGist(gist, this.getNames());
+                this.notice(u, gist);
+            } catch (final UnirestException ex) {
+                this.notice(u, "An error occurred: " + ex.getMessage());
+            }
+        } else {
+            this.notice(u, HelpCommand.currentGist.getGist());
+        }
+    }
+
+    private class HelpGist {
+
+        private final String gist;
+        private final String names;
+
+        private HelpGist(final String gist, final String names) {
+            this.gist = gist;
+            this.names = names;
+        }
+
+        private String getGist() {
+            return this.gist;
+        }
+
+        private String getNames() {
+            return this.names;
         }
     }
 }
