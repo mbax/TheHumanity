@@ -1,12 +1,10 @@
 package org.royaldev.thehumanity.commands.impl;
 
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.HttpResponse;
-
-import org.pircbotx.Colors;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import org.pircbotx.User;
-import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.types.GenericMessageEvent;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.commands.CallInfo;
@@ -14,7 +12,6 @@ import org.royaldev.thehumanity.commands.IRCCommand;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
 
 import java.util.Arrays;
-import java.lang.StringBuilder;
 
 public class HelpCommand implements NoticeableCommand {
 
@@ -52,15 +49,17 @@ public class HelpCommand implements NoticeableCommand {
     @Override
     public void onCommand(GenericMessageEvent event, CallInfo ci, String[] args) {
         final User u = event.getUser();
-        String[] helptext = new String[];
+        final StringBuilder sb = new StringBuilder();
         for (final IRCCommand ic : this.humanity.getCommandHandler().getAll()) {
-            helptext.append(this.humanity.getPrefix() + ic.getName() + " – " + ic.getDescription());
-            helptext.append("  Usage: " + ic.getUsage().replaceAll("<command>", ic.getName()));
-            helptext.append("  Aliases: " + Arrays.toString(ic.getAliases()));
+            sb.append(this.humanity.getPrefix()).append(ic.getName()).append(" – ").append(ic.getDescription()).append("\n");
+            sb.append("  Usage: ").append(ic.getUsage().replaceAll("<command>", ic.getName())).append("\n");
+            sb.append("  Aliases: ").append(Arrays.toString(ic.getAliases())).append("\n");
         }
-        HttpResponse<JsonNode> jsonResponse = Unirest.post("http://hasteb.in/documents")
-                                                       .body(String.join("\n", helptext))
-                                                       .asJson();
-        this.notice(u, "http://hasteb.in/" + jsonResponse.getBody()["key"]);
+        try {
+            final HttpResponse<JsonNode> response = Unirest.post("http://hasteb.in/documents").body(sb.toString()).asJson();
+            this.notice(u, "http://hasteb.in/" + response.getBody().getObject().getString("key"));
+        } catch (final UnirestException ex) {
+            this.notice(u, "An error occurred: " + ex.getMessage());
+        }
     }
 }
