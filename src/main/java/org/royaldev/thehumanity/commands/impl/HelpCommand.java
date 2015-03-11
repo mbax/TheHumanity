@@ -69,9 +69,7 @@ public class HelpCommand implements NoticeableCommand {
                 sb.append("**Usage:** ").append(ic.getUsage().replace("<command>", ic.getName())).append("  \n");
             }
             if (ic.getAliases().length > 0) {
-                sb.append("**Aliases:** ");
-                sb.append(String.join(", ", ic.getAliases()));
-                sb.append("\n");
+                sb.append("**Aliases:** ").append(String.join(", ", ic.getAliases())).append("\n");
             }
         }
         if (this.isNewGistNeeded()) {
