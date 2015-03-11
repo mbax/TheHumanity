@@ -53,7 +53,7 @@ public class HelpCommand implements NoticeableCommand {
         for (final IRCCommand ic : this.humanity.getCommandHandler().getAll()) {
             sb.append(this.humanity.getPrefix()).append(ic.getName()).append(" – ").append(ic.getDescription()).append("\n");
             sb.append("  Usage: ").append(ic.getUsage().replaceAll("<command>", ic.getName())).append("\n");
-            sb.append("  Aliases: ").append(Arrays.toString(ic.getAliases())).append("\n");
+            if (ic.getAliases().length > 0) sb.append("  Aliases: ").append(Arrays.toString(ic.getAliases())).append("\n");
         }
         try {
             final HttpResponse<JsonNode> response = Unirest.post("http://hasteb.in/documents").body(sb.toString()).asJson();
