@@ -9,7 +9,7 @@ import org.royaldev.thehumanity.commands.NoticeableCommand;
 
 public class CardsCommand implements NoticeableCommand {
 
-    final TheHumanity humanity;
+    private final TheHumanity humanity;
 
     public CardsCommand(final TheHumanity instance) {
         this.humanity = instance;

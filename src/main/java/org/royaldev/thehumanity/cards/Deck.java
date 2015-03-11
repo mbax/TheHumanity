@@ -115,8 +115,10 @@ public class Deck {
      * Adds all the black cards from the card packs back into the draw pile.
      */
     public void repopulateBlackCards() {
-        for (final CardPack cp : this.cardPacks) {
-            this.blackCards.addAll(cp.getBlackCards());
+        synchronized (this.cardPacks) {
+            synchronized (this.blackCards) {
+                this.cardPacks.forEach(cp -> this.blackCards.addAll(cp.getBlackCards()));
+            }
         }
     }
 
