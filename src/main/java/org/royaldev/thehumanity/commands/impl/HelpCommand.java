@@ -13,7 +13,6 @@ import org.royaldev.thehumanity.commands.IRCCommand;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
 
 import java.io.StringWriter;
-import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class HelpCommand implements NoticeableCommand {
@@ -71,7 +70,7 @@ public class HelpCommand implements NoticeableCommand {
             }
             if (ic.getAliases().length > 0) {
                 sb.append("**Aliases:** ");
-                sb.append(Arrays.stream(ic.getAliases()).collect(Collectors.joining(", ")));
+                sb.append(String.join(", ", ic.getAliases()));
                 sb.append("\n");
             }
         }
