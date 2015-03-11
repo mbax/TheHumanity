@@ -1,5 +1,9 @@
 package org.royaldev.thehumanity.commands.impl;
 
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.HttpResponse;
+
 import org.pircbotx.Colors;
 import org.pircbotx.User;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
@@ -10,6 +14,7 @@ import org.royaldev.thehumanity.commands.IRCCommand;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
 
 import java.util.Arrays;
+import java.lang.StringBuilder;
 
 public class HelpCommand implements NoticeableCommand {
 
@@ -47,11 +52,15 @@ public class HelpCommand implements NoticeableCommand {
     @Override
     public void onCommand(GenericMessageEvent event, CallInfo ci, String[] args) {
         final User u = event.getUser();
-        if (!(event instanceof PrivateMessageEvent)) this.notice(u, "Check your private messages.");
+        String[] helptext = new String[];
         for (final IRCCommand ic : this.humanity.getCommandHandler().getAll()) {
-            u.send().message(Colors.BOLD + this.humanity.getPrefix() + ic.getName() + Colors.NORMAL + " – " + ic.getDescription());
-            u.send().message("  Usage: " + ic.getUsage().replaceAll("<command>", ic.getName()));
-            u.send().message("  Aliases: " + Arrays.toString(ic.getAliases()));
+            helptext.append(this.humanity.getPrefix() + ic.getName() + " – " + ic.getDescription());
+            helptext.append("  Usage: " + ic.getUsage().replaceAll("<command>", ic.getName()));
+            helptext.append("  Aliases: " + Arrays.toString(ic.getAliases()));
         }
+        HttpResponse<JsonNode> jsonResponse = Unirest.post("http://hasteb.in/documents")
+                                                       .body(String.join("\n", helptext))
+                                                       .asJson();
+        this.notice(u, "http://hasteb.in/" + jsonResponse.getBody()["key"]);
     }
 }
