@@ -12,8 +12,9 @@ import java.lang.annotation.Target;
 public @interface Command {
 
     /**
+     * Gets an array of names that can be used for this command.
      *
-     * @return
+     * @return Array
      */
     String[] aliases() default {};
 

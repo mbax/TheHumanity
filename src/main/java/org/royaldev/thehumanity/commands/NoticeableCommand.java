@@ -2,6 +2,9 @@ package org.royaldev.thehumanity.commands;
 
 import org.pircbotx.User;
 
+/**
+ * A normal {@link IRCCommand} with a {@link #notice} method.
+ */
 public abstract class NoticeableCommand extends IRCCommand {
 
     /**
