@@ -19,12 +19,23 @@ public abstract class IRCCommand {
     public abstract void onCommand(GenericMessageEvent event, CallInfo ci, String[] args);
 
     /**
+     * Returns the first parameter, unless it is null, in which case, the second parameter is returned.
+     *
+     * @param expected Parameter to check
+     * @param def      Default if expected is null
+     * @return Never null
+     */
+    private <T> T orDefault(final T expected, final T def) {
+        return expected == null ? def : expected;
+    }
+
+    /**
      * Gets an array of names that can be used for this command.
      *
      * @return Array, not null
      */
     public String[] getAliases() {
-        return this.getCommandAnnotation().aliases();
+        return this.orDefault(this.getCommandAnnotation().aliases(), new String[0]);
     }
 
     public final Command getCommandAnnotation() {
@@ -37,7 +48,7 @@ public abstract class IRCCommand {
      * @return CommandType
      */
     public CommandType getCommandType() {
-        return this.getCommandAnnotation().commandType();
+        return this.orDefault(this.getCommandAnnotation().commandType(), CommandType.BOTH);
     }
 
     /**
@@ -46,7 +57,7 @@ public abstract class IRCCommand {
      * @return <em>Brief</em> description
      */
     public String getDescription() {
-        return this.getCommandAnnotation().description();
+        return this.orDefault(this.getCommandAnnotation().description(), this.getName());
     }
 
     /**
@@ -57,7 +68,7 @@ public abstract class IRCCommand {
      * @return Name of the command.
      */
     public String getName() {
-        return this.getCommandAnnotation().name();
+        return this.orDefault(this.getCommandAnnotation().name(), "invalid_command");
     }
 
     /**
@@ -68,7 +79,7 @@ public abstract class IRCCommand {
      * @return Usage string
      */
     public String getUsage() {
-        return this.getCommandAnnotation().usage();
+        return this.orDefault(this.getCommandAnnotation().usage(), "<command>");
     }
 
     /**
