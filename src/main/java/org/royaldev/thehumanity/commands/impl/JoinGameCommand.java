@@ -7,39 +7,22 @@ import org.pircbotx.hooks.types.GenericMessageEvent;
 import org.royaldev.thehumanity.Game;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.commands.CallInfo;
+import org.royaldev.thehumanity.commands.Command;
+import org.royaldev.thehumanity.commands.IRCCommand.CommandType;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
 
-public class JoinGameCommand implements NoticeableCommand {
+@Command(
+    name = "join",
+    description = "Joins the current game.",
+    aliases = {"joingame"},
+    commandType = CommandType.MESSAGE
+)
+public class JoinGameCommand extends NoticeableCommand {
 
     private final TheHumanity humanity;
 
     public JoinGameCommand(final TheHumanity humanity) {
         this.humanity = humanity;
-    }
-
-    @Override
-    public String[] getAliases() {
-        return new String[]{"joingame"};
-    }
-
-    @Override
-    public CommandType getCommandType() {
-        return CommandType.MESSAGE;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Joins the current game.";
-    }
-
-    @Override
-    public String getName() {
-        return "join";
-    }
-
-    @Override
-    public String getUsage() {
-        return "<command>";
     }
 
     @Override

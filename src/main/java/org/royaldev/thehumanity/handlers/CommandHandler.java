@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.handlers;
 
+import org.royaldev.thehumanity.commands.Command;
 import org.royaldev.thehumanity.commands.IRCCommand;
 
 import java.util.Collection;
@@ -15,41 +16,11 @@ public class CommandHandler implements Handler<IRCCommand, String> {
     // Alias, Command
     private final Map<String, String> aliasCommands = new TreeMap<>();
 
-    /**
-     * Registers a command into the CommandHandler.
-     * <br/>
-     * <strong>Note:</strong> If a command with the same name is already registered, this method will <em>not</em>
-     * register your command.
-     *
-     * @param command Command to be registered
-     * @return If command was registered
-     */
-    @Override
-    public boolean register(final IRCCommand command) {
-        final String name = command.getName().toLowerCase();
-        synchronized (this.commands) {
-            if (this.commands.containsKey(name)) return false;
-            this.commands.put(name, command);
+    private void checkCommand(final IRCCommand command) {
+        final Command c = command.getCommandAnnotation();
+        if (c == null) {
+            throw new IllegalArgumentException("No Command annotation on IRCCommand.");
         }
-        for (String alias : command.getAliases()) {
-            alias = alias.toLowerCase();
-            synchronized (this.aliasCommands) {
-                if (this.aliasCommands.containsKey(alias)) continue;
-                this.aliasCommands.put(alias, name);
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Removes the supplied command from the CommandHandler.
-     *
-     * @param command Command to be removed
-     * @return If command was removed
-     */
-    @Override
-    public boolean unregister(final IRCCommand command) {
-        return this.unregister(command.getName());
     }
 
     /**
@@ -78,6 +49,44 @@ public class CommandHandler implements Handler<IRCCommand, String> {
         synchronized (this.commands) {
             return this.commands.values();
         }
+    }
+
+    /**
+     * Registers a command into the CommandHandler.
+     * <br/>
+     * <strong>Note:</strong> If a command with the same name is already registered, this method will <em>not</em>
+     * register your command.
+     *
+     * @param command Command to be registered
+     * @return If command was registered
+     */
+    @Override
+    public boolean register(final IRCCommand command) {
+        this.checkCommand(command);
+        final String name = command.getName().toLowerCase();
+        synchronized (this.commands) {
+            if (this.commands.containsKey(name)) return false;
+            this.commands.put(name, command);
+        }
+        for (String alias : command.getAliases()) {
+            alias = alias.toLowerCase();
+            synchronized (this.aliasCommands) {
+                if (this.aliasCommands.containsKey(alias)) continue;
+                this.aliasCommands.put(alias, name);
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Removes the supplied command from the CommandHandler.
+     *
+     * @param command Command to be removed
+     * @return If command was removed
+     */
+    @Override
+    public boolean unregister(final IRCCommand command) {
+        return this.unregister(command.getName());
     }
 
     /**

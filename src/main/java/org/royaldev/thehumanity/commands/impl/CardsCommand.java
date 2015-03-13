@@ -5,49 +5,22 @@ import org.pircbotx.hooks.types.GenericMessageEvent;
 import org.royaldev.thehumanity.Game;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.commands.CallInfo;
-import org.royaldev.thehumanity.commands.NoticeableCommand;
+import org.royaldev.thehumanity.commands.Command;
+import org.royaldev.thehumanity.commands.InGameCommand;
 
-public class CardsCommand implements NoticeableCommand {
-
-    private final TheHumanity humanity;
+@Command(
+    name = "cards",
+    description = "Shows your cards."
+)
+public class CardsCommand extends InGameCommand {
 
     public CardsCommand(final TheHumanity instance) {
-        this.humanity = instance;
+        super(instance);
     }
 
     @Override
-    public String[] getAliases() {
-        return new String[0];
-    }
-
-    @Override
-    public CommandType getCommandType() {
-        return CommandType.BOTH;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Shows your your cards.";
-    }
-
-    @Override
-    public String getName() {
-        return "cards";
-    }
-
-    @Override
-    public String getUsage() {
-        return "<command>";
-    }
-
-    @Override
-    public void onCommand(GenericMessageEvent event, CallInfo ci, String[] args) {
+    public void onInGameCommand(final GenericMessageEvent event, final CallInfo ci, final Game g, final String[] args) {
         final User u = event.getUser();
-        final Game g = this.humanity.getGameFor(u);
-        if (g == null) {
-            this.notice(u, "You're not in a game.");
-            return;
-        }
         g.showCards(g.getPlayer(u));
     }
 }

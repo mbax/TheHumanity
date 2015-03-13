@@ -6,52 +6,26 @@ import org.royaldev.thehumanity.Game;
 import org.royaldev.thehumanity.Round;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.commands.CallInfo;
-import org.royaldev.thehumanity.commands.NoticeableCommand;
+import org.royaldev.thehumanity.commands.Command;
+import org.royaldev.thehumanity.commands.InGameCommand;
 import org.royaldev.thehumanity.player.Player;
 
-public class SkipCommand implements NoticeableCommand {
+@Command(
+    name = "skip",
+    description = "Skips a player for the round.",
+    usage = "<command> [player]"
+)
+public class SkipCommand extends InGameCommand {
 
-    private final TheHumanity humanity;
-
-    public SkipCommand(TheHumanity instance) {
-        this.humanity = instance;
+    public SkipCommand(final TheHumanity instance) {
+        super(instance);
     }
 
     @Override
-    public String[] getAliases() {
-        return new String[0];
-    }
-
-    @Override
-    public CommandType getCommandType() {
-        return CommandType.BOTH;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Skips a player for the round.";
-    }
-
-    @Override
-    public String getName() {
-        return "skip";
-    }
-
-    @Override
-    public String getUsage() {
-        return "<command> [player]";
-    }
-
-    @Override
-    public void onCommand(GenericMessageEvent event, CallInfo ci, String[] args) {
+    public void onInGameCommand(final GenericMessageEvent event, final CallInfo ci, final Game g, final String[] args) {
         final User u = event.getUser();
         if (args.length < 1) {
             this.notice(u, "Usage: " + this.getUsage().replace("<command>", ci.getLabel()));
-            return;
-        }
-        final Game g = this.humanity.getGameFor(u);
-        if (g == null) {
-            this.notice(u, "You're not in any game.");
             return;
         }
         final Player p = g.getPlayer(u);
@@ -69,7 +43,6 @@ public class SkipCommand implements NoticeableCommand {
             this.notice(u, "That user is already skipped.");
             return;
         }
-        if (r.skip(t)) this.notice(u, "User skipped.");
-        else this.notice(u, "User could not be skipped.");
+        this.notice(u, r.skip(t) ? "User skipped." : "User could not be skipped.");
     }
 }

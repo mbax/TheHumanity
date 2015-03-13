@@ -5,9 +5,14 @@ import org.pircbotx.hooks.types.GenericMessageEvent;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.cards.CardPack;
 import org.royaldev.thehumanity.commands.CallInfo;
+import org.royaldev.thehumanity.commands.Command;
 import org.royaldev.thehumanity.commands.IRCCommand;
 
-public class PacksCommand implements IRCCommand {
+@Command(
+    name = "packs",
+    description = "Shows the loaded card packs."
+)
+public class PacksCommand extends IRCCommand {
 
     private final TheHumanity humanity;
 
@@ -16,32 +21,7 @@ public class PacksCommand implements IRCCommand {
     }
 
     @Override
-    public String[] getAliases() {
-        return new String[0];
-    }
-
-    @Override
-    public CommandType getCommandType() {
-        return CommandType.BOTH;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Shows the loaded card packs.";
-    }
-
-    @Override
-    public String getName() {
-        return "packs";
-    }
-
-    @Override
-    public String getUsage() {
-        return "<command>";
-    }
-
-    @Override
-    public void onCommand(GenericMessageEvent event, CallInfo ci, String[] args) {
+    public void onCommand(final GenericMessageEvent event, final CallInfo ci, final String[] args) {
         final StringBuilder sb = new StringBuilder();
         for (final CardPack cp : this.humanity.getLoadedCardPacks()) {
             sb.append(Colors.BOLD).append(cp.getName()).append(Colors.NORMAL).append(", ");

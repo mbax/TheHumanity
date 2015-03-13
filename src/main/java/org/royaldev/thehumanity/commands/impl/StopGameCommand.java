@@ -6,40 +6,23 @@ import org.pircbotx.hooks.types.GenericMessageEvent;
 import org.royaldev.thehumanity.Game;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.commands.CallInfo;
+import org.royaldev.thehumanity.commands.Command;
+import org.royaldev.thehumanity.commands.IRCCommand.CommandType;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
 import org.royaldev.thehumanity.player.Player;
 
-public class StopGameCommand implements NoticeableCommand {
+@Command(
+    name = "stopgame",
+    description = "Stops the game you're in, if you're an operator or the host in its channel.",
+    aliases = {"stop"},
+    commandType = CommandType.MESSAGE
+)
+public class StopGameCommand extends NoticeableCommand {
 
     private final TheHumanity humanity;
 
     public StopGameCommand(final TheHumanity instance) {
         this.humanity = instance;
-    }
-
-    @Override
-    public String[] getAliases() {
-        return new String[]{"stop"};
-    }
-
-    @Override
-    public CommandType getCommandType() {
-        return CommandType.MESSAGE;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Stops the game you're in, if you're an operator in its channel.";
-    }
-
-    @Override
-    public String getName() {
-        return "stopgame";
-    }
-
-    @Override
-    public String getUsage() {
-        return "<command>";
     }
 
     @Override

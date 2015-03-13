@@ -2,7 +2,7 @@ package org.royaldev.thehumanity.commands;
 
 import org.pircbotx.User;
 
-public interface NoticeableCommand extends IRCCommand {
+public abstract class NoticeableCommand extends IRCCommand {
 
     /**
      * Sends a notice to the given User.
@@ -10,7 +10,7 @@ public interface NoticeableCommand extends IRCCommand {
      * @param u       User to send notice to
      * @param message Message to send
      */
-    default public void notice(final User u, final String message) {
+    public void notice(final User u, final String message) {
         u.send().notice(message);
     }
 

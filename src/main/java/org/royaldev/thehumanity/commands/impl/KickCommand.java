@@ -5,52 +5,27 @@ import org.pircbotx.hooks.types.GenericMessageEvent;
 import org.royaldev.thehumanity.Game;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.commands.CallInfo;
-import org.royaldev.thehumanity.commands.NoticeableCommand;
+import org.royaldev.thehumanity.commands.Command;
+import org.royaldev.thehumanity.commands.InGameCommand;
 import org.royaldev.thehumanity.player.Player;
 
-public class KickCommand implements NoticeableCommand {
-
-    private final TheHumanity humanity;
+@Command(
+    name = "kick",
+    description = "Kicks a player from the game.",
+    aliases = {"k"},
+    usage = "<command> [player]"
+)
+public class KickCommand extends InGameCommand {
 
     public KickCommand(final TheHumanity instance) {
-        this.humanity = instance;
+        super(instance);
     }
 
     @Override
-    public String[] getAliases() {
-        return new String[]{"k"};
-    }
-
-    @Override
-    public CommandType getCommandType() {
-        return CommandType.BOTH;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Kicks a player from the game.";
-    }
-
-    @Override
-    public String getName() {
-        return "kick";
-    }
-
-    @Override
-    public String getUsage() {
-        return "<command> [player]";
-    }
-
-    @Override
-    public void onCommand(GenericMessageEvent event, CallInfo ci, String[] args) {
+    public void onInGameCommand(final GenericMessageEvent event, final CallInfo ci, final Game g, final String[] args) {
         final User u = event.getUser();
         if (args.length < 1) {
             this.notice(u, "Usage: " + this.getUsage().replace("<command>", ci.getLabel()));
-            return;
-        }
-        final Game g = this.humanity.getGameFor(u);
-        if (g == null) {
-            this.notice(u, "You're not in a game.");
             return;
         }
         final Player p = g.getPlayer(u);

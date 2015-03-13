@@ -9,13 +9,18 @@ import org.pircbotx.User;
 import org.pircbotx.hooks.types.GenericMessageEvent;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.commands.CallInfo;
+import org.royaldev.thehumanity.commands.Command;
 import org.royaldev.thehumanity.commands.IRCCommand;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
 
 import java.io.StringWriter;
 import java.util.stream.Collectors;
 
-public class HelpCommand implements NoticeableCommand {
+@Command(
+    name = "help",
+    description = "Gets the help for all commands."
+)
+public class HelpCommand extends NoticeableCommand {
 
     @SuppressWarnings("StaticNonFinalField")
     private static HelpGist currentGist;
@@ -31,31 +36,6 @@ public class HelpCommand implements NoticeableCommand {
 
     private boolean isNewGistNeeded() {
         return HelpCommand.currentGist == null || !HelpCommand.currentGist.getNames().equals(this.getNames());
-    }
-
-    @Override
-    public String[] getAliases() {
-        return new String[0];
-    }
-
-    @Override
-    public CommandType getCommandType() {
-        return CommandType.BOTH;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Gets the help for all commands.";
-    }
-
-    @Override
-    public String getName() {
-        return "help";
-    }
-
-    @Override
-    public String getUsage() {
-        return "<command>";
     }
 
     @Override

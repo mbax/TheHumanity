@@ -8,12 +8,21 @@ import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.cards.CardPack;
 import org.royaldev.thehumanity.cards.cardcast.CardcastFetcher;
 import org.royaldev.thehumanity.commands.CallInfo;
+import org.royaldev.thehumanity.commands.Command;
+import org.royaldev.thehumanity.commands.IRCCommand.CommandType;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class StartGameCommand implements NoticeableCommand {
+@Command(
+    name = "startgame",
+    description = "Starts a new game of Cards Against Humanity.",
+    aliases = {"start"},
+    usage = "<command> (packs)",
+    commandType = CommandType.MESSAGE
+)
+public class StartGameCommand extends NoticeableCommand {
 
     private final TheHumanity humanity;
 
@@ -21,33 +30,39 @@ public class StartGameCommand implements NoticeableCommand {
         this.humanity = instance;
     }
 
-    @Override
-    public String[] getAliases() {
-        return new String[]{"start"};
+    private void addDefaults(final List<CardPack> cardPacks, final boolean useDefaults) {
+        if (cardPacks.isEmpty() || useDefaults) {
+            for (String cardPack : this.humanity.getDefaultPacks()) {
+                final CardPack cp = this.humanity.getCardPack(cardPack);
+                if (cp == null) continue;
+                cardPacks.add(cp);
+            }
+            if (cardPacks.isEmpty()) cardPacks.addAll(this.humanity.getLoadedCardPacks());
+        }
+    }
+
+    private List<CardPack> getCardPacks(final String[] args) {
+        final List<CardPack> cardPacks = new ArrayList<>();
+        boolean useDefaults = false;
+        for (final String cardPack : args) {
+            if ("default".equalsIgnoreCase(cardPack)) {
+                useDefaults = true;
+                continue;
+            }
+            final CardPack cp = cardPack.startsWith("cc:") ? this.getCardcastPack(cardPack) : this.humanity.getCardPack(cardPack);
+            if (cp == null) continue;
+            cardPacks.add(cp);
+        }
+        this.addDefaults(cardPacks, useDefaults);
+        return cardPacks;
+    }
+
+    private CardPack getCardcastPack(final String name) {
+        return new CardcastFetcher(name.substring(3)).getCardPack();
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.MESSAGE;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Starts a new game of Cards Against Humanity.";
-    }
-
-    @Override
-    public String getName() {
-        return "startgame";
-    }
-
-    @Override
-    public String getUsage() {
-        return "<command> (packs)";
-    }
-
-    @Override
-    public void onCommand(GenericMessageEvent event, CallInfo ci, String[] args) {
+    public void onCommand(final GenericMessageEvent event, final CallInfo ci, final String[] args) {
         if (!(event instanceof MessageEvent)) return;
         final User u = event.getUser();
         final MessageEvent e = (MessageEvent) event;
@@ -60,31 +75,7 @@ public class StartGameCommand implements NoticeableCommand {
             this.notice(u, "You can't be in more than one game at a time!");
             return;
         }
-        final List<CardPack> cardPacks = new ArrayList<>();
-        boolean useDefaults = false;
-        for (final String cardPack : args) {
-            if ("default".equalsIgnoreCase(cardPack)) {
-                useDefaults = true;
-                continue;
-            }
-            final CardPack cp;
-            if (cardPack.startsWith("cc:")) {
-                final CardcastFetcher cf = new CardcastFetcher(cardPack.substring(3));
-                cp = cf.getCardPack();
-            } else {
-                cp = this.humanity.getCardPack(cardPack);
-            }
-            if (cp == null) continue;
-            cardPacks.add(cp);
-        }
-        if (cardPacks.isEmpty() || useDefaults) {
-            for (String cardPack : this.humanity.getDefaultPacks()) {
-                final CardPack cp = this.humanity.getCardPack(cardPack);
-                if (cp == null) continue;
-                cardPacks.add(cp);
-            }
-            if (cardPacks.isEmpty()) cardPacks.addAll(this.humanity.getLoadedCardPacks());
-        }
+        final List<CardPack> cardPacks = this.getCardPacks(args);
         final Game g = new Game(this.humanity, e.getChannel(), cardPacks);
         this.humanity.getGames().put(e.getChannel(), g);
         g.start();
