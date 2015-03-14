@@ -54,7 +54,7 @@ public class PickCardCommand extends InGameCommand {
 
     private void playerPick(final Game g, final User u, final Player p, final String[] args) {
         final Round r = g.getCurrentRound();
-        if (!this.isCzar(r, p)) {
+        if (this.isCzar(r, p)) {
             this.notice(u, "You're the card czar! Wait until all the players have chosen their cards.");
             return;
         }
