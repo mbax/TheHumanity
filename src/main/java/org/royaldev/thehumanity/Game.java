@@ -38,6 +38,7 @@ public class Game {
     private final Deck deck;
     private Round currentRound = null;
     private Player host = null;
+    private boolean hostVoiced = false;
     private ScheduledFuture countdownTask;
     private GameStatus gameStatus = GameStatus.IDLE;
 
@@ -207,7 +208,12 @@ public class Game {
      */
     public void setHost(final Player host) {
         this.host = host;
-        this.channel.send().setMode("+v " + this.getHost().getUser().getNick());
+        if (this.channel.voices.contains(this.getHost().getUser())) {
+            hostVoiced = true;
+        } else {
+            this.channel.send().setMode("+v " + this.getHost().getUser().getNick());
+            hostVoiced = false
+        }
     }
 
     /**
@@ -483,7 +489,7 @@ public class Game {
      */
     public void stop() {
         this.humanity.getGames().remove(this.channel);
-        if (this.host != null) this.channel.send().setMode("-v " + this.getHost().getUser().getNick());
+        if (this.host != null && !hostVoiced) this.channel.send().setMode("-v " + this.getHost().getUser().getNick());
         if (this.countdownTask != null) this.countdownTask.cancel(true);
         if (this.gameStatus != GameStatus.IDLE) {
             this.gameStatus = GameStatus.IDLE;
