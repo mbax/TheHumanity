@@ -13,6 +13,7 @@ import org.royaldev.thehumanity.commands.IRCCommand.CommandType;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Command(
@@ -32,11 +33,7 @@ public class StartGameCommand extends NoticeableCommand {
 
     private void addDefaults(final List<CardPack> cardPacks, final boolean useDefaults) {
         if (cardPacks.isEmpty() || useDefaults) {
-            for (String cardPack : this.humanity.getDefaultPacks()) {
-                final CardPack cp = this.humanity.getCardPack(cardPack);
-                if (cp == null) continue;
-                cardPacks.add(cp);
-            }
+            Arrays.stream(this.humanity.getDefaultPacks()).map(this.humanity::getCardPack).filter(cp -> cp != null).forEach(cardPacks::add);
             if (cardPacks.isEmpty()) cardPacks.addAll(this.humanity.getLoadedCardPacks());
         }
     }
