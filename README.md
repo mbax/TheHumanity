@@ -1,6 +1,8 @@
 TheHumanity
 ===========
 
+*Oh, the humanity!*
+
 An IRC bot for Cards Against Humanity.
 
 ## Building
@@ -65,3 +67,7 @@ The bot supports the following commands:
 | reboottheuniverse | Card numbers | reboot, rbtu | Allows use of the house rule *Rebooting the Universe*. This will sacrifice one point in order to replace cards out of your hand. |
 | packs | *None* | *None* | Gets a list of the card packs the bot is using. |
 | help | *None* | *None* | Sends a list of commands similar to this one to you over private message. |
+| cards | *None* | *None* | Shows you your cards. |
+| reboottheuniverse | Card numbers | rbtu, reboot | Sacrifices one point to replace the given card numbers. |
+| cardcounts | "public" | cardcount, cc | Displays the current card count from all of the used card packs. If the word ```public``` is used as an argument, the count will be shown in the channel. |
+| score | *None* | scores, point, points | Display the current score. |
