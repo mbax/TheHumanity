@@ -1,10 +1,5 @@
 package org.royaldev.thehumanity.commands.impl;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import org.json.JSONWriter;
 import org.pircbotx.User;
 import org.pircbotx.hooks.types.GenericMessageEvent;
 import org.royaldev.thehumanity.TheHumanity;
@@ -13,7 +8,6 @@ import org.royaldev.thehumanity.commands.Command;
 import org.royaldev.thehumanity.commands.IRCCommand;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
 
-import java.io.StringWriter;
 import java.util.stream.Collectors;
 
 @Command(
@@ -53,23 +47,11 @@ public class HelpCommand extends NoticeableCommand {
             }
         }
         if (this.isNewGistNeeded()) {
-            final StringWriter sw = new StringWriter();
-            final JSONWriter jw = new JSONWriter(sw);
-            jw.object().key("files")
-                .object().key("help.md")
-                .object().key("content").value(sb.toString())
-                .endObject().endObject().endObject();
-            try {
-                final HttpResponse<JsonNode> response = Unirest
-                    .post("https://api.github.com/gists")
-                    .body(sw.toString())
-                    .asJson();
-                final String gist = response.getBody().getObject().getString("html_url");
+            final String gist = this.humanity.gist("help.md", sb.toString());
+            if (!gist.startsWith("An error occurred")) {
                 HelpCommand.currentGist = new HelpGist(gist, this.getNames());
-                this.notice(u, gist);
-            } catch (final UnirestException ex) {
-                this.notice(u, "An error occurred: " + ex.getMessage());
             }
+            this.notice(u, gist);
         } else {
             this.notice(u, HelpCommand.currentGist.getGist());
         }

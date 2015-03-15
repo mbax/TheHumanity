@@ -1,5 +1,10 @@
 package org.royaldev.thehumanity;
 
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import org.json.JSONWriter;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -35,6 +40,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -231,6 +237,24 @@ public class TheHumanity {
 
     public ScheduledThreadPoolExecutor getThreadPool() {
         return this.stpe;
+    }
+
+    public String gist(final String fileName, final String contents) {
+        final StringWriter sw = new StringWriter();
+        final JSONWriter jw = new JSONWriter(sw);
+        jw.object().key("files")
+            .object().key(fileName)
+            .object().key("content").value(contents)
+            .endObject().endObject().endObject();
+        try {
+            final HttpResponse<JsonNode> response = Unirest
+                .post("https://api.github.com/gists")
+                .body(sw.toString())
+                .asJson();
+            return response.getBody().getObject().getString("html_url");
+        } catch (final UnirestException ex) {
+            return "An error occurred: " + ex.getMessage();
+        }
     }
 
     public boolean usersMatch(final User u, final User u2) {
