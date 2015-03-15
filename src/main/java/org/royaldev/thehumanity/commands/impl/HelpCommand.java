@@ -16,8 +16,6 @@ import java.util.stream.Collectors;
 )
 public class HelpCommand extends NoticeableCommand {
 
-    @SuppressWarnings("StaticNonFinalField")
-    private static HelpGist currentGist;
     private final TheHumanity humanity;
 
     public HelpCommand(final TheHumanity instance) {
@@ -26,10 +24,6 @@ public class HelpCommand extends NoticeableCommand {
 
     private String getNames() {
         return this.humanity.getCommandHandler().getAll().stream().map(IRCCommand::getName).sorted().collect(Collectors.joining());
-    }
-
-    private boolean isNewGistNeeded() {
-        return HelpCommand.currentGist == null || !HelpCommand.currentGist.getNames().equals(this.getNames());
     }
 
     @Override
@@ -46,33 +40,6 @@ public class HelpCommand extends NoticeableCommand {
                 sb.append("**Aliases:** ").append(String.join(", ", ic.getAliases())).append("\n");
             }
         }
-        if (this.isNewGistNeeded()) {
-            final String gist = this.humanity.gist("help.md", sb.toString());
-            if (!gist.startsWith("An error occurred")) {
-                HelpCommand.currentGist = new HelpGist(gist, this.getNames());
-            }
-            this.notice(u, gist);
-        } else {
-            this.notice(u, HelpCommand.currentGist.getGist());
-        }
-    }
-
-    private class HelpGist {
-
-        private final String gist;
-        private final String names;
-
-        private HelpGist(final String gist, final String names) {
-            this.gist = gist;
-            this.names = names;
-        }
-
-        private String getGist() {
-            return this.gist;
-        }
-
-        private String getNames() {
-            return this.names;
-        }
+        this.notice(u, this.humanity.gist("help", this.getNames(), "help.md", sb.toString()));
     }
 }

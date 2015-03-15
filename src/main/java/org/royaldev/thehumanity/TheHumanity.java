@@ -4,6 +4,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.json.JSONWriter;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -35,6 +36,7 @@ import org.royaldev.thehumanity.commands.impl.StartGameCommand;
 import org.royaldev.thehumanity.commands.impl.StopGameCommand;
 import org.royaldev.thehumanity.commands.impl.WhoCommand;
 import org.royaldev.thehumanity.handlers.CommandHandler;
+import org.royaldev.thehumanity.util.Pair;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -61,7 +63,7 @@ public class TheHumanity {
     private final PircBotX bot;
     private final CommandHandler ch = new CommandHandler();
     private final Map<Channel, Game> games = new HashMap<>();
-
+    private final Map<String, Pair<String, String>> gistCache = new HashMap<>();
     @Option(name = "-c", usage = "Channels to join.", required = true, handler = StringArrayOptionHandler.class)
     private String[] channels;
     @Option(name = "-s", usage = "Server to connect to.", required = true, handler = StringOptionHandler.class)
@@ -80,7 +82,6 @@ public class TheHumanity {
     private String nickserv = "";
     @Option(name = "-d", usage = "Default packs to use on !start.", handler = StringArrayOptionHandler.class)
     private String[] defaultPacks = new String[0];
-
     private Logger l = Logger.getLogger("org.royaldev.thehumanity");
     private ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(1);
 
@@ -239,21 +240,29 @@ public class TheHumanity {
         return this.stpe;
     }
 
-    public String gist(final String fileName, final String contents) {
-        final StringWriter sw = new StringWriter();
-        final JSONWriter jw = new JSONWriter(sw);
-        jw.object().key("files")
-            .object().key(fileName)
-            .object().key("content").value(contents)
-            .endObject().endObject().endObject();
-        try {
-            final HttpResponse<JsonNode> response = Unirest
-                .post("https://api.github.com/gists")
-                .body(sw.toString())
-                .asJson();
-            return response.getBody().getObject().getString("html_url");
-        } catch (final UnirestException ex) {
-            return "An error occurred: " + ex.getMessage();
+    public String gist(final String id, final String cacheString, final String fileName, final String contents) {
+        final Pair<String, String> hashGist = this.gistCache.get(id);
+        final String hash = DigestUtils.md5Hex(cacheString);
+        if (hashGist == null || !hash.equals(hashGist.getLeft())) {
+            final StringWriter sw = new StringWriter();
+            final JSONWriter jw = new JSONWriter(sw);
+            jw.object().key("files")
+                .object().key(fileName)
+                .object().key("content").value(contents)
+                .endObject().endObject().endObject();
+            try {
+                final HttpResponse<JsonNode> response = Unirest
+                    .post("https://api.github.com/gists")
+                    .body(sw.toString())
+                    .asJson();
+                final String gist = response.getBody().getObject().getString("html_url");
+                this.gistCache.put(id, new Pair<>(hash, gist));
+                return gist;
+            } catch (final UnirestException ex) {
+                return "An error occurred: " + ex.getMessage();
+            }
+        } else {
+            return hashGist.getRight();
         }
     }
 
