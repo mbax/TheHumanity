@@ -46,7 +46,15 @@ public class StartGameCommand extends NoticeableCommand {
                 useDefaults = true;
                 continue;
             }
-            final CardPack cp = cardPack.startsWith("cc:") ? this.getCardcastPack(cardPack) : this.humanity.getCardPack(cardPack);
+            final CardPack cp;
+            if (cardPack.startsWith("cc:")) {
+                cp = this.getCardcastPack(cardPack);
+                if (this.humanity.areCardcastPacksKept() && this.humanity.getCardPack(cp.getName()) == null) {
+                    this.humanity.addCardPack(cp);
+                }
+            } else {
+                cp = this.humanity.getCardPack(cardPack);
+            }
             if (cp == null) continue;
             cardPacks.add(cp);
         }

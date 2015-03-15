@@ -9,6 +9,7 @@ import org.json.JSONWriter;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
+import org.kohsuke.args4j.spi.BooleanOptionHandler;
 import org.kohsuke.args4j.spi.CharOptionHandler;
 import org.kohsuke.args4j.spi.IntOptionHandler;
 import org.kohsuke.args4j.spi.StringArrayOptionHandler;
@@ -77,6 +78,8 @@ public class TheHumanity {
     private String nickserv = "";
     @Option(name = "-d", usage = "Default packs to use on !start.", handler = StringArrayOptionHandler.class)
     private String[] defaultPacks = new String[0];
+    @Option(name = "-k", usage = "Keep Cardcast packs loaded once they are downloaded?", handler = BooleanOptionHandler.class)
+    private boolean keepCardcastPacks = false;
     private Logger l = Logger.getLogger("org.royaldev.thehumanity");
     private ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(1);
 
@@ -153,6 +156,10 @@ public class TheHumanity {
         synchronized (this.loadedCardPacks) {
             this.loadedCardPacks.add(cp);
         }
+    }
+
+    public boolean areCardcastPacksKept() {
+        return this.keepCardcastPacks;
     }
 
     public PircBotX getBot() {
