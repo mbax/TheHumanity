@@ -203,6 +203,19 @@ public class TheHumanity {
         return this.stpe;
     }
 
+    /**
+     * Gists the given contents under the given file name. This returns the URL to the Gist or a string of the following
+     * format: "An error occurred: [error message]"
+     * <p/>
+     * The given ID is used for caching purposes. The cacheString should be a String that identifies the contents. If
+     * cacheString changes, then the current cache for the given ID will be invalidated, and a new Gist will be made.
+     *
+     * @param id          ID of this cached gist
+     * @param cacheString Identifier for the contents
+     * @param fileName    Filename for the contents
+     * @param contents    Contents of the Gist
+     * @return URL of Gist or error message
+     */
     public String gist(final String id, final String cacheString, final String fileName, final String contents) {
         final Pair<String, String> hashGist = this.gistCache.get(id);
         final String hash = DigestUtils.md5Hex(cacheString);
