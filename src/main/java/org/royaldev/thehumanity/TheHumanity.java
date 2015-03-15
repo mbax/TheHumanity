@@ -19,8 +19,6 @@ import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.exception.IrcException;
 import org.royaldev.thehumanity.cards.CardPack;
-import org.royaldev.thehumanity.cards.types.BlackCard;
-import org.royaldev.thehumanity.cards.types.WhiteCard;
 import org.royaldev.thehumanity.commands.impl.CardCountsCommand;
 import org.royaldev.thehumanity.commands.impl.CardsCommand;
 import org.royaldev.thehumanity.commands.impl.HelpCommand;
@@ -38,9 +36,6 @@ import org.royaldev.thehumanity.commands.impl.WhoCommand;
 import org.royaldev.thehumanity.handlers.CommandHandler;
 import org.royaldev.thehumanity.util.Pair;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
@@ -111,39 +106,7 @@ public class TheHumanity {
     }
 
     private void loadCardPacks() {
-        for (final String cardPack : this.cardPacks) {
-            final File f = new File("cardpacks", cardPack);
-            if (!f.exists() || !f.isFile()) {
-                this.getLogger().warning(f.getName() + " does not exist.");
-                continue;
-            }
-            if (!f.canRead()) {
-                this.getLogger().warning("Cannot read " + f.getName() + ".");
-                continue;
-            }
-            final CardPack cp = new CardPack(CardPack.getNameFromFileName(f.getName()));
-            try (final BufferedReader br = new BufferedReader(new FileReader(f))) {
-                String line;
-                boolean isBlack = false;
-                while ((line = br.readLine()) != null) {
-                    line = line.trim();
-                    if (line.isEmpty() || line.startsWith("#")) continue;
-                    if ("___WHITE___".equalsIgnoreCase(line)) {
-                        isBlack = false;
-                        continue;
-                    } else if ("___BLACK___".equalsIgnoreCase(line)) {
-                        isBlack = true;
-                        continue;
-                    }
-                    if (isBlack) cp.addCard(new BlackCard(cp, line));
-                    else cp.addCard(new WhiteCard(cp, line));
-                }
-            } catch (final IOException ex) {
-                this.getLogger().warning(ex.getMessage());
-                continue;
-            }
-            this.addCardPack(cp);
-        }
+        new CardPackParser(this).parseCardPacks(this.cardPacks).forEach(this::addCardPack);
     }
 
     private void parseArguments(final String[] args) {

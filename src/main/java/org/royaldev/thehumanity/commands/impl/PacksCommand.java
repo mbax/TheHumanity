@@ -25,6 +25,34 @@ public class PacksCommand extends IRCCommand {
         this.humanity = instance;
     }
 
+    private String generateCardPackMarkdown(final CardPack cp) {
+        final StringBuilder sb = new StringBuilder();
+        final int blackCards = cp.getBlackCards().size();
+        final int whiteCards = cp.getWhiteCards().size();
+        final int totalCards = blackCards + whiteCards;
+        sb.append("## ").append(cp.getName()).append("\n");
+        final String description = cp.getDescription();
+        final String author = cp.getAuthor();
+        if (description != null || author != null) {
+            sb.append("### Metadata\n");
+            sb.append("|Title|Data|\n|---|---|\n");
+            if (description != null) {
+                sb.append("|Description|").append(description).append("|\n");
+            }
+            if (author != null) {
+                sb.append("|Author|").append(author).append("|\n");
+            }
+        }
+        sb.append("### Information\n");
+        sb.append("|Title|Data|\n|---|---|\n");
+        sb.append("|Total cards|").append(totalCards).append("|\n");
+        sb.append("|Black cards|").append(blackCards).append(" (").append(PacksCommand.df.format((double) blackCards / (double) totalCards)).append(")|\n");
+        sb.append("|White cards|").append(whiteCards).append(" (").append(PacksCommand.df.format((double) whiteCards / (double) totalCards)).append(")|\n");
+        sb.append("|Random black card|").append("```").append(cp.getBlackCards().get(PacksCommand.r.nextInt(blackCards))).append("```|\n");
+        sb.append("|Random white card|").append("```").append(cp.getWhiteCards().get(PacksCommand.r.nextInt(whiteCards))).append("```|\n");
+        return sb.toString();
+    }
+
     @Override
     public void onCommand(final GenericMessageEvent event, final CallInfo ci, final String[] args) {
         final StringBuilder sb = new StringBuilder();
@@ -35,15 +63,7 @@ public class PacksCommand extends IRCCommand {
         );
         sb.append("\n\n# Individual card packs\n");
         for (final CardPack cp : this.humanity.getLoadedCardPacks()) {
-            final int blackCards = cp.getBlackCards().size();
-            final int whiteCards = cp.getWhiteCards().size();
-            final int totalCards = blackCards + whiteCards;
-            sb.append("## ").append(cp.getName()).append("\n");
-            sb.append("**Total cards:** ").append(totalCards).append("  \n");
-            sb.append("**Black cards:** ").append(blackCards).append(" (").append(PacksCommand.df.format((double) blackCards / (double) totalCards)).append(")  \n");
-            sb.append("**White cards:** ").append(whiteCards).append(" (").append(PacksCommand.df.format((double) whiteCards / (double) totalCards)).append(")  \n");
-            sb.append("**Random black card:** ").append("```").append(cp.getBlackCards().get(PacksCommand.r.nextInt(blackCards))).append("```  \n");
-            sb.append("**Random white card:** ").append("```").append(cp.getWhiteCards().get(PacksCommand.r.nextInt(whiteCards))).append("```  \n");
+            sb.append(this.generateCardPackMarkdown(cp));
         }
         event.respond(this.humanity.gist("packs", allPackNames, "packs.md", sb.toString()));
     }

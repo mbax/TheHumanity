@@ -11,6 +11,8 @@ public class CardPack {
     private final String name;
     private final List<BlackCard> blackCards = new ArrayList<>();
     private final List<WhiteCard> whiteCards = new ArrayList<>();
+    private String description;
+    private String author;
 
     public CardPack(final String name) {
         this.name = name;
@@ -37,8 +39,24 @@ public class CardPack {
         return cp.getName().equals(this.getName());
     }
 
+    public String getAuthor() {
+        return this.author;
+    }
+
+    public void setAuthor(final String author) {
+        this.author = author;
+    }
+
     public List<BlackCard> getBlackCards() {
         return new ArrayList<>(this.blackCards);
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
     }
 
     public String getName() {
