@@ -15,6 +15,9 @@ import org.royaldev.thehumanity.cards.types.WhiteCard;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class the creates CardPacks based on Cardcast IDs.
+ */
 public class CardcastFetcher {
 
     private static final String INFO_URL = "https://api.cardcastgame.com/v1/decks/%s";
@@ -22,11 +25,22 @@ public class CardcastFetcher {
     private final String id;
     private String name;
 
+    /**
+     * Constructs a new fether for the given Cardcast ID.
+     *
+     * @param id ID of the Cardcast pack
+     */
     public CardcastFetcher(final String id) {
         this.id = id;
         this.getInfo();
     }
 
+    /**
+     * Gets the text of a black card, given its parts.
+     *
+     * @param parts Parts of the black card
+     * @return Complete text
+     */
     private String getBlackCardText(final JSONArray parts) {
         final List<String> listParts = new ArrayList<>();
         for (int i = 0; i < parts.length(); i++) {
@@ -35,10 +49,23 @@ public class CardcastFetcher {
         return StringUtils.join(listParts, "_");
     }
 
+    /**
+     * Adds the list of cards to the CardPack.
+     *
+     * @param cp    CardPack to add to
+     * @param cards Cards to add
+     */
     public void addCards(final CardPack cp, final List<Card> cards) {
         cards.forEach(cp::addCard);
     }
 
+    /**
+     * Gets all the black cards of the Cardcast pack.
+     *
+     * @param cp    CardPack for black cards
+     * @param calls Cardcast black cards
+     * @return All converted black cards
+     */
     public List<Card> getBlackCards(final CardPack cp, final JSONArray calls) {
         final List<Card> blackCards = new ArrayList<>();
         for (int i = 0; i < calls.length(); i++) {
@@ -48,6 +75,11 @@ public class CardcastFetcher {
         return blackCards;
     }
 
+    /**
+     * Gets the converted CardPack. If there was an error contacting Cardcast, this returns null.
+     *
+     * @return CardPack or null
+     */
     public CardPack getCardPack() {
         final HttpResponse<JsonNode> hr;
         try {
@@ -63,6 +95,9 @@ public class CardcastFetcher {
         return cp;
     }
 
+    /**
+     * Sets the information about this CardPack from Cardcast's API.
+     */
     public void getInfo() {
         final HttpResponse<JsonNode> hr;
         try {
@@ -74,6 +109,13 @@ public class CardcastFetcher {
         this.name = hr.getBody().getObject().getString("name");
     }
 
+    /**
+     * Gets all the white cards of the Cardcast pack.
+     *
+     * @param cp        CardPack for white cards
+     * @param responses Cardcast white cards
+     * @return All converted white cards
+     */
     public List<Card> getWhiteCards(final CardPack cp, final JSONArray responses) {
         final List<Card> whiteCards = new ArrayList<>();
         for (int i = 0; i < responses.length(); i++) {

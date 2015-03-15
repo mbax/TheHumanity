@@ -25,6 +25,14 @@ public class RebootTheUniverseCommand extends InGameCommand {
         super(instance);
     }
 
+    /**
+     * Gets WhiteCards from the given Player's Hand, given their numbers. If any number is invalid, null will be returned.
+     *
+     * @param args Numbers of cards
+     * @param p    Player to get cards from
+     * @param u    User that the Player represents
+     * @return A list of WhiteCards of null
+     */
     private List<WhiteCard> getCardsFromNumbers(final String[] args, final Player p, final User u) {
         final List<WhiteCard> cardsToRemove = new ArrayList<>();
         for (final String index : args) {

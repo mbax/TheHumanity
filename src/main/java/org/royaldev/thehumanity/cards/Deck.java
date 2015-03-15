@@ -10,7 +10,10 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Deck class. Each game should have one deck, which contains both white and black cards. Decks are repopulating,
+ * Deck class. A deck is a collection of {@link CardPack CardPacks}. When playing, the Deck pays no heed to which pack a
+ * card belongs to when dealing.
+ * <p/>
+ * Each game should have one deck, which contains both white and black cards. Decks are repopulating,
  * meaning that if cards of either type run out, that type of card will be replenished from the card pack sources. This
  * happens automatically for white cards when drawing randomly. Black cards must be manually repopulated.
  */

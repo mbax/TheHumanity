@@ -31,6 +31,12 @@ public class StartGameCommand extends NoticeableCommand {
         this.humanity = instance;
     }
 
+    /**
+     * Adds default packs to the given list of packs if it is empty of if useDefaults is true.
+     *
+     * @param cardPacks   List of packs to add to
+     * @param useDefaults Should defaults be added, even if the list is not empty?
+     */
     private void addDefaults(final List<CardPack> cardPacks, final boolean useDefaults) {
         if (cardPacks.isEmpty() || useDefaults) {
             Arrays.stream(this.humanity.getDefaultPacks()).map(this.humanity::getCardPack).filter(cp -> cp != null).forEach(cardPacks::add);
@@ -38,6 +44,17 @@ public class StartGameCommand extends NoticeableCommand {
         }
     }
 
+    /**
+     * Gets the named card packs. If any card pack starts with "cc:", it is assumed to be a Cardcast pack, and an
+     * attempt will be made to fetch and convert it for this game. If TheHumanity was started with the option to keep
+     * Cardcast packs loaded after downloading, the pack will be added to the main list of global packs.
+     * <p/>
+     * If any of the listed packs is titled "default", the default packs listed when TheHumanity was started will be
+     * added.
+     *
+     * @param args List of pack names
+     * @return List of packs
+     */
     private List<CardPack> getCardPacks(final String[] args) {
         final List<CardPack> cardPacks = new ArrayList<>();
         boolean useDefaults = false;
@@ -62,6 +79,12 @@ public class StartGameCommand extends NoticeableCommand {
         return cardPacks;
     }
 
+    /**
+     * Gets a Cardcast pack by its ID.
+     *
+     * @param name ID
+     * @return Pack or null
+     */
     private CardPack getCardcastPack(final String name) {
         return new CardcastFetcher(name.substring(3)).getCardPack();
     }

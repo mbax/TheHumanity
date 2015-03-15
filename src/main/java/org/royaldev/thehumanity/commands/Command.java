@@ -18,12 +18,32 @@ public @interface Command {
      */
     String[] aliases() default {};
 
+    /**
+     * The CommandType for this command.
+     *
+     * @return CommandType
+     */
     CommandType commandType() default CommandType.BOTH;
 
+    /**
+     * A description of what this command does.
+     *
+     * @return Description
+     */
     String description();
 
+    /**
+     * The name of this command.
+     *
+     * @return Name
+     */
     String name();
 
+    /**
+     * The usage of this command.
+     *
+     * @return Usage
+     */
     String usage() default "<command>";
 
 }

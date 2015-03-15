@@ -22,6 +22,12 @@ public class WhoCommand extends InGameCommand {
         super(instance);
     }
 
+    /**
+     * Builds a String containing information about who the czar is, who is playing, and if they have played or not.
+     *
+     * @param g Game to build this String for
+     * @return Built String, ready to be sent
+     */
     private String getStatusString(final Game g) {
         final Round r = g.getCurrentRound();
         final StringBuilder sb = new StringBuilder();
@@ -31,7 +37,7 @@ public class WhoCommand extends InGameCommand {
             final String c = r.hasPlayed(player) ? Colors.GREEN : r.getCurrentStage() == RoundStage.WAITING_FOR_CZAR ? Colors.BLUE : Colors.RED;
             sb.append(c).append(player.getUser().getNick()).append(Colors.NORMAL).append(", ");
         }
-        return sb.toString();
+        return sb.substring(0, sb.length() - 2);
     }
 
     @Override
@@ -43,6 +49,6 @@ public class WhoCommand extends InGameCommand {
             return;
         }
         final String ss = this.getStatusString(g);
-        event.respond(g.antiPing(ss.substring(0, ss.length() - 2)));
+        event.respond(g.antiPing(ss));
     }
 }

@@ -22,6 +22,12 @@ public class HelpCommand extends NoticeableCommand {
         this.humanity = instance;
     }
 
+    /**
+     * Gets the names of all commands, in alphabetical order, concatenated together with no delimiter. Used for a cache
+     * String by the {@link org.royaldev.thehumanity.TheHumanity#gist TheHumanity#gist()} method.
+     *
+     * @return String, as specified above
+     */
     private String getNames() {
         return this.humanity.getCommandHandler().getAll().stream().map(IRCCommand::getName).sorted().collect(Collectors.joining());
     }

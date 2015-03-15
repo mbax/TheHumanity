@@ -31,6 +31,14 @@ public class PickCardCommand extends InGameCommand {
         super(instance);
     }
 
+    /**
+     * Processes any use of this command during the WAITING_FOR_CZAR stage.
+     *
+     * @param g    Game the command was used in
+     * @param u    User using command
+     * @param p    Player representative of the User
+     * @param args Arguments supplied
+     */
     private void czarPick(final Game g, final User u, final Player p, final String[] args) {
         final Round r = g.getCurrentRound();
         if (!this.isCzar(r, p)) {
@@ -48,10 +56,25 @@ public class PickCardCommand extends InGameCommand {
         r.chooseWinningPlay(winningPlay);
     }
 
+    /**
+     * Checks if the given Player is the czar of the given Round.
+     *
+     * @param r Round to check
+     * @param p Player to check
+     * @return true if Player is czar of the Round, false if otherwise
+     */
     private boolean isCzar(final Round r, final Player p) {
         return r.getCzar().equals(p);
     }
 
+    /**
+     * Processes any use of this command during the WAITING_FOR_PLAYERS stage.
+     *
+     * @param g    Game the command was used in
+     * @param u    User using command
+     * @param p    Player representative of the User
+     * @param args Arguments supplied
+     */
     private void playerPick(final Game g, final User u, final Player p, final String[] args) {
         final Round r = g.getCurrentRound();
         if (this.isCzar(r, p)) {
@@ -73,6 +96,14 @@ public class PickCardCommand extends InGameCommand {
         r.addPlay(new Play(p, play));
     }
 
+    /**
+     * Returns a list of WhiteCards from the given Hand, given their numbers as Strings.
+     *
+     * @param u     User who used command
+     * @param hand  Hand to use cards from
+     * @param picks Supplied numbers
+     * @return List of WhiteCards or null if there was an issue
+     */
     private List<WhiteCard> processPicks(final User u, final Hand<WhiteCard> hand, final String[] picks) {
         final List<WhiteCard> play = new ArrayList<>();
         for (final String number : picks) {

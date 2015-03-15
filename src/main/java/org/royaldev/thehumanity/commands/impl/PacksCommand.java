@@ -25,6 +25,14 @@ public class PacksCommand extends IRCCommand {
         this.humanity = instance;
     }
 
+    /**
+     * Generates Markdown, suitable for pasting to GitHub Gist, for the the given CardPack. Markdown will include the
+     * name of the pack, any description or author (if set), statistics about the numbers of cards, and a random
+     * selection of both one white and one black card.
+     *
+     * @param cp CardPack to generate Markdown for
+     * @return A Markdown String
+     */
     private String generateCardPackMarkdown(final CardPack cp) {
         final StringBuilder sb = new StringBuilder();
         final int blackCards = cp.getBlackCards().size();
