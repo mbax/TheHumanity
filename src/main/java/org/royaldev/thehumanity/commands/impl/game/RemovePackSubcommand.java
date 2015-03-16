@@ -40,6 +40,6 @@ public class RemovePackSubcommand extends InGameCommand {
             this.notice(u, "No such card pack.");
             return;
         }
-        this.notice(u, (g.removeCardPack(cp, args.length > 1 && "sweep".equalsIgnoreCase(args[1])) ? "Removed" : "Could not removed") + " " + Colors.BOLD + cp.getName() + Colors.NORMAL + " from the game.");
+        event.respond((g.removeCardPack(cp, args.length > 1 && "sweep".equalsIgnoreCase(args[1])) ? "Removed" : "Could not remove") + " " + Colors.BOLD + cp.getName() + Colors.NORMAL + " from the game.");
     }
 }

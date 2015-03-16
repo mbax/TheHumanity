@@ -39,6 +39,6 @@ public class AddPackSubcommand extends InGameCommand {
             this.notice(u, "No such card pack.");
             return;
         }
-        this.notice(u, (g.addCardPack(cp) ? "Added" : "Could not add") + " " + Colors.BOLD + cp.getName() + Colors.NORMAL + " to the game.");
+        event.respond((g.addCardPack(cp) ? "Added" : "Could not add") + " " + Colors.BOLD + cp.getName() + Colors.NORMAL + " to the game.");
     }
 }
