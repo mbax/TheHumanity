@@ -35,6 +35,7 @@ import org.royaldev.thehumanity.commands.impl.SkipCommand;
 import org.royaldev.thehumanity.commands.impl.StartGameCommand;
 import org.royaldev.thehumanity.commands.impl.StopGameCommand;
 import org.royaldev.thehumanity.commands.impl.WhoCommand;
+import org.royaldev.thehumanity.commands.impl.game.GameCommand;
 import org.royaldev.thehumanity.handlers.CommandHandler;
 import org.royaldev.thehumanity.util.Pair;
 
@@ -140,6 +141,7 @@ public class TheHumanity {
         this.getCommandHandler().register(new CardCountsCommand(this));
         this.getCommandHandler().register(new ScoreCommand(this));
         this.getCommandHandler().register(new HostCommand(this));
+        this.getCommandHandler().register(new GameCommand(this));
     }
 
     private void setUpLogger() {

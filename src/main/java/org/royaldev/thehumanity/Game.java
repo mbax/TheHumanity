@@ -49,6 +49,16 @@ public class Game {
     }
 
     /**
+     * Adds a CardPack to this Game.
+     *
+     * @param cp CardPack to add.
+     * @return true if pack was added, false if otherwise
+     */
+    public boolean addCardPack(final CardPack cp) {
+        return this.deck.addCardPack(cp);
+    }
+
+    /**
      * Adds a player to the game. If there are not enough white cards to deal this player in, the game will end. If this
      * Player has previously played, all cards and points will be restored to it.
      *
@@ -363,6 +373,27 @@ public class Game {
                 this.getCurrentRound().advanceStage();
                 break;
         }
+    }
+
+    /**
+     * Removes a CardPack from this Game. If sweep is true, any cards in players' hands will be removed if they belonged
+     * to the removed pack. If cards are removed, new cards will be dealt, and the affected players will have their
+     * hands shown to them.
+     *
+     * @param cp    CardPack to remove
+     * @param sweep Remove cards in hands?
+     * @return true if the pack was removed, false if otherwise
+     */
+    public boolean removeCardPack(final CardPack cp, final boolean sweep) {
+        if (!this.deck.removeCardPack(cp)) return false;
+        if (!sweep) return true;
+        this.allPlayers.forEach(p -> {
+            if (!p.getHand().removeCards(cp.getWhiteCards())) return;
+            this.deal(p);
+            p.getUser().send().notice("Your hand has changed as a result of card pack changes. Here's your new hand!");
+            this.showCards(p);
+        });
+        return true;
     }
 
     /**

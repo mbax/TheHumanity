@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Deck class. A deck is a collection of {@link CardPack CardPacks}. When playing, the Deck pays no heed to which pack a
@@ -34,6 +35,19 @@ public class Deck {
         }
         this.repopulateBlackCards();
         this.repopulateWhiteCards();
+    }
+
+    /**
+     * Adds a CardPack to this Deck. All cards in the pack will be added to this Deck.
+     *
+     * @param cp CardPack to add
+     * @return true if the pack was added, false if otherwise
+     */
+    public boolean addCardPack(final CardPack cp) {
+        if (!this.cardPacks.add(cp)) return false;
+        cp.getWhiteCards().forEach(this.whiteCards::add);
+        cp.getBlackCards().forEach(this.blackCards::add);
+        return true;
     }
 
     /**
@@ -112,6 +126,16 @@ public class Deck {
      */
     public int getWhiteCardCount() {
         return this.cardPacks.stream().mapToInt(cp -> cp.getWhiteCards().size()).sum();
+    }
+
+    /**
+     * Removes a CardPack from this Deck, removing all the cards it has, as well.
+     *
+     * @param cp CardPack to remove
+     * @return true if pack was removed, false if otherwise
+     */
+    public boolean removeCardPack(final CardPack cp) {
+        return !(!this.cardPacks.contains(cp) || !this.cardPacks.remove(cp)) && this.whiteCards.removeAll(this.whiteCards.stream().filter(wc -> wc.getCardPack().equals(cp)).collect(Collectors.toCollection(ArrayList::new)));
     }
 
     /**
