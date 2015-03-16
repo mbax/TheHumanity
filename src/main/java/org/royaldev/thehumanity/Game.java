@@ -209,7 +209,7 @@ public class Game {
     public void setHost(final Player host) {
         this.host = host;
         this.hostWasVoiced = this.channel.getVoices().contains(this.getHost().getUser());
-        if (this.hostWasVoiced) {
+        if (!this.hostWasVoiced) {
             this.channel.send().setMode("+v " + this.getHost().getUser().getNick());
         }
     }
@@ -302,7 +302,9 @@ public class Game {
      * Devoices the current host and sets a new host (voicing him).
      */
     public void nextHost() {
-        if (this.host != null) this.channel.send().setMode("-v " + this.getHost().getUser().getNick());
+        if (this.host != null && !this.hostWasVoiced) {
+            this.channel.send().setMode("-v " + this.getHost().getUser().getNick());
+        }
         synchronized (this.players) {
             if (this.players.size() < 1) return; // should never happen without the game stopping
             this.setHost(this.players.get(0));
