@@ -12,8 +12,8 @@ public abstract class InGameCommand extends NoticeableCommand {
 
     protected final TheHumanity humanity;
 
-    protected InGameCommand(final TheHumanity humanity) {
-        this.humanity = humanity;
+    protected InGameCommand(final TheHumanity instance) {
+        this.humanity = instance;
     }
 
     /**
