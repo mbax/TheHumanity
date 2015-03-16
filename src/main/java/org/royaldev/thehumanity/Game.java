@@ -212,6 +212,7 @@ public class Game {
         if (!this.hostWasVoiced) {
             this.channel.send().setMode("+v " + this.getHost().getUser().getNick());
         }
+        this.showHost();
     }
 
     /**
@@ -456,6 +457,13 @@ public class Game {
      */
     public void showCards() {
         this.players.stream().filter(p -> !p.equals(this.getCurrentRound().getCzar())).forEach(this::showCards);
+    }
+
+    /**
+     * Sends a message to the game channel, declaring who the host is.
+     */
+    public void showHost() {
+        this.sendMessage("The host is " + Colors.BOLD + this.host.getUser().getNick() + Colors.NORMAL + ".");
     }
 
     /**

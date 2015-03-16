@@ -23,6 +23,7 @@ import org.royaldev.thehumanity.cards.CardPack;
 import org.royaldev.thehumanity.commands.impl.CardCountsCommand;
 import org.royaldev.thehumanity.commands.impl.CardsCommand;
 import org.royaldev.thehumanity.commands.impl.HelpCommand;
+import org.royaldev.thehumanity.commands.impl.HostCommand;
 import org.royaldev.thehumanity.commands.impl.JoinGameCommand;
 import org.royaldev.thehumanity.commands.impl.KickCommand;
 import org.royaldev.thehumanity.commands.impl.LeaveGameCommand;
@@ -138,6 +139,7 @@ public class TheHumanity {
         this.getCommandHandler().register(new RebootTheUniverseCommand(this));
         this.getCommandHandler().register(new CardCountsCommand(this));
         this.getCommandHandler().register(new ScoreCommand(this));
+        this.getCommandHandler().register(new HostCommand(this));
     }
 
     private void setUpLogger() {
