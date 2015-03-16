@@ -407,14 +407,16 @@ public class Game {
         }
         this.sendMessage(Colors.BOLD + p.getUser().getNick() + Colors.NORMAL + " has left the game.");
         if (this.host.equals(p)) this.nextHost();
-        if (p.equals(this.getCurrentRound().getCzar())) {
-            this.sendMessage(Colors.BOLD + "The czar has left!" + Colors.NORMAL + " Returning your cards and starting a new round.");
-            this.getCurrentRound().returnCards();
-            this.advanceStage();
-            return;
-        }
-        if (this.getCurrentRound().hasAllPlaysMade() && this.getCurrentRound().getCurrentStage() == RoundStage.WAITING_FOR_PLAYERS) {
-            this.getCurrentRound().advanceStage();
+        if (this.getCurrentRound() != null) {
+            if (this.getCurrentRound().getCzar().equals(p)) {
+                this.sendMessage(Colors.BOLD + "The czar has left!" + Colors.NORMAL + " Returning your cards and starting a new round.");
+                this.getCurrentRound().returnCards();
+                this.advanceStage();
+                return;
+            }
+            if (this.getCurrentRound().hasAllPlaysMade() && this.getCurrentRound().getCurrentStage() == RoundStage.WAITING_FOR_PLAYERS) {
+                this.getCurrentRound().advanceStage();
+            }
         }
     }
 
