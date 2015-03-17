@@ -315,6 +315,7 @@ public class Game {
     public void nextHost() {
         if (this.host != null && !this.hostWasVoiced) {
             this.channel.send().setMode("-v " + this.getHost().getUser().getNick());
+            this.host = null;
         }
         synchronized (this.players) {
             if (this.players.size() < 1) return; // should never happen without the game stopping
