@@ -20,8 +20,9 @@ public final class ConversionHelper {
             ConversionHelper.respond((ActorChannelEvent<User>) ae, message);
         } else if (ae instanceof ActorMessageEvent) {
             ConversionHelper.respond((ActorMessageEvent<User>) ae, message);
+        } else {
+            throw new IllegalArgumentException("Invalid event type.");
         }
-        throw new IllegalArgumentException("Invalid event type.");
     }
 
 }
