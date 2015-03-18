@@ -45,7 +45,7 @@ public class WhoCommand extends InGameCommand {
     public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, final Game g, final String[] args) {
         final User u = event.getActor();
         final Round r = g.getCurrentRound();
-        if (r.getCurrentStage() != RoundStage.WAITING_FOR_CZAR && r.getCurrentStage() != RoundStage.WAITING_FOR_PLAYERS) {
+        if (r == null || r.getCurrentStage() != RoundStage.WAITING_FOR_CZAR && r.getCurrentStage() != RoundStage.WAITING_FOR_PLAYERS) {
             this.notice(u, "The game has not yet started.");
             return;
         }
