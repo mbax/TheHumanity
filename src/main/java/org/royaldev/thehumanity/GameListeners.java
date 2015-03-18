@@ -2,7 +2,9 @@ package org.royaldev.thehumanity;
 
 import org.kitteh.irc.client.library.EventHandler;
 import org.kitteh.irc.client.library.element.User;
+import org.kitteh.irc.client.library.event.channel.ChannelKickEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelPartEvent;
+import org.kitteh.irc.client.library.event.user.UserNickChangeEvent;
 import org.kitteh.irc.client.library.event.user.UserQuitEvent;
 
 public class GameListeners {
@@ -11,6 +13,26 @@ public class GameListeners {
 
     public GameListeners(final TheHumanity instance) {
         this.humanity = instance;
+    }
+
+    @EventHandler
+    public void onNick(final UserNickChangeEvent event) {
+        this.humanity.getGames().values().stream().forEach(
+            game -> {
+                game.updateChannel();
+                game.getHistoricPlayers().stream()
+                    .filter(p -> p.getUser().getNick().equals(event.getActor().getNick()))
+                    .forEach(p -> p.setUser(event.getNewUser()));
+            }
+        );
+    }
+
+    @EventHandler
+    public void onKick(final ChannelKickEvent event) {
+        final User u = event.getActor();
+        final Game g = this.humanity.getGameFor(u);
+        if (g == null || !g.getChannel().getName().equalsIgnoreCase(event.getChannel().getName())) return;
+        g.removePlayer(g.getPlayer(event.getActor()));
     }
 
     @EventHandler

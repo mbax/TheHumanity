@@ -26,7 +26,6 @@ import java.util.concurrent.TimeUnit;
 public class Game {
 
     private final TheHumanity humanity;
-    private final Channel channel;
     /**
      * A list of the current players in this game.
      */
@@ -36,6 +35,7 @@ public class Game {
      */
     private final List<Player> allPlayers = Collections.synchronizedList(new ArrayList<>());
     private final Deck deck;
+    private Channel channel;
     private Round currentRound = null;
     private Player host = null;
     private ScheduledFuture countdownTask;
@@ -74,6 +74,7 @@ public class Game {
                 this.allPlayers.add(player);
             }
         }
+        this.update();
         final int totalCards = this.getDeck().getCardPacks().stream().mapToInt(cp -> cp.getWhiteCards().size()).sum();
         if (this.players.size() * 7 >= totalCards) {
             this.sendMessage(IRCFormat.BOLD + "Not enough white cards to play!");
@@ -167,6 +168,15 @@ public class Game {
     }
 
     /**
+     * Sets the Channel that this Game is in.
+     *
+     * @param channel Channel
+     */
+    private void setChannel(final Channel channel) {
+        this.channel = channel;
+    }
+
+    /**
      * Gets the current Round.
      *
      * @return Round
@@ -200,6 +210,15 @@ public class Game {
      */
     public void setGameStatus(final GameStatus s) {
         this.gameStatus = s;
+    }
+
+    /**
+     * Returns the internal list of all players that have ever played in this game.
+     *
+     * @return List
+     */
+    public List<Player> getHistoricPlayers() {
+        return this.allPlayers;
     }
 
     /**
@@ -411,6 +430,7 @@ public class Game {
         }
         this.sendMessage(IRCFormat.BOLD + p.getUser().getNick() + IRCFormat.RESET + " has left the game.");
         if (this.host.equals(p)) this.nextHost();
+        this.update();
         if (this.getCurrentRound() != null) {
             if (!this.hasEnoughPlayers()) return;
             if (this.getCurrentRound().getCzar().equals(p)) {
@@ -545,6 +565,43 @@ public class Game {
             if (this.gameStatus != GameStatus.JOINING) this.showScores();
         }
         this.gameStatus = GameStatus.ENDED;
+    }
+
+    /**
+     * Updates the Channel and Users.
+     */
+    public void update() {
+        this.updateChannel();
+        this.updateUsers();
+    }
+
+    /**
+     * Updates the stored Channel snapshot.
+     */
+    public void updateChannel() {
+        this.setChannel(
+            this.humanity.getBot().getChannels().stream()
+                .filter(c -> c.getName().equalsIgnoreCase(this.getChannel().getName()))
+                .findFirst()
+                .orElseThrow(IllegalStateException::new)
+        );
+    }
+
+    /**
+     * Updates the Users stored in all Players.
+     */
+    public void updateUsers() {
+        this.getHistoricPlayers().stream()
+            .forEach(p -> {
+                    final User newUser = this.channel.getUsers().keySet().stream()
+                        .filter(u -> u.getNick().equalsIgnoreCase(p.getUser().getNick()))
+                        .findFirst()
+                        .orElse(null);
+                    if (newUser == null) return;
+                    p.setUser(newUser);
+                }
+            );
+
     }
 
     public enum GameStatus {

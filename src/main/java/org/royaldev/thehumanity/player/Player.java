@@ -11,7 +11,7 @@ public class Player {
 
     private final Hand<WhiteCard> hand = new Hand<>();
     private final Hand<BlackCard> wins = new Hand<>();
-    private final User user;
+    private User user;
 
     public Player(final User user) {
         this.user = user;
@@ -35,6 +35,10 @@ public class Player {
 
     public User getUser() {
         return this.user;
+    }
+
+    public void setUser(final User user) {
+        this.user = user;
     }
 
     public Hand<BlackCard> getWins() {
