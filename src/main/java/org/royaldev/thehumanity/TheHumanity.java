@@ -97,6 +97,7 @@ public class TheHumanity {
         if (!this.nickserv.isEmpty()) cb.auth(AuthType.NICKSERV, this.nickname, this.nickserv);
         if (!this.serverPassword.isEmpty()) cb.serverPassword(this.serverPassword);
         this.bot = cb.build();
+        this.bot.setMessageDelay(0);
         this.bot.addChannel(this.channels);
         final EventManager em = this.bot.getEventManager();
         em.registerEventListener(new BaseListeners(this));
