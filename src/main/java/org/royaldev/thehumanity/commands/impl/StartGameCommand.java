@@ -105,6 +105,8 @@ public class StartGameCommand extends NoticeableCommand {
         }
         final List<CardPack> cardPacks = this.getCardPacks(args);
         final Game g = new Game(this.humanity, e.getChannel(), cardPacks);
+        System.out.println("this.humanity.getGames() = " + this.humanity.getGames());
+        System.out.println("e.getChannel().hashCode() = " + e.getChannel().hashCode());
         this.humanity.getGames().put(e.getChannel(), g);
         g.start();
         g.setHost(g.createPlayer(u));
