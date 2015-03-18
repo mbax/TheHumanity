@@ -1,6 +1,7 @@
 package org.royaldev.thehumanity.commands;
 
-import org.pircbotx.hooks.types.GenericMessageEvent;
+import org.kitteh.irc.client.library.element.User;
+import org.kitteh.irc.client.library.event.ActorEvent;
 
 /**
  * The basis for all commands handled by the bot.
@@ -9,14 +10,14 @@ public abstract class IRCCommand {
 
     /**
      * This method is called when a command is received. Depending on what {@link #getCommandType()} returns, the event
-     * passed to this method will either be a {@link org.pircbotx.hooks.events.MessageEvent} or a
-     * {@link org.pircbotx.hooks.events.PrivateMessageEvent}.
+     * passed to this method will either be a {@link org.kitteh.irc.client.library.event.channel.ChannelMessageEvent} or
+     * a {@link org.kitteh.irc.client.library.event.user.PrivateMessageEvent}.
      *
      * @param event Event of receiving command
      * @param ci    Information received when this command was called
      * @param args  Arguments passed to the command
      */
-    public abstract void onCommand(GenericMessageEvent event, CallInfo ci, String[] args);
+    public abstract void onCommand(final ActorEvent<User> event, final CallInfo ci, final String[] args);
 
     /**
      * Returns the first parameter, unless it is null, in which case, the second parameter is returned.

@@ -1,6 +1,6 @@
 package org.royaldev.thehumanity.cards.types;
 
-import org.pircbotx.Colors;
+import org.kitteh.irc.client.library.IRCFormat;
 import org.royaldev.thehumanity.cards.Card;
 import org.royaldev.thehumanity.cards.CardPack;
 import org.royaldev.thehumanity.cards.Play;
@@ -51,7 +51,7 @@ public class BlackCard extends Card {
         for (final WhiteCard wc : p.getWhiteCards()) {
             final Matcher m = BlackCard.blankPattern.matcher(filled);
             try {
-                filled = m.replaceFirst(Colors.BOLD + wc.getText().replaceAll("([\\\\\\$])", "\\\\$1") + Colors.NORMAL);
+                filled = m.replaceFirst(IRCFormat.BOLD + wc.getText().replaceAll("([\\\\\\$])", "\\\\$1") + IRCFormat.RESET);
             } catch (final IndexOutOfBoundsException ex) {
                 ex.printStackTrace();
             }

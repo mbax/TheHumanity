@@ -1,9 +1,9 @@
 package org.royaldev.thehumanity.commands.impl;
 
-import org.pircbotx.Colors;
-import org.pircbotx.User;
-import org.pircbotx.hooks.events.MessageEvent;
-import org.pircbotx.hooks.types.GenericMessageEvent;
+import org.kitteh.irc.client.library.IRCFormat;
+import org.kitteh.irc.client.library.element.User;
+import org.kitteh.irc.client.library.event.ActorEvent;
+import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 import org.royaldev.thehumanity.Game;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.commands.CallInfo;
@@ -26,13 +26,13 @@ public class JoinGameCommand extends NoticeableCommand {
     }
 
     @Override
-    public void onCommand(GenericMessageEvent event, CallInfo ci, String[] args) {
-        if (!(event instanceof MessageEvent)) return;
-        final MessageEvent e = (MessageEvent) event;
-        final User u = e.getUser();
+    public void onCommand(final ActorEvent<User> event, final CallInfo ci, final String[] args) {
+        if (!(event instanceof ChannelMessageEvent)) return;
+        final ChannelMessageEvent e = (ChannelMessageEvent) event;
+        final User u = e.getActor();
         final Game g = this.humanity.getGames().get(e.getChannel());
         if (g == null) {
-            this.notice(u, "There's no game right now. Start one with " + Colors.BOLD + this.humanity.getPrefix() + "start" + Colors.NORMAL + ".");
+            this.notice(u, "There's no game right now. Start one with " + IRCFormat.BOLD + this.humanity.getPrefix() + "start" + IRCFormat.RESET + ".");
             return;
         }
         if (g.hasPlayer(u.getNick())) {
@@ -40,7 +40,7 @@ public class JoinGameCommand extends NoticeableCommand {
             return;
         }
         for (final Game game : this.humanity.getGames().values()) {
-            if (!game.hasPlayer(e.getUser().getNick())) continue;
+            if (!game.hasPlayer(u.getNick())) continue;
             this.notice(u, "You can't be in more than one game at a time!");
             return;
         }

@@ -1,12 +1,11 @@
 package org.royaldev.thehumanity;
 
-import org.pircbotx.PircBotX;
-import org.pircbotx.User;
-import org.pircbotx.hooks.ListenerAdapter;
-import org.pircbotx.hooks.events.PartEvent;
-import org.pircbotx.hooks.events.QuitEvent;
+import org.kitteh.irc.client.library.EventHandler;
+import org.kitteh.irc.client.library.element.User;
+import org.kitteh.irc.client.library.event.channel.ChannelPartEvent;
+import org.kitteh.irc.client.library.event.user.UserQuitEvent;
 
-public class GameListeners extends ListenerAdapter<PircBotX> {
+public class GameListeners {
 
     private final TheHumanity humanity;
 
@@ -14,19 +13,19 @@ public class GameListeners extends ListenerAdapter<PircBotX> {
         this.humanity = instance;
     }
 
-    @Override
-    public void onPart(final PartEvent<PircBotX> event) throws Exception {
-        final User u = event.getUser();
+    @EventHandler
+    public void onPart(final ChannelPartEvent event) {
+        final User u = event.getActor();
         final Game g = this.humanity.getGameFor(u);
         if (g == null || !g.getChannel().getName().equalsIgnoreCase(event.getChannel().getName())) return;
-        g.removePlayer(g.getPlayer(event.getUser()));
+        g.removePlayer(g.getPlayer(event.getActor()));
     }
 
-    @Override
-    public void onQuit(final QuitEvent<PircBotX> event) throws Exception {
-        final User u = event.getUser();
+    @EventHandler
+    public void onQuit(final UserQuitEvent event) {
+        final User u = event.getActor();
         final Game g = this.humanity.getGameFor(u);
         if (g == null) return;
-        g.removePlayer(g.getPlayer(event.getUser()));
+        g.removePlayer(g.getPlayer(u));
     }
 }

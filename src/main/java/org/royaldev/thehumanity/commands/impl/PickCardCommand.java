@@ -1,8 +1,8 @@
 package org.royaldev.thehumanity.commands.impl;
 
-import org.pircbotx.Colors;
-import org.pircbotx.User;
-import org.pircbotx.hooks.types.GenericMessageEvent;
+import org.kitteh.irc.client.library.IRCFormat;
+import org.kitteh.irc.client.library.element.User;
+import org.kitteh.irc.client.library.event.ActorEvent;
 import org.royaldev.thehumanity.Game;
 import org.royaldev.thehumanity.Game.GameStatus;
 import org.royaldev.thehumanity.Round;
@@ -86,7 +86,7 @@ public class PickCardCommand extends InGameCommand {
             return;
         }
         if (args.length != r.getBlackCard().getBlanks()) {
-            this.notice(u, Colors.BOLD + "Wrong amount of cards!" + Colors.NORMAL + " You need to pick exactly " + r.getBlackCard().getBlanks() + " cards.");
+            this.notice(u, IRCFormat.BOLD + "Wrong amount of cards!" + IRCFormat.RESET + " You need to pick exactly " + r.getBlackCard().getBlanks() + " cards.");
             return;
         }
         final Hand<WhiteCard> hand = p.getHand();
@@ -130,8 +130,8 @@ public class PickCardCommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(final GenericMessageEvent event, final CallInfo ci, final Game g, final String[] args) {
-        final User u = event.getUser();
+    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, final Game g, final String[] args) {
+        final User u = event.getActor();
         if (args.length < 1) {
             this.notice(u, "Usage: " + this.getUsage().replace("<command>", ci.getLabel()));
             return;

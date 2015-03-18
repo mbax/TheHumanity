@@ -1,8 +1,8 @@
 package org.royaldev.thehumanity.commands.impl.game;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.pircbotx.User;
-import org.pircbotx.hooks.types.GenericMessageEvent;
+import org.kitteh.irc.client.library.element.User;
+import org.kitteh.irc.client.library.event.ActorEvent;
 import org.royaldev.thehumanity.Game;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.commands.CallInfo;
@@ -34,8 +34,8 @@ public class GameCommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(final GenericMessageEvent event, final CallInfo ci, final Game g, final String[] args) {
-        final User u = event.getUser();
+    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, final Game g, final String[] args) {
+        final User u = event.getActor();
         if (args.length < 1) {
             this.notice(u, "Provide a subcommand."); // TODO: Help
             return;

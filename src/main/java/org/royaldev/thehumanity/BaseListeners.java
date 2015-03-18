@@ -1,23 +1,22 @@
 package org.royaldev.thehumanity;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.pircbotx.PircBotX;
-import org.pircbotx.hooks.ListenerAdapter;
-import org.pircbotx.hooks.events.ConnectEvent;
-import org.pircbotx.hooks.events.InviteEvent;
-import org.pircbotx.hooks.events.JoinEvent;
-import org.pircbotx.hooks.events.KickEvent;
-import org.pircbotx.hooks.events.MessageEvent;
-import org.pircbotx.hooks.events.PartEvent;
-import org.pircbotx.hooks.events.PrivateMessageEvent;
-import org.pircbotx.hooks.types.GenericMessageEvent;
+import org.kitteh.irc.client.library.EventHandler;
+import org.kitteh.irc.client.library.event.channel.ChannelInviteEvent;
+import org.kitteh.irc.client.library.event.channel.ChannelJoinEvent;
+import org.kitteh.irc.client.library.event.channel.ChannelKickEvent;
+import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
+import org.kitteh.irc.client.library.event.channel.ChannelPartEvent;
+import org.kitteh.irc.client.library.event.client.ClientConnectedEvent;
+import org.kitteh.irc.client.library.event.user.PrivateMessageEvent;
 import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.IRCCommand;
+import org.royaldev.thehumanity.util.ConversionHelper;
 
 /**
  * The basic listeners of the bot that allow it to function.
  */
-final class BaseListeners extends ListenerAdapter<PircBotX> {
+final class BaseListeners {
 
     private final TheHumanity humanity;
 
@@ -25,78 +24,83 @@ final class BaseListeners extends ListenerAdapter<PircBotX> {
         this.humanity = instance;
     }
 
-    @Override
-    public void onConnect(final ConnectEvent<PircBotX> event) throws Exception {
-        event.getBot().sendIRC().mode(event.getBot().getNick(), "+B");
-    }
-
-    @Override
-    public void onInvite(final InviteEvent<PircBotX> e) {
-        e.getBot().sendIRC().joinChannel(e.getChannel());
-        this.humanity.getLogger().info("Invited to " + e.getChannel() + " by " + e.getUser() + ".");
-    }
-
-    @Override
-    public void onJoin(final JoinEvent<PircBotX> e) {
-        if (e.getChannel().getUsers().size() < 1) e.getChannel().send().part("Alone.");
-        if (!e.getUser().getNick().equals(this.humanity.getBot().getUserBot().getNick())) return;
-        this.humanity.getLogger().info("Joined " + e.getChannel().getName() + ".");
-    }
-
-    @Override
-    public void onKick(final KickEvent<PircBotX> e) {
-        if (!e.getUser().getNick().equals(this.humanity.getBot().getUserBot().getNick())) return;
-        this.humanity.getLogger().info("Kicked from " + e.getChannel().getName() + ".");
-    }
-
-    @Override
-    public void onPart(final PartEvent<PircBotX> e) {
-        if (e.getDaoSnapshot().getUsers(e.getChannel()).size() <= 2) e.getChannel().send().part("Alone.");
-        if (!e.getUser().getNick().equals(this.humanity.getBot().getUserBot().getNick())) return;
-        this.humanity.getLogger().info("Parted from " + e.getChannel().getName() + ".");
-    }
-
     @SuppressWarnings("ConstantConditions")
-    @Override
-    public void onGenericMessage(final GenericMessageEvent<PircBotX> e) {
-        if (!(e instanceof MessageEvent) && !(e instanceof PrivateMessageEvent)) return;
-        final boolean isPrivateMessage = e instanceof PrivateMessageEvent;
-        String message = e.getMessage();
-        if (message.isEmpty()) return;
-        if (message.startsWith(e.getBot().getNick()) && !isPrivateMessage) {
-            message = e.getMessage().substring(e.getBot().getNick().length());
-            if (message.charAt(0) != '.') return;
-            message = message.substring(1);
-            int parenIndex = message.indexOf('(');
-            String command = message.substring(0, parenIndex);
-            message = message.substring(parenIndex);
-            if (!message.startsWith("(") || !message.endsWith(");")) return;
-            message = message.substring(1, message.length() - 2);
-            message = this.humanity.getPrefix() + command + " " + message;
-        }
-        if (message.charAt(0) != this.humanity.getPrefix() && !isPrivateMessage) return;
+    @EventHandler
+    public void onChannelMessage(final ChannelMessageEvent e) {
+        final String message = e.getMessage();
+        if (message.isEmpty() || message.charAt(0) != this.humanity.getPrefix()) return;
         final String[] split = message.trim().split(" ");
-        final String commandString = (!isPrivateMessage) ? split[0].substring(1, split[0].length()) : split[0];
+        final String commandString = split[0].substring(1, split[0].length());
         final IRCCommand command = this.humanity.getCommandHandler().get(commandString);
-        if (command == null) {
-            if (isPrivateMessage) e.respond("No such command.");
-            return;
-        }
+        if (command == null) return;
         final IRCCommand.CommandType commandType = command.getCommandType();
-        if (!isPrivateMessage && commandType != IRCCommand.CommandType.MESSAGE && commandType != IRCCommand.CommandType.BOTH) {
-            return;
-        } else if (isPrivateMessage && commandType != IRCCommand.CommandType.PRIVATE && commandType != IRCCommand.CommandType.BOTH) {
-            e.respond("No such command.");
-            return;
-        }
-        this.humanity.getLogger().info(((isPrivateMessage) ? "" : ((MessageEvent) e).getChannel().getName() + "/") + e.getUser().getNick() + ": " + e.getMessage());
+        if (commandType != IRCCommand.CommandType.MESSAGE && commandType != IRCCommand.CommandType.BOTH) return;
+        this.humanity.getLogger().info(e.getChannel().getName() + "/" + e.getActor().getNick() + ": " + e.getMessage());
         try {
-            command.onCommand(e, new CallInfo(commandString, ((isPrivateMessage) ? CallInfo.UsageType.PRIVATE : CallInfo.UsageType.MESSAGE)), ArrayUtils.subarray(split, 1, split.length));
-        } catch (Throwable t) {
+            command.onCommand(e, new CallInfo(commandString, CallInfo.UsageType.MESSAGE), ArrayUtils.subarray(split, 1, split.length));
+        } catch (final Throwable t) {
             t.printStackTrace();
             final StringBuilder sb = new StringBuilder("Unhandled command exception! ");
             sb.append(t.getClass().getSimpleName()).append(": ").append(t.getMessage());
-            e.getUser().send().notice(sb.toString());
+            e.getActor().sendNotice(sb.toString());
+            this.humanity.getLogger().warning(sb.toString());
+        }
+    }
+
+    @EventHandler
+    public void onConnect(final ClientConnectedEvent event) throws Exception {
+        event.getClient().sendRawLine("/mode " + event.getClient().getNick() + " +B");
+    }
+
+    @EventHandler
+    public void onInvite(final ChannelInviteEvent e) {
+        e.getClient().addChannel(e.getChannel().getName());
+        this.humanity.getLogger().info("Invited to " + e.getChannel() + " by " + e.getActor().getName() + ".");
+    }
+
+    @EventHandler
+    public void onJoin(final ChannelJoinEvent e) {
+        if (e.getChannel().getUsers().size() < 1) e.getChannel().part("Alone.");
+        if (!e.getActor().getNick().equals(this.humanity.getBot().getNick())) return;
+        this.humanity.getLogger().info("Joined " + e.getChannel().getName() + ".");
+    }
+
+    @EventHandler
+    public void onKick(final ChannelKickEvent e) {
+        this.humanity.getLogger().info("Kicked from " + e.getChannel().getName() + ".");
+    }
+
+    @EventHandler
+    public void onPart(final ChannelPartEvent e) {
+        if (e.getChannel().getUsers().size() <= 2) e.getChannel().part("Alone.");
+        if (!e.getActor().getNick().equals(this.humanity.getBot().getNick())) return;
+        this.humanity.getLogger().info("Parted from " + e.getChannel().getName() + ".");
+    }
+
+    @EventHandler
+    public void onPrivateMessage(final PrivateMessageEvent e) {
+        final String message = e.getMessage();
+        if (message.isEmpty()) return;
+        final String[] split = message.trim().split(" ");
+        final String commandString = split[0];
+        final IRCCommand command = this.humanity.getCommandHandler().get(commandString);
+        if (command == null) {
+            ConversionHelper.respond(e, "No such command.");
+            return;
+        }
+        final IRCCommand.CommandType commandType = command.getCommandType();
+        if (commandType != IRCCommand.CommandType.PRIVATE && commandType != IRCCommand.CommandType.BOTH) {
+            ConversionHelper.respond(e, "No such command.");
+            return;
+        }
+        this.humanity.getLogger().info(e.getActor().getNick() + ": " + e.getMessage());
+        try {
+            command.onCommand(e, new CallInfo(commandString, CallInfo.UsageType.PRIVATE), ArrayUtils.subarray(split, 1, split.length));
+        } catch (final Throwable t) {
+            t.printStackTrace();
+            final StringBuilder sb = new StringBuilder("Unhandled command exception! ");
+            sb.append(t.getClass().getSimpleName()).append(": ").append(t.getMessage());
+            e.getActor().sendNotice(sb.toString());
             this.humanity.getLogger().warning(sb.toString());
         }
     }

@@ -1,8 +1,8 @@
 package org.royaldev.thehumanity.commands.impl;
 
-import org.pircbotx.User;
-import org.pircbotx.hooks.events.MessageEvent;
-import org.pircbotx.hooks.types.GenericMessageEvent;
+import org.kitteh.irc.client.library.element.User;
+import org.kitteh.irc.client.library.event.ActorEvent;
+import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 import org.royaldev.thehumanity.Game;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.commands.CallInfo;
@@ -26,17 +26,17 @@ public class StopGameCommand extends NoticeableCommand {
     }
 
     @Override
-    public void onCommand(GenericMessageEvent event, CallInfo ci, String[] args) {
-        if (!(event instanceof MessageEvent)) return;
-        final User u = event.getUser();
-        final MessageEvent e = (MessageEvent) event;
+    public void onCommand(final ActorEvent<User> event, final CallInfo ci, final String[] args) {
+        if (!(event instanceof ChannelMessageEvent)) return;
+        final User u = event.getActor();
+        final ChannelMessageEvent e = (ChannelMessageEvent) event;
         final Game g = this.humanity.getGameFor(e.getChannel());
         if (g == null) {
             this.notice(u, "No game in this channel!");
             return;
         }
         final Player p = g.getPlayer(u);
-        if (!g.getChannel().getOps().contains(u) && !g.getHost().equals(p)) {
+        if (!g.getHost().equals(p) && !this.humanity.hasChannelMode(g.getChannel(), u, 'o')) {
             this.notice(u, "You're not an op or the host!");
             return;
         }

@@ -1,7 +1,7 @@
 package org.royaldev.thehumanity.commands;
 
-import org.pircbotx.User;
-import org.pircbotx.hooks.types.GenericMessageEvent;
+import org.kitteh.irc.client.library.element.User;
+import org.kitteh.irc.client.library.event.ActorEvent;
 import org.royaldev.thehumanity.Game;
 import org.royaldev.thehumanity.TheHumanity;
 
@@ -25,7 +25,7 @@ public abstract class InGameCommand extends NoticeableCommand {
      * @param g     The game the User is in
      * @param args  Arguments passed to the command
      */
-    public abstract void onInGameCommand(final GenericMessageEvent event, final CallInfo ci, final Game g, final String[] args);
+    public abstract void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, final Game g, final String[] args);
 
     /**
      * Gets the Game for the given User.
@@ -56,10 +56,10 @@ public abstract class InGameCommand extends NoticeableCommand {
      * @param args  Arguments passed to the command
      */
     @Override
-    public final void onCommand(final GenericMessageEvent event, final CallInfo ci, final String[] args) {
-        final Game g = this.getGame(event.getUser());
+    public final void onCommand(final ActorEvent<User> event, final CallInfo ci, final String[] args) {
+        final Game g = this.getGame(event.getActor());
         if (g == null) {
-            this.notice(event.getUser(), "You're not in a game.");
+            this.notice(event.getActor(), "You're not in a game.");
             return;
         }
         this.onInGameCommand(event, ci, g, args);

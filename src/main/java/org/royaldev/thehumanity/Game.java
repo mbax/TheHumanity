@@ -1,8 +1,8 @@
 package org.royaldev.thehumanity;
 
-import org.pircbotx.Channel;
-import org.pircbotx.Colors;
-import org.pircbotx.User;
+import org.kitteh.irc.client.library.IRCFormat;
+import org.kitteh.irc.client.library.element.Channel;
+import org.kitteh.irc.client.library.element.User;
 import org.royaldev.thehumanity.Round.RoundStage;
 import org.royaldev.thehumanity.cards.CardPack;
 import org.royaldev.thehumanity.cards.Deck;
@@ -76,13 +76,13 @@ public class Game {
         }
         final int totalCards = this.getDeck().getCardPacks().stream().mapToInt(cp -> cp.getWhiteCards().size()).sum();
         if (this.players.size() * 7 >= totalCards) {
-            this.sendMessage(Colors.BOLD + "Not enough white cards to play!");
+            this.sendMessage(IRCFormat.BOLD + "Not enough white cards to play!");
             this.stop();
             return;
         }
         this.deal(player);
         if (this.gameStatus != GameStatus.JOINING) this.showCards(player);
-        this.sendMessage(Colors.BOLD + player.getUser().getNick() + Colors.NORMAL + " has joined the game!");
+        this.sendMessage(IRCFormat.BOLD + player.getUser().getNick() + IRCFormat.RESET + " has joined the game!");
     }
 
     /**
@@ -107,7 +107,7 @@ public class Game {
      * @return Reformatted message
      */
     public String antiPing(String message) {
-        for (final User u : this.channel.getUsers()) {
+        for (final User u : this.channel.getUsers().keySet()) {
             if (u.getNick().length() <= 1) continue;
             message = message.replace(u.getNick(), u.getNick().substring(0, 1) + "\u200b" + u.getNick().substring(1));
         }
@@ -152,8 +152,8 @@ public class Game {
      * @return String
      */
     public String getCardCounts() {
-        return Colors.BOLD + "Card counts: "
-            + Colors.NORMAL + this.getDeck().getUnusedBlackCardCount() + " unused/" + this.getDeck().getBlackCardCount() + " black cards, "
+        return IRCFormat.BOLD + "Card counts: "
+            + IRCFormat.RESET + this.getDeck().getUnusedBlackCardCount() + " unused/" + this.getDeck().getBlackCardCount() + " black cards, "
             + this.getDeck().getUnusedWhiteCardCount() + " unused/" + this.getDeck().getWhiteCardCount() + " white cards";
     }
 
@@ -218,9 +218,9 @@ public class Game {
      */
     public void setHost(final Player host) {
         this.host = host;
-        this.hostWasVoiced = this.channel.getVoices().contains(this.getHost().getUser());
+        this.hostWasVoiced = this.humanity.hasChannelMode(this.channel, this.getHost().getUser(), 'v');
         if (!this.hostWasVoiced) {
-            this.channel.send().setMode("+v " + this.getHost().getUser().getNick());
+            this.humanity.getBot().sendRawLine("MODE " + this.channel.getName() + " +v " + this.host.getUser().getNick());
         }
         this.showHost();
     }
@@ -241,6 +241,7 @@ public class Game {
      * @return Corresponding Player
      */
     public Player getPlayer(final User u) {
+        if (u == null) return null;
         return this.getPlayers().stream().filter(p -> this.humanity.usersMatch(u, p.getUser())).findFirst().orElse(null);
     }
 
@@ -251,6 +252,7 @@ public class Game {
      * @return Player or null
      */
     public Player getPlayer(final Player p) {
+        if (p == null) return null;
         return this.getPlayers().get(this.getPlayers().indexOf(p));
     }
 
@@ -261,7 +263,8 @@ public class Game {
      * @return Player or null
      */
     public Player getPlayer(final String name) {
-        return this.getPlayer(this.channel.getBot().getUserChannelDao().getUser(name));
+        if (name == null) return null;
+        return this.getPlayer(this.channel.getUsers().keySet().stream().filter(u -> u.getNick().equalsIgnoreCase(name)).findFirst().orElse(null));
     }
 
     /**
@@ -282,7 +285,7 @@ public class Game {
      */
     public boolean hasEnoughPlayers() {
         if (this.getPlayers().size() < 3) {
-            this.sendMessage(Colors.BOLD + "Not enough players to continue!");
+            this.sendMessage(IRCFormat.BOLD + "Not enough players to continue!");
             this.stop();
             return false;
         }
@@ -296,7 +299,7 @@ public class Game {
      * @return true if name is in the game, false if otherwise
      */
     public boolean hasPlayer(final String name) {
-        return this.getPlayer(this.channel.getBot().getUserChannelDao().getUser(name)) != null;
+        return this.getPlayer(name) != null;
     }
 
     /**
@@ -314,7 +317,7 @@ public class Game {
      */
     public void nextHost() {
         if (this.host != null && !this.hostWasVoiced) {
-            this.channel.send().setMode("-v " + this.getHost().getUser().getNick());
+            this.humanity.getBot().sendRawLine("MODE " + this.channel.getName() + " -v " + this.host.getUser().getNick());
             this.host = null;
         }
         synchronized (this.players) {
@@ -336,12 +339,12 @@ public class Game {
         switch (newStatus) {
             case JOINING:
                 final StringBuilder sb = new StringBuilder();
-                sb.append(Colors.BOLD).append("Card packs for this game:").append(Colors.NORMAL).append(" ");
+                sb.append(IRCFormat.BOLD).append("Card packs for this game:").append(IRCFormat.RESET).append(" ");
                 this.getDeck().getCardPacks().stream().forEach(cp -> sb.append(cp.getName()).append(", "));
-                this.sendMessage(Colors.BOLD + "A new game is starting!");
+                this.sendMessage(IRCFormat.BOLD + "A new game is starting!");
                 this.sendMessage(sb.toString().substring(0, sb.length() - 2));
                 this.showCardCounts();
-                this.sendMessage("Use " + Colors.BOLD + this.humanity.getPrefix() + "join" + Colors.NORMAL + " to join.");
+                this.sendMessage("Use " + IRCFormat.BOLD + this.humanity.getPrefix() + "join" + IRCFormat.RESET + " to join.");
                 break;
             case PLAYING:
                 if (!this.hasEnoughPlayers()) return;
@@ -354,12 +357,12 @@ public class Game {
                 BlackCard blackCard = null;
                 do {
                     if (blackCard != null) {
-                        this.sendMessage("Black card " + Colors.BOLD + blackCard.getText() + Colors.NORMAL + " was skipped because it is invalid.");
+                        this.sendMessage("Black card " + IRCFormat.BOLD + blackCard.getText() + IRCFormat.RESET + " was skipped because it is invalid.");
                     }
                     blackCard = this.getDeck().getRandomBlackCard();
                     if (blackCard == null) {
                         this.sendMessage(" ");
-                        this.sendMessage(Colors.BOLD + "There are no more black cards!");
+                        this.sendMessage(IRCFormat.BOLD + "There are no more black cards!");
                         this.stop();
                         return;
                     }
@@ -367,9 +370,9 @@ public class Game {
                 this.currentRound = new Round(this, this.getCurrentRound() == null ? 1 : this.getCurrentRound().getNumber() + 1, blackCard, this.getPlayers().get(index));
                 this.deal();
                 this.sendMessage(" ");
-                this.sendMessage(Colors.BOLD + "Round " + this.getCurrentRound().getNumber() + Colors.NORMAL + "!");
-                this.sendMessage(Colors.BOLD + this.getCurrentRound().getCzar().getUser().getNick() + Colors.NORMAL + " is the card czar.");
-                this.sendMessage(Colors.BOLD + this.getCurrentRound().getBlackCard().getText());
+                this.sendMessage(IRCFormat.BOLD + "Round " + this.getCurrentRound().getNumber() + IRCFormat.RESET + "!");
+                this.sendMessage(IRCFormat.BOLD + this.getCurrentRound().getCzar().getUser().getNick() + IRCFormat.RESET + " is the card czar.");
+                this.sendMessage(IRCFormat.BOLD + this.getCurrentRound().getBlackCard().getText());
                 this.showCards();
                 this.getCurrentRound().advanceStage();
                 break;
@@ -391,7 +394,7 @@ public class Game {
         this.allPlayers.forEach(p -> {
             if (!p.getHand().removeCards(cp.getWhiteCards())) return;
             this.deal(p);
-            p.getUser().send().notice("Your hand has changed as a result of card pack changes. Here's your new hand!");
+            p.getUser().sendNotice("Your hand has changed as a result of card pack changes. Here's your new hand!");
             this.showCards(p);
         });
         return true;
@@ -406,12 +409,12 @@ public class Game {
         synchronized (this.players) {
             if (!this.players.remove(p)) return;
         }
-        this.sendMessage(Colors.BOLD + p.getUser().getNick() + Colors.NORMAL + " has left the game.");
+        this.sendMessage(IRCFormat.BOLD + p.getUser().getNick() + IRCFormat.RESET + " has left the game.");
         if (this.host.equals(p)) this.nextHost();
         if (this.getCurrentRound() != null) {
             if (!this.hasEnoughPlayers()) return;
             if (this.getCurrentRound().getCzar().equals(p)) {
-                this.sendMessage(Colors.BOLD + "The czar has left!" + Colors.NORMAL + " Returning your cards and starting a new round.");
+                this.sendMessage(IRCFormat.BOLD + "The czar has left!" + IRCFormat.RESET + " Returning your cards and starting a new round.");
                 this.getCurrentRound().returnCards();
                 this.advanceStage();
                 return;
@@ -428,7 +431,7 @@ public class Game {
      * @param name Name of Player to remove
      */
     public void removePlayer(final String name) {
-        this.removePlayer(this.getPlayer(this.channel.getBot().getUserChannelDao().getUser(name)));
+        this.removePlayer(this.getPlayer(name));
     }
 
     /**
@@ -437,7 +440,7 @@ public class Game {
      * @param message Message to send
      */
     public void sendMessage(final String message) {
-        this.channel.send().message(this.antiPing(message));
+        this.channel.sendMessage(this.antiPing(message));
     }
 
     /**
@@ -482,9 +485,9 @@ public class Game {
         final Hand<WhiteCard> hand = p.getHand();
         for (int i = 0; i < hand.getSize(); i++) {
             final WhiteCard wc = hand.getCard(i);
-            sb.append(i + 1).append(". ").append(Colors.BOLD).append(wc.getText()).append(Colors.NORMAL).append(" ");
+            sb.append(i + 1).append(". ").append(IRCFormat.BOLD).append(wc.getText()).append(IRCFormat.RESET).append(" ");
         }
-        p.getUser().send().notice(sb.toString());
+        p.getUser().sendNotice(sb.toString());
     }
 
     /**
@@ -498,7 +501,7 @@ public class Game {
      * Sends a message to the game channel, declaring who the host is.
      */
     public void showHost() {
-        this.sendMessage("The host is " + Colors.BOLD + this.host.getUser().getNick() + Colors.NORMAL + ".");
+        this.sendMessage("The host is " + IRCFormat.BOLD + this.host.getUser().getNick() + IRCFormat.RESET + ".");
     }
 
     /**
@@ -512,7 +515,7 @@ public class Game {
         final Map<Player, Integer> sortedScores = new TreeMap<>(new DescendingValueComparator(scores));
         sortedScores.putAll(scores);
         final StringBuilder sb = new StringBuilder();
-        sb.append(Colors.BOLD + "Scores:").append(Colors.NORMAL).append(" ");
+        sb.append(IRCFormat.BOLD + "Scores:").append(IRCFormat.RESET).append(" ");
         for (final Map.Entry<Player, Integer> entry : sortedScores.entrySet()) {
             sb.append(entry.getKey().getUser().getNick()).append(": ").append(entry.getValue() == null ? 0 : entry.getValue()).append(", ");
         }
@@ -533,12 +536,12 @@ public class Game {
     public void stop() {
         this.humanity.getGames().remove(this.channel);
         if (this.host != null && !this.hostWasVoiced) {
-            this.channel.send().setMode("-v " + this.getHost().getUser().getNick());
+            this.humanity.getBot().sendRawLine("MODE " + this.channel.getName() + " -v " + this.host.getUser().getNick());
         }
         if (this.countdownTask != null) this.countdownTask.cancel(true);
         if (this.gameStatus != GameStatus.IDLE) {
             this.gameStatus = GameStatus.IDLE;
-            this.sendMessage(Colors.BOLD + "The game has ended.");
+            this.sendMessage(IRCFormat.BOLD + "The game has ended.");
             if (this.gameStatus != GameStatus.JOINING) this.showScores();
         }
         this.gameStatus = GameStatus.ENDED;
@@ -571,13 +574,13 @@ public class Game {
         public void run() {
             final int seconds = this.runCount * 15;
             if (seconds > 0) {
-                Game.this.sendMessage(Colors.BOLD + (this.runCount * 15) + Colors.NORMAL + " seconds remain to join the game!");
+                Game.this.sendMessage(IRCFormat.BOLD.toString() + (this.runCount * 15) + IRCFormat.RESET + " seconds remain to join the game!");
             }
             if (this.runCount-- < 1) {
                 if (Game.this.getPlayers().size() >= 3) {
                     Game.this.advanceStage();
                 } else {
-                    Game.this.sendMessage(Colors.BOLD + "Not enough players." + Colors.NORMAL + " At least three people are required for the game to begin.");
+                    Game.this.sendMessage(IRCFormat.BOLD + "Not enough players." + IRCFormat.RESET + " At least three people are required for the game to begin.");
                     Game.this.stop();
                 }
                 Game.this.countdownTask.cancel(true);

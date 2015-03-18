@@ -1,6 +1,6 @@
 package org.royaldev.thehumanity.player;
 
-import org.pircbotx.User;
+import org.kitteh.irc.client.library.element.User;
 import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
 

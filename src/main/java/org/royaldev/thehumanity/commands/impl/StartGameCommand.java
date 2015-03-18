@@ -1,8 +1,8 @@
 package org.royaldev.thehumanity.commands.impl;
 
-import org.pircbotx.User;
-import org.pircbotx.hooks.events.MessageEvent;
-import org.pircbotx.hooks.types.GenericMessageEvent;
+import org.kitteh.irc.client.library.element.User;
+import org.kitteh.irc.client.library.event.ActorEvent;
+import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 import org.royaldev.thehumanity.Game;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.cards.CardPack;
@@ -90,16 +90,16 @@ public class StartGameCommand extends NoticeableCommand {
     }
 
     @Override
-    public void onCommand(final GenericMessageEvent event, final CallInfo ci, final String[] args) {
-        if (!(event instanceof MessageEvent)) return;
-        final User u = event.getUser();
-        final MessageEvent e = (MessageEvent) event;
+    public void onCommand(final ActorEvent<User> event, final CallInfo ci, final String[] args) {
+        if (!(event instanceof ChannelMessageEvent)) return;
+        final User u = event.getActor();
+        final ChannelMessageEvent e = (ChannelMessageEvent) event;
         if (this.humanity.getGames().containsKey(e.getChannel())) {
             this.notice(u, "There is already a game in this channel.");
             return;
         }
         for (final Game game : this.humanity.getGames().values()) {
-            if (!game.hasPlayer(e.getUser().getNick())) continue;
+            if (!game.hasPlayer(u.getNick())) continue;
             this.notice(u, "You can't be in more than one game at a time!");
             return;
         }
@@ -107,6 +107,6 @@ public class StartGameCommand extends NoticeableCommand {
         final Game g = new Game(this.humanity, e.getChannel(), cardPacks);
         this.humanity.getGames().put(e.getChannel(), g);
         g.start();
-        g.setHost(g.createPlayer(event.getUser()));
+        g.setHost(g.createPlayer(u));
     }
 }

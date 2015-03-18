@@ -1,8 +1,8 @@
 package org.royaldev.thehumanity.commands.impl.game;
 
-import org.pircbotx.Colors;
-import org.pircbotx.User;
-import org.pircbotx.hooks.types.GenericMessageEvent;
+import org.kitteh.irc.client.library.IRCFormat;
+import org.kitteh.irc.client.library.element.User;
+import org.kitteh.irc.client.library.event.ActorEvent;
 import org.royaldev.thehumanity.Game;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.cards.CardPack;
@@ -10,6 +10,7 @@ import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.Command;
 import org.royaldev.thehumanity.commands.InGameCommand;
 import org.royaldev.thehumanity.player.Player;
+import org.royaldev.thehumanity.util.ConversionHelper;
 
 @Command(
     name = "removepack",
@@ -24,10 +25,10 @@ public class RemovePackSubcommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(final GenericMessageEvent event, final CallInfo ci, final Game g, final String[] args) {
-        final User u = event.getUser();
+    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, final Game g, final String[] args) {
+        final User u = event.getActor();
         final Player p = g.getPlayer(u);
-        if (!g.getChannel().getOps().contains(u) && !g.getHost().equals(p)) {
+        if (!g.getHost().equals(p) && !this.humanity.hasChannelMode(g.getChannel(), u, 'o')) {
             this.notice(u, "You are not an op or the host!");
             return;
         }
@@ -40,6 +41,6 @@ public class RemovePackSubcommand extends InGameCommand {
             this.notice(u, "No such card pack.");
             return;
         }
-        event.respond((g.removeCardPack(cp, args.length > 1 && "sweep".equalsIgnoreCase(args[1])) ? "Removed" : "Could not remove") + " " + Colors.BOLD + cp.getName() + Colors.NORMAL + " from the game.");
+        ConversionHelper.respond(event, (g.removeCardPack(cp, args.length > 1 && "sweep".equalsIgnoreCase(args[1])) ? "Removed" : "Could not remove") + " " + IRCFormat.BOLD + cp.getName() + IRCFormat.RESET + " from the game.");
     }
 }

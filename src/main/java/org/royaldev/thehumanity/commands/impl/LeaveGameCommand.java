@@ -1,6 +1,7 @@
 package org.royaldev.thehumanity.commands.impl;
 
-import org.pircbotx.hooks.types.GenericMessageEvent;
+import org.kitteh.irc.client.library.element.User;
+import org.kitteh.irc.client.library.event.ActorEvent;
 import org.royaldev.thehumanity.Game;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.commands.CallInfo;
@@ -19,7 +20,7 @@ public class LeaveGameCommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(final GenericMessageEvent event, final CallInfo ci, final Game g, final String[] args) {
-        g.removePlayer(g.getPlayer(event.getUser()));
+    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, final Game g, final String[] args) {
+        g.removePlayer(g.getPlayer(event.getActor()));
     }
 }

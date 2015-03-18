@@ -1,11 +1,13 @@
 package org.royaldev.thehumanity.commands.impl;
 
-import org.pircbotx.hooks.types.GenericMessageEvent;
+import org.kitteh.irc.client.library.element.User;
+import org.kitteh.irc.client.library.event.ActorEvent;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.cards.CardPack;
 import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.Command;
 import org.royaldev.thehumanity.commands.IRCCommand;
+import org.royaldev.thehumanity.util.ConversionHelper;
 
 import java.text.DecimalFormat;
 import java.util.Random;
@@ -62,7 +64,7 @@ public class PacksCommand extends IRCCommand {
     }
 
     @Override
-    public void onCommand(final GenericMessageEvent event, final CallInfo ci, final String[] args) {
+    public void onCommand(final ActorEvent<User> event, final CallInfo ci, final String[] args) {
         final StringBuilder sb = new StringBuilder();
         final String allPackNames = this.humanity.getLoadedCardPacks().stream().map(CardPack::getName).sorted().collect(Collectors.joining());
         sb.append("# All card packs\n");
@@ -73,6 +75,6 @@ public class PacksCommand extends IRCCommand {
         for (final CardPack cp : this.humanity.getLoadedCardPacks()) {
             sb.append(this.generateCardPackMarkdown(cp));
         }
-        event.respond(this.humanity.gist("packs", allPackNames, "packs.md", sb.toString()));
+        ConversionHelper.respond(event, this.humanity.gist("packs", allPackNames, "packs.md", sb.toString()));
     }
 }

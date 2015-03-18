@@ -1,7 +1,7 @@
 package org.royaldev.thehumanity.commands.impl;
 
-import org.pircbotx.User;
-import org.pircbotx.hooks.types.GenericMessageEvent;
+import org.kitteh.irc.client.library.element.User;
+import org.kitteh.irc.client.library.event.ActorEvent;
 import org.royaldev.thehumanity.Game;
 import org.royaldev.thehumanity.Round;
 import org.royaldev.thehumanity.TheHumanity;
@@ -22,8 +22,8 @@ public class SkipCommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(final GenericMessageEvent event, final CallInfo ci, final Game g, final String[] args) {
-        final User u = event.getUser();
+    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, final Game g, final String[] args) {
+        final User u = event.getActor();
         if (args.length < 1) {
             this.notice(u, "Usage: " + this.getUsage().replace("<command>", ci.getLabel()));
             return;
@@ -35,7 +35,7 @@ public class SkipCommand extends InGameCommand {
             return;
         }
         final Round r = g.getCurrentRound();
-        if (!g.getChannel().getOps().contains(u) && !g.getHost().equals(p) && !u.getNick().equalsIgnoreCase(args[0])) {
+        if (!g.getHost().equals(p) && !u.getNick().equalsIgnoreCase(args[0]) && !this.humanity.hasChannelMode(g.getChannel(), u, 'o')) {
             this.notice(u, "You're not an op, the host, or skipping yourself!");
             return;
         }

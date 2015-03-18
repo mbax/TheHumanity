@@ -1,6 +1,6 @@
 package org.royaldev.thehumanity;
 
-import org.pircbotx.Colors;
+import org.kitteh.irc.client.library.IRCFormat;
 import org.royaldev.thehumanity.cards.Play;
 import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.player.Player;
@@ -39,8 +39,8 @@ public class Round {
                 if (this.czar == null) break;
                 Collections.shuffle(this.plays);
                 this.displayPlays();
-                this.getGame().sendMessage(Colors.BOLD + this.getCzar().getUser().getNick() + Colors.NORMAL + " is picking a winner.");
-                this.getCzar().getUser().send().notice("Send " + Colors.BOLD + this.getGame().getHumanity().getPrefix() + "pick" + Colors.NORMAL + " followed by the number you think should win.");
+                this.getGame().sendMessage(IRCFormat.BOLD + this.getCzar().getUser().getNick() + IRCFormat.RESET + " is picking a winner.");
+                this.getCzar().getUser().sendNotice("Send " + IRCFormat.BOLD + this.getGame().getHumanity().getPrefix() + "pick" + IRCFormat.RESET + " followed by the number you think should win.");
                 break;
             case ENDED:
                 this.getGame().advanceStage();
@@ -89,7 +89,7 @@ public class Round {
         if (index < 0 || index >= this.getPlays().size()) return;
         final Play p = this.getPlays().get(index);
         p.getPlayer().getWins().addCard(this.getBlackCard());
-        this.getGame().sendMessage(Colors.NORMAL + "Play " + Colors.BOLD + (index + 1) + Colors.NORMAL + " by " + Colors.BOLD + p.getPlayer().getUser().getNick() + Colors.NORMAL + " wins!");
+        this.getGame().sendMessage(IRCFormat.RESET + "Play " + IRCFormat.BOLD + (index + 1) + IRCFormat.RESET + " by " + IRCFormat.BOLD + p.getPlayer().getUser().getNick() + IRCFormat.RESET + " wins!");
         this.advanceStage();
     }
 
@@ -237,7 +237,7 @@ public class Round {
                 break;
             case WAITING_FOR_CZAR:
                 if (p.equals(this.getCzar())) {
-                    this.getGame().sendMessage(Colors.BOLD + "The czar has been skipped!" + Colors.NORMAL + " Returning your cards and starting a new round.");
+                    this.getGame().sendMessage(IRCFormat.BOLD + "The czar has been skipped!" + IRCFormat.RESET + " Returning your cards and starting a new round.");
                     this.returnCards();
                     this.advanceStage();
                 }

@@ -1,6 +1,6 @@
 package org.royaldev.thehumanity.cards;
 
-import org.pircbotx.Colors;
+import org.kitteh.irc.client.library.IRCFormat;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
 import org.royaldev.thehumanity.player.Player;
 
@@ -57,7 +57,7 @@ public class Play {
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         for (final WhiteCard wc : this.getWhiteCards()) {
-            sb.append(Colors.BOLD).append(wc.getText()).append(Colors.NORMAL).append(", ");
+            sb.append(IRCFormat.BOLD).append(wc.getText()).append(IRCFormat.RESET).append(", ");
         }
         return sb.substring(0, sb.length() - 2);
     }

@@ -6,6 +6,13 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.json.JSONWriter;
+import org.kitteh.irc.client.library.AuthType;
+import org.kitteh.irc.client.library.Client;
+import org.kitteh.irc.client.library.ClientBuilder;
+import org.kitteh.irc.client.library.EventManager;
+import org.kitteh.irc.client.library.element.Channel;
+import org.kitteh.irc.client.library.element.ChannelUserMode;
+import org.kitteh.irc.client.library.element.User;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -14,11 +21,6 @@ import org.kohsuke.args4j.spi.CharOptionHandler;
 import org.kohsuke.args4j.spi.IntOptionHandler;
 import org.kohsuke.args4j.spi.StringArrayOptionHandler;
 import org.kohsuke.args4j.spi.StringOptionHandler;
-import org.pircbotx.Channel;
-import org.pircbotx.Configuration.Builder;
-import org.pircbotx.PircBotX;
-import org.pircbotx.User;
-import org.pircbotx.exception.IrcException;
 import org.royaldev.thehumanity.cards.CardPack;
 import org.royaldev.thehumanity.commands.impl.CardCountsCommand;
 import org.royaldev.thehumanity.commands.impl.CardsCommand;
@@ -39,15 +41,13 @@ import org.royaldev.thehumanity.commands.impl.game.GameCommand;
 import org.royaldev.thehumanity.handlers.CommandHandler;
 import org.royaldev.thehumanity.util.Pair;
 
-import java.io.IOException;
 import java.io.StringWriter;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Formatter;
@@ -58,7 +58,7 @@ import java.util.logging.Logger;
 public class TheHumanity {
 
     private final List<CardPack> loadedCardPacks = Collections.synchronizedList(new ArrayList<>());
-    private final PircBotX bot;
+    private final Client bot;
     private final CommandHandler ch = new CommandHandler();
     private final Map<Channel, Game> games = new HashMap<>();
     private final Map<String, Pair<String, String>> gistCache = new HashMap<>();
@@ -70,6 +70,8 @@ public class TheHumanity {
     private int serverPort = 6667;
     @Option(name = "-P", usage = "Server password.", handler = StringOptionHandler.class)
     private String serverPassword = "";
+    @Option(name = "-Z", usage = "Connect to the server using SSL?", handler = BooleanOptionHandler.class)
+    private boolean ssl = false;
     @Option(name = "-n", usage = "Nickname for the bot to use.", handler = StringOptionHandler.class)
     private String nickname = "TheHumanity";
     @Option(name = "-C", usage = "Card pack files to use.", required = true, handler = StringArrayOptionHandler.class)
@@ -90,20 +92,15 @@ public class TheHumanity {
         this.parseArguments(args);
         this.loadCardPacks();
         this.registerCommands();
-        final Builder<PircBotX> cb = new Builder<>();
-        cb.setAutoNickChange(true).setAutoReconnect(true).setLogin(this.nickname).setMessageDelay(0L).setName(this.nickname).setRealName(this.nickname).setServer(this.server, this.serverPort).setEncoding(Charset.forName("UTF-8"));
-        Arrays.stream(this.channels).forEach(cb::addAutoJoinChannel);
-        cb.addListener(new BaseListeners(this)).addListener(new GameListeners(this));
-        if (!this.nickserv.isEmpty()) cb.setNickservPassword(this.nickserv);
-        if (!this.serverPassword.isEmpty()) cb.setServerPassword(this.serverPassword);
-        this.bot = new PircBotX(cb.buildConfiguration());
-        new Thread(() -> {
-            try {
-                TheHumanity.this.bot.startBot();
-            } catch (final IOException | IrcException ex) {
-                ex.printStackTrace();
-            }
-        }).start();
+        final ClientBuilder cb = new ClientBuilder();
+        cb.nick(this.nickname).user(this.nickname).name(this.nickname).realName(this.nickname).server(this.server).server(this.serverPort);
+        if (!this.nickserv.isEmpty()) cb.auth(AuthType.NICKSERV, this.nickname, this.nickserv);
+        if (!this.serverPassword.isEmpty()) cb.serverPassword(this.serverPassword);
+        this.bot = cb.build();
+        this.bot.addChannel(this.channels);
+        final EventManager em = this.bot.getEventManager();
+        em.registerEventListener(new BaseListeners(this));
+        em.registerEventListener(new GameListeners(this));
     }
 
     public static void main(final String[] args) {
@@ -166,7 +163,7 @@ public class TheHumanity {
         return this.keepCardcastPacks;
     }
 
-    public PircBotX getBot() {
+    public Client getBot() {
         return this.bot;
     }
 
@@ -253,7 +250,12 @@ public class TheHumanity {
         }
     }
 
+    public boolean hasChannelMode(final Channel c, final User u, final char mode) {
+        final Map<User, Set<ChannelUserMode>> users = c.getUsers();
+        return users.containsKey(u) && users.get(u).stream().anyMatch(m -> m.getMode() == mode);
+    }
+
     public boolean usersMatch(final User u, final User u2) {
-        return u.getNick().equals(u2.getNick()); // because PircBotX doesn't know how to use UUIDs because OOHHHHH NO
+        return u.getNick().equals(u2.getNick());
     }
 }
