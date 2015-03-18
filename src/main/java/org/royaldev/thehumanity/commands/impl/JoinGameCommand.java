@@ -30,8 +30,6 @@ public class JoinGameCommand extends NoticeableCommand {
         if (!(event instanceof ChannelMessageEvent)) return;
         final ChannelMessageEvent e = (ChannelMessageEvent) event;
         final User u = e.getActor();
-        System.out.println("this.humanity.getGames() = " + this.humanity.getGames());
-        System.out.println("e.getChannel().hashCode() = " + e.getChannel().hashCode());
         final Game g = this.humanity.getGames().get(e.getChannel());
         if (g == null) {
             this.notice(u, "There's no game right now. Start one with " + IRCFormat.BOLD + this.humanity.getPrefix() + "start" + IRCFormat.RESET + ".");
