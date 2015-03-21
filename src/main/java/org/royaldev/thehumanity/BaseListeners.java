@@ -54,7 +54,7 @@ final class BaseListeners {
     @Handler
     public void onInvite(final ChannelInviteEvent e) {
         e.getClient().addChannel(e.getChannel().getName());
-        this.humanity.getLogger().info("Invited to " + e.getChannel() + " by " + e.getActor().getName() + ".");
+        this.humanity.getLogger().info("Invited to " + e.getChannel().getName() + " by " + e.getActor().getName() + ".");
     }
 
     @Handler
