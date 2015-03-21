@@ -43,6 +43,7 @@ import org.royaldev.thehumanity.util.Pair;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -124,22 +125,24 @@ public class TheHumanity {
     }
 
     private void registerCommands() {
-        this.getCommandHandler().register(new StartGameCommand(this));
-        this.getCommandHandler().register(new JoinGameCommand(this));
-        this.getCommandHandler().register(new PickCardCommand(this));
-        this.getCommandHandler().register(new StopGameCommand(this));
-        this.getCommandHandler().register(new LeaveGameCommand(this));
-        this.getCommandHandler().register(new PacksCommand(this));
-        this.getCommandHandler().register(new WhoCommand(this));
-        this.getCommandHandler().register(new KickCommand(this));
-        this.getCommandHandler().register(new SkipCommand(this));
-        this.getCommandHandler().register(new HelpCommand(this));
-        this.getCommandHandler().register(new CardsCommand(this));
-        this.getCommandHandler().register(new RebootTheUniverseCommand(this));
-        this.getCommandHandler().register(new CardCountsCommand(this));
-        this.getCommandHandler().register(new ScoreCommand(this));
-        this.getCommandHandler().register(new HostCommand(this));
-        this.getCommandHandler().register(new GameCommand(this));
+        Arrays.asList(
+            new StartGameCommand(this),
+            new JoinGameCommand(this),
+            new PickCardCommand(this),
+            new StopGameCommand(this),
+            new LeaveGameCommand(this),
+            new PacksCommand(this),
+            new WhoCommand(this),
+            new KickCommand(this),
+            new SkipCommand(this),
+            new HelpCommand(this),
+            new CardsCommand(this),
+            new RebootTheUniverseCommand(this),
+            new CardCountsCommand(this),
+            new ScoreCommand(this),
+            new HostCommand(this),
+            new GameCommand(this)
+        ).stream().forEach(this.getCommandHandler()::register);
     }
 
     private void setUpLogger() {
