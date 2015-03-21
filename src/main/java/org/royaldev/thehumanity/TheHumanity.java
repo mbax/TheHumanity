@@ -142,7 +142,7 @@ public class TheHumanity {
             new ScoreCommand(this),
             new HostCommand(this),
             new GameCommand(this)
-        ).stream().forEach(this.getCommandHandler()::register);
+        ).forEach(this.getCommandHandler()::register);
     }
 
     private void setUpLogger() {

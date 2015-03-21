@@ -3,6 +3,7 @@ package org.royaldev.thehumanity.handlers;
 import org.royaldev.thehumanity.commands.Command;
 import org.royaldev.thehumanity.commands.IRCCommand;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
@@ -65,16 +66,13 @@ public class CommandHandler implements Handler<IRCCommand, String> {
         this.checkCommand(command);
         final String name = command.getName().toLowerCase();
         synchronized (this.commands) {
-            if (this.commands.containsKey(name)) return false;
-            this.commands.put(name, command);
+            this.commands.putIfAbsent(name, command);
         }
-        for (String alias : command.getAliases()) {
-            alias = alias.toLowerCase();
+        Arrays.asList(command.getAliases()).stream().map(String::toLowerCase).forEach(alias -> {
             synchronized (this.aliasCommands) {
-                if (this.aliasCommands.containsKey(alias)) continue;
-                this.aliasCommands.put(alias, name);
+                this.aliasCommands.putIfAbsent(alias, name);
             }
-        }
+        });
         return true;
     }
 
