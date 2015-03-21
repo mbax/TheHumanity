@@ -99,7 +99,7 @@ public class StartGameCommand extends NoticeableCommand {
     private void rush(final ChannelMessageEvent e, final User u) {
         final Game g = this.humanity.getGameFor(e.getChannel());
         final Player p = g.getPlayer(u);
-        if (!g.getHost().equals(p) && !this.humanity.hasChannelMode(g.getChannel(), p.getUser(), 'o')) {
+        if (p == null || !p.equals(g.getHost()) && !this.humanity.hasChannelMode(g.getChannel(), p.getUser(), 'o')) {
             this.notice(u, "There is already a game in this channel.");
             return;
         }
