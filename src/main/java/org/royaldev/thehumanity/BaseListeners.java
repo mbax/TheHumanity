@@ -1,7 +1,6 @@
 package org.royaldev.thehumanity;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.kitteh.irc.client.library.EventHandler;
 import org.kitteh.irc.client.library.event.channel.ChannelInviteEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelJoinEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelKickEvent;
@@ -9,6 +8,7 @@ import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelPartEvent;
 import org.kitteh.irc.client.library.event.client.ClientConnectedEvent;
 import org.kitteh.irc.client.library.event.user.PrivateMessageEvent;
+import org.kitteh.irc.lib.net.engio.mbassy.listener.Handler;
 import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.IRCCommand;
 import org.royaldev.thehumanity.util.ConversionHelper;
@@ -24,8 +24,7 @@ final class BaseListeners {
         this.humanity = instance;
     }
 
-    @SuppressWarnings("ConstantConditions")
-    @EventHandler
+    @Handler
     public void onChannelMessage(final ChannelMessageEvent e) {
         final String message = e.getMessage();
         if (message.isEmpty() || message.charAt(0) != this.humanity.getPrefix()) return;
@@ -47,37 +46,37 @@ final class BaseListeners {
         }
     }
 
-    @EventHandler
+    @Handler
     public void onConnect(final ClientConnectedEvent event) throws Exception {
         event.getClient().sendRawLine("/mode " + event.getClient().getNick() + " +B");
     }
 
-    @EventHandler
+    @Handler
     public void onInvite(final ChannelInviteEvent e) {
         e.getClient().addChannel(e.getChannel().getName());
         this.humanity.getLogger().info("Invited to " + e.getChannel() + " by " + e.getActor().getName() + ".");
     }
 
-    @EventHandler
+    @Handler
     public void onJoin(final ChannelJoinEvent e) {
         if (e.getChannel().getUsers().size() < 1) e.getChannel().part("Alone.");
         if (!e.getActor().getNick().equals(this.humanity.getBot().getNick())) return;
         this.humanity.getLogger().info("Joined " + e.getChannel().getName() + ".");
     }
 
-    @EventHandler
+    @Handler
     public void onKick(final ChannelKickEvent e) {
         this.humanity.getLogger().info("Kicked from " + e.getChannel().getName() + ".");
     }
 
-    @EventHandler
+    @Handler
     public void onPart(final ChannelPartEvent e) {
         if (e.getChannel().getUsers().size() <= 2) e.getChannel().part("Alone.");
         if (!e.getActor().getNick().equals(this.humanity.getBot().getNick())) return;
         this.humanity.getLogger().info("Parted from " + e.getChannel().getName() + ".");
     }
 
-    @EventHandler
+    @Handler
     public void onPrivateMessage(final PrivateMessageEvent e) {
         final String message = e.getMessage();
         if (message.isEmpty()) return;
