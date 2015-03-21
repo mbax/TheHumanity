@@ -103,7 +103,7 @@ public class StartGameCommand extends NoticeableCommand {
             this.notice(u, "There is already a game in this channel.");
             return;
         }
-        this.notice(u, "The countdown was " + (g.skipCountdown() ? "" : "not") + " skipped.");
+        this.notice(u, "The countdown was" + (g.skipCountdown() ? "" : " not") + " skipped.");
     }
 
     @Override
