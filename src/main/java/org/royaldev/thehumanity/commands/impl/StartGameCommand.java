@@ -11,6 +11,7 @@ import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.Command;
 import org.royaldev.thehumanity.commands.IRCCommand.CommandType;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
+import org.royaldev.thehumanity.player.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -89,13 +90,29 @@ public class StartGameCommand extends NoticeableCommand {
         return new CardcastFetcher(name.substring(3)).getCardPack();
     }
 
+    /**
+     * Tries to skip the countdown and rush the Game to start.
+     *
+     * @param e Event
+     * @param u User trying to rush
+     */
+    private void rush(final ChannelMessageEvent e, final User u) {
+        final Game g = this.humanity.getGameFor(e.getChannel());
+        final Player p = g.getPlayer(u);
+        if (!g.getHost().equals(p) && !this.humanity.hasChannelMode(g.getChannel(), p.getUser(), 'o')) {
+            this.notice(u, "There is already a game in this channel.");
+            return;
+        }
+        this.notice(u, "The countdown was " + (g.skipCountdown() ? "" : "not") + " skipped.");
+    }
+
     @Override
     public void onCommand(final ActorEvent<User> event, final CallInfo ci, final String[] args) {
         if (!(event instanceof ChannelMessageEvent)) return;
         final User u = event.getActor();
         final ChannelMessageEvent e = (ChannelMessageEvent) event;
         if (this.humanity.getGames().containsKey(e.getChannel())) {
-            this.notice(u, "There is already a game in this channel.");
+            this.rush(e, u);
             return;
         }
         for (final Game game : this.humanity.getGames().values()) {

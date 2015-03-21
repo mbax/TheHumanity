@@ -535,11 +535,23 @@ public class Game {
         final Map<Player, Integer> sortedScores = new TreeMap<>(new DescendingValueComparator(scores));
         sortedScores.putAll(scores);
         final StringBuilder sb = new StringBuilder();
-        sb.append(IRCFormat.BOLD + "Scores:").append(IRCFormat.RESET).append(" ");
+        sb.append(IRCFormat.BOLD).append("Scores:").append(IRCFormat.RESET).append(" ");
         for (final Map.Entry<Player, Integer> entry : sortedScores.entrySet()) {
             sb.append(entry.getKey().getUser().getNick()).append(": ").append(entry.getValue() == null ? 0 : entry.getValue()).append(", ");
         }
         this.sendMessage(sb.toString().substring(0, sb.length() - 2));
+    }
+
+    /**
+     * Skips the countdown to start this Game and immediately starts the Game.
+     * @return true if countdown was skipped, false if otherwise
+     */
+    public boolean skipCountdown() {
+        if (this.countdownTask == null || this.countdownTask.isCancelled() || this.countdownTask.isDone()) return false;
+        if (this.getPlayers().size() < 3) return false;
+        this.advanceStage();
+        this.countdownTask.cancel(true);
+        return true;
     }
 
     /**
