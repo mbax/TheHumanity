@@ -94,7 +94,7 @@ public class TheHumanity {
         this.loadCardPacks();
         this.registerCommands();
         final ClientBuilder cb = new ClientBuilder();
-        cb.nick(this.nickname).user(this.nickname).name(this.nickname).realName(this.nickname).server(this.server).server(this.serverPort);
+        cb.nick(this.nickname).user(this.nickname).name(this.nickname).realName(this.nickname).server(this.server).server(this.serverPort).secure(this.ssl);
         if (!this.nickserv.isEmpty()) cb.auth(AuthType.NICKSERV, this.nickname, this.nickserv);
         if (!this.serverPassword.isEmpty()) cb.serverPassword(this.serverPassword);
         this.bot = cb.build();
