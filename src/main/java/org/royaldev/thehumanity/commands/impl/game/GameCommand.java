@@ -11,6 +11,7 @@ import org.royaldev.thehumanity.commands.IRCCommand;
 import org.royaldev.thehumanity.commands.InGameCommand;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Command(
@@ -24,9 +25,24 @@ public class GameCommand extends InGameCommand {
 
     public GameCommand(final TheHumanity instance) {
         super(instance);
-        this.subcommands.add(new PacksSubcommand(this.humanity));
-        this.subcommands.add(new AddPackSubcommand(this.humanity));
-        this.subcommands.add(new RemovePackSubcommand(this.humanity));
+        Arrays.asList(
+            new PacksSubcommand(this.humanity),
+            new AddPackSubcommand(this.humanity),
+            new RemovePackSubcommand(this.humanity),
+            new HouseRulesSubCommand(this.humanity)
+        ).forEach(this.subcommands::add);
+    }
+
+    private String getHelpString() {
+        final StringBuilder sb = new StringBuilder("Subcommands: ");
+        for (final IRCCommand subcommand : this.subcommands) {
+            sb.append("(").append(subcommand.getName());
+            for (final String alias : subcommand.getAliases()) {
+                sb.append(", ").append(alias);
+            }
+            sb.append("), ");
+        }
+        return sb.substring(0, sb.length() - 2);
     }
 
     private IRCCommand getSubcommand(final String name) {
@@ -37,7 +53,8 @@ public class GameCommand extends InGameCommand {
     public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, final Game g, final String[] args) {
         final User u = event.getActor();
         if (args.length < 1) {
-            this.notice(u, "Provide a subcommand."); // TODO: Help
+            this.notice(u, "Provide a subcommand.");
+            this.notice(u, this.getHelpString());
             return;
         }
         final IRCCommand subcommand = this.getSubcommand(args[0]);

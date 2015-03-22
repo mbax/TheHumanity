@@ -21,8 +21,6 @@ import java.util.TreeMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-// TODO: Skip timeout
-
 public class Game {
 
     private final TheHumanity humanity;
@@ -35,6 +33,7 @@ public class Game {
      */
     private final List<Player> allPlayers = Collections.synchronizedList(new ArrayList<>());
     private final Deck deck;
+    private final List<HouseRule> houseRules = new ArrayList<>();
     private Channel channel;
     private Round currentRound = null;
     private Player host = null;
@@ -245,6 +244,15 @@ public class Game {
     }
 
     /**
+     * Gets a list of {@link HouseRule HouseRules} being used for this game.
+     *
+     * @return House rules
+     */
+    public List<HouseRule> getHouseRules() {
+        return this.houseRules;
+    }
+
+    /**
      * Gets the instance of the bot that this game is running under.
      *
      * @return TheHumanity
@@ -309,6 +317,16 @@ public class Game {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Convenience method to check if this game has a house rule in effect.
+     *
+     * @param rule Rule to check
+     * @return true if the rule is being used, false if otherwise
+     */
+    public boolean hasHouseRule(final HouseRule rule) {
+        return this.getHouseRules().contains(rule);
     }
 
     /**
@@ -544,6 +562,7 @@ public class Game {
 
     /**
      * Skips the countdown to start this Game and immediately starts the Game.
+     *
      * @return true if countdown was skipped, false if otherwise
      */
     public boolean skipCountdown() {

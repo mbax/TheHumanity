@@ -3,6 +3,7 @@ package org.royaldev.thehumanity.commands.impl;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
 import org.royaldev.thehumanity.Game;
+import org.royaldev.thehumanity.HouseRule;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
 import org.royaldev.thehumanity.commands.CallInfo;
@@ -49,6 +50,13 @@ public class RebootTheUniverseCommand extends InGameCommand {
     @Override
     public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, final Game g, final String[] args) {
         final User u = event.getActor();
+        if (!g.hasHouseRule(HouseRule.REBOOTING_THE_UNIVERSE)) {
+            this.notice(u, "The house rule \"Rebooting the Universe\" must be enabled to use this command.");
+            if (this.isHostOrOp(g.getPlayer(u))) {
+                this.notice(u, "Try " + this.humanity.getPrefix() + "game hr list.");
+            }
+            return;
+        }
         if (args.length < 1) {
             this.notice(u, "Usage: " + this.getUsage().replace("<command>", ci.getLabel()));
             return;
