@@ -84,13 +84,14 @@ public class Round {
      *
      * @param index Index of the winning play (starting at 1)
      */
-    public void chooseWinningPlay(int index) {
+    public boolean chooseWinningPlay(int index) {
         index--;
-        if (index < 0 || index >= this.getPlays().size()) return;
+        if (index < 0 || index >= this.getPlays().size()) return false;
         final Play p = this.getPlays().get(index);
         p.getPlayer().getWins().addCard(this.getBlackCard());
         this.getGame().sendMessage(IRCFormat.RESET + "Play " + IRCFormat.BOLD + (index + 1) + IRCFormat.RESET + " by " + IRCFormat.BOLD + p.getPlayer().getUser().getNick() + IRCFormat.RESET + " wins!");
         this.advanceStage();
+        return true;
     }
 
     /**

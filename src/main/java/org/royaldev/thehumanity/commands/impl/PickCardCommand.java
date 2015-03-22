@@ -52,8 +52,7 @@ public class PickCardCommand extends InGameCommand {
             this.notice(u, args[0] + " is not a valid number.");
             return;
         }
-        this.notice(u, "Play picked!");
-        r.chooseWinningPlay(winningPlay);
+        this.notice(u, r.chooseWinningPlay(winningPlay) ? "Play picked!" : "Invalid play.");
     }
 
     /**
