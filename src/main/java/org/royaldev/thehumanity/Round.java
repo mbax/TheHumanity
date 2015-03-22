@@ -43,18 +43,31 @@ public class Round {
     }
 
     /**
+     * Processes tasks that house rules need to complete.
+     */
+    private void processHouseRules() {
+        if (this.currentStage != RoundStage.WAITING_FOR_PLAYERS) return;
+        if (this.game.hasHouseRule(HouseRule.RANDO_CARDRISSIAN)) {
+            final List<WhiteCard> randoPlay = new ArrayList<>();
+            for (int i = 0; i < this.blackCard.getBlanks(); i++) {
+                randoPlay.add(this.game.getDeck().getRandomWhiteCard(null));
+            }
+            this.addPlay(new Play(this.game.getRandoCardrissian(), randoPlay));
+        }
+        if (this.game.hasHouseRule(HouseRule.PACKING_HEAT)) {
+            this.game.getPlayers().forEach(p -> p.getHand().addCard(this.game.getDeck().getRandomWhiteCard(null)));
+        }
+    }
+
+    /**
      * Processes various tasks for each new stage the round enters.
      */
     private void processStage() {
         if (!this.getGame().hasEnoughPlayers()) return;
         switch (this.currentStage) {
             case WAITING_FOR_PLAYERS:
-                if (!this.game.hasHouseRule(HouseRule.RANDO_CARDRISSIAN)) break;
-                final List<WhiteCard> randoPlay = new ArrayList<>();
-                for (int i = 0; i < this.blackCard.getBlanks(); i++) {
-                    randoPlay.add(this.game.getDeck().getRandomWhiteCard(null));
-                }
-                this.addPlay(new Play(this.game.getRandoCardrissian(), randoPlay));
+                this.processHouseRules();
+                this.game.showCards();
                 break;
             case WAITING_FOR_CZAR:
                 if (this.czar == null) break;

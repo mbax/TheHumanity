@@ -447,7 +447,6 @@ public class Game {
                 this.sendMessage(IRCFormat.BOLD + "Round " + this.getCurrentRound().getNumber() + IRCFormat.RESET + "!");
                 this.sendMessage(IRCFormat.BOLD + this.getCurrentRound().getCzar().getUser().getNick() + IRCFormat.RESET + " is the card czar.");
                 this.sendMessage(IRCFormat.BOLD + this.getCurrentRound().getBlackCard().getText());
-                this.showCards();
                 this.getCurrentRound().advanceStage();
                 break;
         }
