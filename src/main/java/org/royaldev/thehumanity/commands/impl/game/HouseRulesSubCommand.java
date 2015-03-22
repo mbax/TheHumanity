@@ -62,7 +62,7 @@ public class HouseRulesSubCommand extends InGameCommand {
     private void list(final ActorEvent<User> event, final Game g) {
         final StringBuilder sb = new StringBuilder();
         Arrays.stream(HouseRule.values()).sorted().forEach(hr -> {
-            sb.append(g.getHouseRules().contains(hr) ? IRCFormat.GREEN : IRCFormat.RED);
+            sb.append(g.hasHouseRule(hr) ? IRCFormat.GREEN : IRCFormat.RED);
             sb.append(hr);
             sb.append(IRCFormat.RESET).append(", ");
         });
