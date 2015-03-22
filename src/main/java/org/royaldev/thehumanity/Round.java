@@ -229,6 +229,11 @@ public class Round {
      */
     public boolean skip(final Player p) {
         if (this.isSkipped(p)) return false;
+        // If the total amount of players less the skipped players is less than the amount needed to play, don't skip.
+        // However, if this person is the czar, it's fine.
+        if (!p.equals(this.getCzar()) && this.getGame().getPlayers().size() - this.skippedPlayers.size() < 3) {
+            return false;
+        }
         synchronized (this.skippedPlayers) {
             this.skippedPlayers.add(p);
         }
