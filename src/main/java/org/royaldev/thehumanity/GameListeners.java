@@ -2,10 +2,12 @@ package org.royaldev.thehumanity;
 
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.channel.ChannelKickEvent;
+import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelPartEvent;
 import org.kitteh.irc.client.library.event.user.UserNickChangeEvent;
 import org.kitteh.irc.client.library.event.user.UserQuitEvent;
 import org.kitteh.irc.lib.net.engio.mbassy.listener.Handler;
+import org.royaldev.thehumanity.player.Player;
 
 public class GameListeners {
 
@@ -49,5 +51,17 @@ public class GameListeners {
         final Game g = this.humanity.getGameFor(u);
         if (g == null) return;
         g.removePlayer(g.getPlayer(u));
+    }
+
+    @Handler
+    public void reminderTaskCanceller(final ChannelMessageEvent event) {
+        final User u = event.getActor();
+        final Game g = this.humanity.getGameFor(u);
+        if (g == null) return;
+        final Player p = g.getPlayer(u);
+        final Round r = g.getCurrentRound();
+        if (p == null || r == null || !r.getCzar().equals(p)) return;
+        // This can't prematurely cancel, since the task is only made when the stage switches to waiting for czar.
+        r.cancelReminderTask();
     }
 }

@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class Round {
@@ -20,6 +22,7 @@ public class Round {
     private final Player czar;
     private final Set<Player> skippedPlayers = Collections.synchronizedSet(new HashSet<>());
     private final List<Play> plays = Collections.synchronizedList(new ArrayList<>());
+    private ScheduledFuture reminderTask;
     private RoundStage currentStage = RoundStage.IDLE;
 
     Round(final Game game, final int number, final BlackCard blackCard, final Player czar) {
@@ -27,6 +30,15 @@ public class Round {
         this.number = number;
         this.blackCard = blackCard;
         this.czar = czar;
+    }
+
+    private ScheduledFuture makeReminderTask() {
+        return this.getGame().getHumanity().getThreadPool().scheduleAtFixedRate(
+            () -> this.getGame().getChannel().sendMessage(this.getCzar().getUser().getNick() + ": Wake up! You're the czar!"),
+            4500L,
+            2250L,
+            TimeUnit.MILLISECONDS
+        );
     }
 
     /**
@@ -41,6 +53,7 @@ public class Round {
                 this.displayPlays();
                 this.getGame().sendMessage(IRCFormat.BOLD + this.getCzar().getUser().getNick() + IRCFormat.RESET + " is picking a winner.");
                 this.getCzar().getUser().sendNotice("Send " + IRCFormat.BOLD + this.getGame().getHumanity().getPrefix() + "pick" + IRCFormat.RESET + " followed by the number you think should win.");
+                this.reminderTask = this.makeReminderTask();
                 break;
             case ENDED:
                 this.getGame().advanceStage();
@@ -79,12 +92,20 @@ public class Round {
         this.processStage();
     }
 
+    public void cancelReminderTask() {
+        if (this.reminderTask == null || this.reminderTask.isCancelled() || this.reminderTask.isDone()) {
+            return;
+        }
+        this.reminderTask.cancel(true);
+    }
+
     /**
      * Chooses the winning play for this round. This ends the round.
      *
      * @param index Index of the winning play (starting at 1)
      */
     public boolean chooseWinningPlay(int index) {
+        this.cancelReminderTask();
         index--;
         if (index < 0 || index >= this.getPlays().size()) return false;
         final Play p = this.getPlays().get(index);
