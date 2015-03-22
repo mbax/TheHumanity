@@ -27,7 +27,7 @@ public class HouseRulesSubCommand extends InGameCommand {
         super(instance);
     }
 
-    private void add(final ActorEvent<User> event, final CallInfo ci, final Game g, final String[] args) {
+    private void add(final ActorEvent<User> event, final Game g, final String[] args) {
         final User u = event.getActor();
         final Player p = g.getPlayer(u);
         if (!this.isHostOrOp(p)) {
@@ -48,7 +48,7 @@ public class HouseRulesSubCommand extends InGameCommand {
             return;
         }
         g.addHouseRule(hr);
-        ConversionHelper.respond(event, "Added house rule: " + hr + ".");
+        ConversionHelper.respond(event, "Added house rule: " + IRCFormat.BOLD + hr + IRCFormat.RESET + ".");
     }
 
     private HouseRule getHouseRule(final String name) {
@@ -69,7 +69,7 @@ public class HouseRulesSubCommand extends InGameCommand {
         ConversionHelper.respond(event, sb.substring(0, sb.length() - 2));
     }
 
-    private void remove(final ActorEvent<User> event, final CallInfo ci, final Game g, final String[] args) {
+    private void remove(final ActorEvent<User> event, final Game g, final String[] args) {
         final User u = event.getActor();
         final Player p = g.getPlayer(u);
         if (!this.isHostOrOp(p)) {
@@ -90,7 +90,7 @@ public class HouseRulesSubCommand extends InGameCommand {
             return;
         }
         g.removeHouseRule(hr);
-        ConversionHelper.respond(event, "Removed house rule: " + hr + ".");
+        ConversionHelper.respond(event, "Removed house rule: " + IRCFormat.BOLD + hr + IRCFormat.RESET + ".");
     }
 
     @Override
@@ -105,11 +105,11 @@ public class HouseRulesSubCommand extends InGameCommand {
         switch (args[0].toLowerCase()) {
             case "add":
             case "a":
-                this.add(event, ci, g, newArgs);
+                this.add(event, g, newArgs);
                 break;
             case "remove":
             case "r":
-                this.remove(event, ci, g, newArgs);
+                this.remove(event, g, newArgs);
                 break;
             case "list":
             case "l":
