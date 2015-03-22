@@ -29,7 +29,7 @@ public class KickCommand extends InGameCommand {
             return;
         }
         final Player p = g.getPlayer(u);
-        if (!g.getHost().equals(p) && !this.humanity.hasChannelMode(g.getChannel(), u, 'o')) {
+        if (!this.isHostOrOp(p, g)) {
             this.notice(u, "You're not an op or the host!");
             return;
         }

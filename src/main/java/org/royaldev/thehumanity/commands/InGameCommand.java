@@ -4,6 +4,7 @@ import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
 import org.royaldev.thehumanity.Game;
 import org.royaldev.thehumanity.TheHumanity;
+import org.royaldev.thehumanity.player.Player;
 
 /**
  * A command that is only meant to be used when the user is in a game.
@@ -35,6 +36,27 @@ public abstract class InGameCommand extends NoticeableCommand {
      */
     public Game getGame(final User u) {
         return this.humanity.getGameFor(u);
+    }
+
+    /**
+     * Checks to see if the given Player is the host or a channel operator in the given Game.
+     *
+     * @param p Player to check
+     * @param g Game to check
+     * @return true if host or chanop, false if not
+     */
+    public boolean isHostOrOp(final Player p, final Game g) {
+        return g != null && (g.getHost().equals(p) || this.humanity.hasChannelMode(g.getChannel(), p.getUser(), 'o'));
+    }
+
+    /**
+     * Checks to see if the given Player is the host or a channel operator in the game the Player is a part of.
+     *
+     * @param p Player to check
+     * @return true if host or chanop, false if not
+     */
+    public boolean isHostOrOp(final Player p) {
+        return this.isHostOrOp(p, this.getGame(p.getUser()));
     }
 
     /**

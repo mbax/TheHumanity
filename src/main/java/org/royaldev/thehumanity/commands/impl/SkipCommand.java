@@ -35,7 +35,7 @@ public class SkipCommand extends InGameCommand {
             return;
         }
         final Round r = g.getCurrentRound();
-        if (!g.getHost().equals(p) && !u.getNick().equalsIgnoreCase(args[0]) && !this.humanity.hasChannelMode(g.getChannel(), u, 'o')) {
+        if (!u.getNick().equalsIgnoreCase(args[0]) && !this.isHostOrOp(p, g)) {
             this.notice(u, "You're not an op, the host, or skipping yourself!");
             return;
         }
