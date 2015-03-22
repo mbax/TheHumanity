@@ -43,11 +43,11 @@ public class HouseRulesSubCommand extends InGameCommand {
             this.notice(u, "No such house rule.");
             return;
         }
-        if (g.getHouseRules().contains(hr)) {
+        if (g.hasHouseRule(hr)) {
             this.notice(u, "This house rule is already being used.");
             return;
         }
-        g.getHouseRules().add(hr);
+        g.addHouseRule(hr);
         ConversionHelper.respond(event, "Added house rule: " + hr + ".");
     }
 
@@ -85,11 +85,11 @@ public class HouseRulesSubCommand extends InGameCommand {
             this.notice(u, "No such house rule.");
             return;
         }
-        if (!g.getHouseRules().contains(hr)) {
+        if (!g.hasHouseRule(hr)) {
             this.notice(u, "This house rule is not being used.");
             return;
         }
-        g.getHouseRules().remove(hr);
+        g.removeHouseRule(hr);
         ConversionHelper.respond(event, "Removed house rule: " + hr + ".");
     }
 

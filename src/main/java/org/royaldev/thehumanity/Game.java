@@ -10,6 +10,7 @@ import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
 import org.royaldev.thehumanity.player.Hand;
 import org.royaldev.thehumanity.player.Player;
+import org.royaldev.thehumanity.util.FakeUser;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +35,7 @@ public class Game {
     private final List<Player> allPlayers = Collections.synchronizedList(new ArrayList<>());
     private final Deck deck;
     private final List<HouseRule> houseRules = new ArrayList<>();
+    private final Player randoCardrissian = new Player(new FakeUser("Rando Cardrissian"));
     private Channel channel;
     private Round currentRound = null;
     private Player host = null;
@@ -48,6 +50,28 @@ public class Game {
     }
 
     /**
+     * Gets a list of {@link HouseRule HouseRules} being used for this game.
+     *
+     * @return House rules
+     */
+    private List<HouseRule> getHouseRules() {
+        return this.houseRules;
+    }
+
+    /**
+     * Processes adding a house rule. Useful for setting up various aspects of the game to work with the rule.
+     *
+     * @param hr Rule being added
+     */
+    private void processAddingHouseRule(final HouseRule hr) {
+        switch (hr) {
+            case RANDO_CARDRISSIAN:
+                this.allPlayers.add(this.randoCardrissian);
+                break;
+        }
+    }
+
+    /**
      * Adds a CardPack to this Game.
      *
      * @param cp CardPack to add.
@@ -55,6 +79,18 @@ public class Game {
      */
     public boolean addCardPack(final CardPack cp) {
         return this.deck.addCardPack(cp);
+    }
+
+    /**
+     * Adds a house rule to the game.
+     *
+     * @param rule Rule to add
+     * @return true if rule was added, false if otherwise
+     */
+    public boolean addHouseRule(final HouseRule rule) {
+        if (this.hasHouseRule(rule)) return false;
+        this.processAddingHouseRule(rule);
+        return this.getHouseRules().add(rule);
     }
 
     /**
@@ -244,15 +280,6 @@ public class Game {
     }
 
     /**
-     * Gets a list of {@link HouseRule HouseRules} being used for this game.
-     *
-     * @return House rules
-     */
-    public List<HouseRule> getHouseRules() {
-        return this.houseRules;
-    }
-
-    /**
      * Gets the instance of the bot that this game is running under.
      *
      * @return TheHumanity
@@ -303,6 +330,16 @@ public class Game {
         synchronized (this.players) {
             return new ArrayList<>(this.players);
         }
+    }
+
+    /**
+     * Gets the Player that represents Rando Cardrissian.
+     *
+     * @return Player
+     */
+    public Player getRandoCardrissian() {
+        if (!this.hasHouseRule(HouseRule.RANDO_CARDRISSIAN)) return null;
+        return this.randoCardrissian;
     }
 
     /**
@@ -435,6 +472,16 @@ public class Game {
             this.showCards(p);
         });
         return true;
+    }
+
+    /**
+     * Removes a house rule from the game.
+     *
+     * @param rule Rule to remove
+     * @return true if rule was removed, false if otherwise
+     */
+    public boolean removeHouseRule(final HouseRule rule) {
+        return this.hasHouseRule(rule) && this.getHouseRules().remove(rule);
     }
 
     /**

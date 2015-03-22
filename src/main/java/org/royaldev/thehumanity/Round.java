@@ -3,6 +3,7 @@ package org.royaldev.thehumanity;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.royaldev.thehumanity.cards.Play;
 import org.royaldev.thehumanity.cards.types.BlackCard;
+import org.royaldev.thehumanity.cards.types.WhiteCard;
 import org.royaldev.thehumanity.player.Player;
 
 import java.util.ArrayList;
@@ -47,6 +48,14 @@ public class Round {
     private void processStage() {
         if (!this.getGame().hasEnoughPlayers()) return;
         switch (this.currentStage) {
+            case WAITING_FOR_PLAYERS:
+                if (!this.game.hasHouseRule(HouseRule.RANDO_CARDRISSIAN)) break;
+                final List<WhiteCard> randoPlay = new ArrayList<>();
+                for (int i = 0; i < this.blackCard.getBlanks(); i++) {
+                    randoPlay.add(this.game.getDeck().getRandomWhiteCard(null));
+                }
+                this.addPlay(new Play(this.game.getRandoCardrissian(), randoPlay));
+                break;
             case WAITING_FOR_CZAR:
                 if (this.czar == null) break;
                 Collections.shuffle(this.plays);
