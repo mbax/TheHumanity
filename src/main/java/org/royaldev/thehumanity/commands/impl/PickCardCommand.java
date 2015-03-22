@@ -5,6 +5,7 @@ import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
 import org.royaldev.thehumanity.Game;
 import org.royaldev.thehumanity.Game.GameStatus;
+import org.royaldev.thehumanity.HouseRule;
 import org.royaldev.thehumanity.Round;
 import org.royaldev.thehumanity.Round.RoundStage;
 import org.royaldev.thehumanity.TheHumanity;
@@ -31,6 +32,24 @@ public class PickCardCommand extends InGameCommand {
         super(instance);
     }
 
+    private void vote(final Game g, final User u, final Player p, final String[] args) {
+        final Round r = g.getCurrentRound();
+        final int winningPlay;
+        try {
+            winningPlay = Integer.parseInt(args[0]);
+        } catch (NumberFormatException ex) {
+            this.notice(u, args[0] + " is not a valid number.");
+            return;
+        }
+        final int index = winningPlay - 1;
+        if (index < 0 || index >= r.getPlays().size()) {
+            this.notice(u, "Invalid play.");
+            return;
+        }
+        this.notice(u, r.hasVoted(p) ? "You have already voted!" : "Vote cast!");
+        r.addVote(p, winningPlay);
+    }
+
     /**
      * Processes any use of this command during the WAITING_FOR_CZAR stage.
      *
@@ -41,6 +60,10 @@ public class PickCardCommand extends InGameCommand {
      */
     private void czarPick(final Game g, final User u, final Player p, final String[] args) {
         final Round r = g.getCurrentRound();
+        if (g.hasHouseRule(HouseRule.GOD_IS_DEAD)) {
+            this.vote(g, u, p, args);
+            return;
+        }
         if (!this.isCzar(r, p)) {
             this.notice(u, "You can't pick any cards right now.");
             return;
@@ -78,7 +101,7 @@ public class PickCardCommand extends InGameCommand {
      */
     private void playerPick(final Game g, final User u, final Player p, final String[] args) {
         final Round r = g.getCurrentRound();
-        if (this.isCzar(r, p)) {
+        if (!g.hasHouseRule(HouseRule.GOD_IS_DEAD) && this.isCzar(r, p)) {
             this.notice(u, "You're the card czar! Wait until all the players have chosen their cards.");
             return;
         }

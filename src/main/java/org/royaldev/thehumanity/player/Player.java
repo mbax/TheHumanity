@@ -17,6 +17,10 @@ public class Player {
         this.user = user;
     }
 
+    public void addWin(final BlackCard win) {
+        this.getWins().addCard(win);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

@@ -5,12 +5,16 @@ import org.royaldev.thehumanity.cards.Play;
 import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
 import org.royaldev.thehumanity.player.Player;
+import org.royaldev.thehumanity.util.DescendingValueComparator;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -23,6 +27,8 @@ public class Round {
     private final Player czar;
     private final Set<Player> skippedPlayers = Collections.synchronizedSet(new HashSet<>());
     private final List<Play> plays = Collections.synchronizedList(new ArrayList<>());
+    private final Map<Play, Integer> votes = new HashMap<>();
+    private final Set<Player> voters = new HashSet<>();
     private ScheduledFuture reminderTask;
     private RoundStage currentStage = RoundStage.IDLE;
 
@@ -70,6 +76,11 @@ public class Round {
                 this.game.showCards();
                 break;
             case WAITING_FOR_CZAR:
+                if (this.game.hasHouseRule(HouseRule.GOD_IS_DEAD)) {
+                    Collections.shuffle(this.plays);
+                    this.displayPlays();
+                    this.getGame().sendMessage("Send " + IRCFormat.BOLD + this.getGame().getHumanity().getPrefix() + "pick" + IRCFormat.RESET + " followed by the number you think should win.");
+                }
                 if (this.czar == null) break;
                 Collections.shuffle(this.plays);
                 this.displayPlays();
@@ -94,6 +105,21 @@ public class Round {
         }
         play.getWhiteCards().stream().forEach(play.getPlayer().getHand()::removeCard);
         if (this.hasAllPlaysMade()) this.advanceStage();
+    }
+
+    public boolean addVote(final Player player, int index) {
+        if (this.hasVoted(player)) return false;
+        index--;
+        if (index < 0 || index >= this.getPlays().size()) return false;
+        this.voters.add(player);
+        final Play p = this.getPlays().get(index);
+        this.votes.compute(p, (k, v) -> v == null ? 1 : v + 1);
+        if (this.votes.values().stream().mapToInt(i -> i).sum() >= this.getGame().getPlayers().size()) {
+            final Play winner = this.getMostVoted();
+            final int winningIndex = this.plays.indexOf(winner);
+            this.chooseWinningPlay(winningIndex + 1);
+        }
+        return true;
     }
 
     /**
@@ -131,7 +157,7 @@ public class Round {
         index--;
         if (index < 0 || index >= this.getPlays().size()) return;
         final Play p = this.getPlays().get(index);
-        p.getPlayer().getWins().addCard(this.getBlackCard());
+        p.getPlayer().addWin(this.getBlackCard());
         this.getGame().sendMessage(IRCFormat.RESET + "Play " + IRCFormat.BOLD + (index + 1) + IRCFormat.RESET + " by " + IRCFormat.BOLD + p.getPlayer().getUser().getNick() + IRCFormat.RESET + " wins!");
         this.advanceStage();
     }
@@ -192,6 +218,12 @@ public class Round {
         return this.game;
     }
 
+    public Play getMostVoted() {
+        final Map<Play, Integer> sortedPlays = new TreeMap<>(new DescendingValueComparator<>(this.votes));
+        sortedPlays.putAll(this.votes);
+        return sortedPlays.entrySet().iterator().next().getKey();
+    }
+
     /**
      * Gets the number of this round.
      *
@@ -234,7 +266,7 @@ public class Round {
     public boolean hasAllPlaysMade() {
         final List<Player> usersTakingPart = new ArrayList<>(this.getGame().getPlayers());
         usersTakingPart.removeAll(this.getSkippedPlayers());
-        return this.getActivePlayerPlays().size() >= usersTakingPart.size() - 1;
+        return this.getActivePlayerPlays().size() >= usersTakingPart.size() - (this.getGame().hasHouseRule(HouseRule.GOD_IS_DEAD) ? 0 : 1);
     }
 
     /**
@@ -245,6 +277,10 @@ public class Round {
      */
     public boolean hasPlayed(final Player p) {
         return this.plays.stream().anyMatch(play -> play.getPlayer().equals(p));
+    }
+
+    public boolean hasVoted(final Player player) {
+        return this.voters.contains(player);
     }
 
     /**

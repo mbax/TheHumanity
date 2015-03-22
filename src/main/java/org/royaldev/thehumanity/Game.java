@@ -10,11 +10,11 @@ import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
 import org.royaldev.thehumanity.player.Hand;
 import org.royaldev.thehumanity.player.Player;
+import org.royaldev.thehumanity.util.DescendingValueComparator;
 import org.royaldev.thehumanity.util.FakeUser;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -441,11 +441,13 @@ public class Game {
                         return;
                     }
                 } while (blackCard.getBlanks() > 10 || blackCard.getBlanks() < 1);
-                this.currentRound = new Round(this, this.getCurrentRound() == null ? 1 : this.getCurrentRound().getNumber() + 1, blackCard, this.getPlayers().get(index));
+                this.currentRound = new Round(this, this.getCurrentRound() == null ? 1 : this.getCurrentRound().getNumber() + 1, blackCard, this.hasHouseRule(HouseRule.GOD_IS_DEAD) ? null : this.getPlayers().get(index));
                 this.deal();
                 this.sendMessage(" ");
                 this.sendMessage(IRCFormat.BOLD + "Round " + this.getCurrentRound().getNumber() + IRCFormat.RESET + "!");
-                this.sendMessage(IRCFormat.BOLD + this.getCurrentRound().getCzar().getUser().getNick() + IRCFormat.RESET + " is the card czar.");
+                if (!this.hasHouseRule(HouseRule.GOD_IS_DEAD)) {
+                    this.sendMessage(IRCFormat.BOLD + this.getCurrentRound().getCzar().getUser().getNick() + IRCFormat.RESET + " is the card czar.");
+                }
                 this.sendMessage(IRCFormat.BOLD + this.getCurrentRound().getBlackCard().getText());
                 this.getCurrentRound().advanceStage();
                 break;
@@ -596,7 +598,7 @@ public class Game {
         synchronized (this.allPlayers) {
             this.allPlayers.stream().forEach(p -> scores.put(p, p.getScore()));
         }
-        final Map<Player, Integer> sortedScores = new TreeMap<>(new DescendingValueComparator(scores));
+        final Map<Player, Integer> sortedScores = new TreeMap<>(new DescendingValueComparator<>(scores));
         sortedScores.putAll(scores);
         final StringBuilder sb = new StringBuilder();
         sb.append(IRCFormat.BOLD).append("Scores:").append(IRCFormat.RESET).append(" ");
@@ -722,17 +724,4 @@ public class Game {
         }
     }
 
-    private class DescendingValueComparator implements Comparator<Player> {
-
-        private final Map<Player, Integer> base;
-
-        private DescendingValueComparator(final Map<Player, Integer> base) {
-            this.base = base;
-        }
-
-        @Override
-        public int compare(final Player o1, final Player o2) {
-            return this.base.get(o1) >= this.base.get(o2) ? -1 : 1;
-        }
-    }
 }
