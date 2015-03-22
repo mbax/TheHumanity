@@ -38,7 +38,7 @@ public class HouseRulesSubCommand extends InGameCommand {
             this.notice(u, "Please provide a house rule.");
             return;
         }
-        final HouseRule hr = this.getHouseRule(StringUtils.join(" ", args));
+        final HouseRule hr = this.getHouseRule(StringUtils.join(args, ' '));
         if (hr == null) {
             this.notice(u, "No such house rule.");
             return;
@@ -80,7 +80,7 @@ public class HouseRulesSubCommand extends InGameCommand {
             this.notice(u, "Please provide a house rule.");
             return;
         }
-        final HouseRule hr = this.getHouseRule(StringUtils.join(" ", args));
+        final HouseRule hr = this.getHouseRule(StringUtils.join(args, ' '));
         if (hr == null) {
             this.notice(u, "No such house rule.");
             return;
