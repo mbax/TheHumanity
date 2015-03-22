@@ -47,6 +47,7 @@ public class Game {
         this.humanity = humanity;
         this.channel = channel;
         this.deck = new Deck(cardPacks);
+        this.addHouseRule(HouseRule.REBOOTING_THE_UNIVERSE);
     }
 
     /**
