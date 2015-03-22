@@ -35,8 +35,8 @@ public class Round {
     private ScheduledFuture makeReminderTask() {
         return this.getGame().getHumanity().getThreadPool().scheduleAtFixedRate(
             () -> this.getGame().getChannel().sendMessage(this.getCzar().getUser().getNick() + ": Wake up! You're the czar!"),
-            4500L,
-            2250L,
+            45000L,
+            22500L,
             TimeUnit.MILLISECONDS
         );
     }
