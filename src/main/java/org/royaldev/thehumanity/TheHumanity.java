@@ -5,6 +5,8 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONWriter;
 import org.kitteh.irc.client.library.AuthType;
 import org.kitteh.irc.client.library.Client;
@@ -89,7 +91,7 @@ public class TheHumanity {
     private Logger l = Logger.getLogger("org.royaldev.thehumanity");
     private ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(1);
 
-    private TheHumanity(final String[] args) {
+    private TheHumanity(@NotNull final String[] args) {
         this.setUpLogger();
         this.parseArguments(args);
         this.loadCardPacks();
@@ -159,7 +161,7 @@ public class TheHumanity {
         this.getLogger().addHandler(ch);
     }
 
-    public void addCardPack(final CardPack cp) {
+    public void addCardPack(@NotNull final CardPack cp) {
         synchronized (this.loadedCardPacks) {
             this.loadedCardPacks.add(cp);
         }
@@ -169,42 +171,51 @@ public class TheHumanity {
         return this.keepCardcastPacks;
     }
 
+    @NotNull
     public Client getBot() {
         return this.bot;
     }
 
-    public CardPack getCardPack(final String name) {
+    @Nullable
+    public CardPack getCardPack(@NotNull final String name) {
         synchronized (this.loadedCardPacks) {
             return this.loadedCardPacks.stream().filter(cp -> cp.getName().equals(name)).findFirst().orElse(null);
         }
     }
 
+    @NotNull
     public CommandHandler getCommandHandler() {
         return this.ch;
     }
 
+    @NotNull
     public String[] getDefaultPacks() {
         return this.defaultPacks.clone();
     }
 
-    public Game getGameFor(final User u) {
+    @Nullable
+    public Game getGameFor(@NotNull final User u) {
         return this.getGames().values().stream().filter(g -> g.hasPlayer(u.getNick())).findFirst().orElse(null);
     }
 
-    public Game getGameFor(final Channel c) {
+    @Nullable
+    public Game getGameFor(@NotNull final Channel c) {
         return this.getGames().get(c);
     }
 
+    @NotNull
     public Map<Channel, Game> getGames() {
         return this.games;
     }
 
+    @NotNull
     public List<CardPack> getLoadedCardPacks() {
         synchronized (this.loadedCardPacks) {
             return this.loadedCardPacks;
         }
     }
 
+    @NotNull
     public Logger getLogger() {
         return this.l;
     }
@@ -213,6 +224,7 @@ public class TheHumanity {
         return this.prefix;
     }
 
+    @NotNull
     public ScheduledThreadPoolExecutor getThreadPool() {
         return this.stpe;
     }
@@ -230,7 +242,8 @@ public class TheHumanity {
      * @param contents    Contents of the Gist
      * @return URL of Gist or error message
      */
-    public String gist(final String id, final String cacheString, final String fileName, final String contents) {
+    @NotNull
+    public String gist(@NotNull final String id, @NotNull final String cacheString, @NotNull final String fileName, @NotNull final String contents) {
         final Pair<String, String> hashGist = this.gistCache.get(id);
         final String hash = DigestUtils.md5Hex(cacheString);
         if (hashGist == null || !hash.equals(hashGist.getLeft())) {
@@ -256,12 +269,12 @@ public class TheHumanity {
         }
     }
 
-    public boolean hasChannelMode(final Channel c, final User u, final char mode) {
+    public boolean hasChannelMode(@NotNull final Channel c, @NotNull final User u, final char mode) {
         final Map<User, Set<ChannelUserMode>> users = c.getUsers();
         return users.containsKey(u) && users.get(u).stream().anyMatch(m -> m.getMode() == mode);
     }
 
-    public boolean usersMatch(final User u, final User u2) {
+    public boolean usersMatch(@NotNull final User u, @NotNull final User u2) {
         return u.getNick().equals(u2.getNick());
     }
 }

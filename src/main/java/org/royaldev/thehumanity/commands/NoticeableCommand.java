@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.commands;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.element.User;
 
 /**
@@ -13,7 +14,7 @@ public abstract class NoticeableCommand extends IRCCommand {
      * @param u       User to send notice to
      * @param message Message to send
      */
-    public void notice(final User u, final String message) {
+    public void notice(@NotNull final User u, final String message) {
         u.sendNotice(message);
     }
 

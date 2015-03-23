@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.player;
 
+import org.jetbrains.annotations.NotNull;
 import org.royaldev.thehumanity.cards.Card;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class Hand<T extends Card> implements Iterable<T> {
      *
      * @param card Card to add
      */
-    public void addCard(final T card) {
+    public void addCard(@NotNull final T card) {
         synchronized (this.hand) {
             this.hand.add(card);
         }
@@ -31,7 +32,7 @@ public class Hand<T extends Card> implements Iterable<T> {
      *
      * @param cards Cards to add
      */
-    public void addCards(final Collection<? extends T> cards) {
+    public void addCards(@NotNull final Collection<? extends T> cards) {
         synchronized (this.hand) {
             this.hand.addAll(cards);
         }
@@ -54,7 +55,8 @@ public class Hand<T extends Card> implements Iterable<T> {
      * @return Card
      * @throws java.lang.NumberFormatException If the given string isn't a number
      */
-    public T getCard(final String indexString) {
+    @NotNull
+    public T getCard(@NotNull final String indexString) {
         final int index;
         try {
             index = Integer.parseInt(indexString);
@@ -71,6 +73,7 @@ public class Hand<T extends Card> implements Iterable<T> {
      * @return Card
      * @throws java.lang.IllegalArgumentException If the index is invalid
      */
+    @NotNull
     public T getCard(final int index) {
         synchronized (this.hand) {
             if (index < 0 || index >= this.hand.size()) {
@@ -85,6 +88,7 @@ public class Hand<T extends Card> implements Iterable<T> {
      *
      * @return Cloned list of cards
      */
+    @NotNull
     public List<T> getCards() {
         synchronized (this.hand) {
             return new ArrayList<>(this.hand);
@@ -102,6 +106,7 @@ public class Hand<T extends Card> implements Iterable<T> {
         }
     }
 
+    @NotNull
     @Override
     public Iterator<T> iterator() {
         synchronized (this.hand) {
@@ -115,7 +120,7 @@ public class Hand<T extends Card> implements Iterable<T> {
      * @param card Card to remove
      * @return true if successful, false if otherwise
      */
-    public boolean removeCard(final T card) {
+    public boolean removeCard(@NotNull final T card) {
         synchronized (this.hand) {
             return this.hand.remove(card);
         }
@@ -127,7 +132,7 @@ public class Hand<T extends Card> implements Iterable<T> {
      * @param cards Cards to remove
      * @return true if the hand changed, false if otherwise
      */
-    public boolean removeCards(final Collection<? extends T> cards) {
+    public boolean removeCards(@NotNull final Collection<? extends T> cards) {
         synchronized (this.hand) {
             return this.hand.removeAll(cards);
         }

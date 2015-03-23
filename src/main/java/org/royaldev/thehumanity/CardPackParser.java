@@ -1,6 +1,8 @@
 package org.royaldev.thehumanity;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.royaldev.thehumanity.cards.CardPack;
 import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
@@ -19,9 +21,10 @@ import java.util.stream.Collectors;
  */
 public class CardPackParser {
 
+    @NotNull
     private final TheHumanity humanity;
 
-    public CardPackParser(final TheHumanity humanity) {
+    public CardPackParser(@NotNull final TheHumanity humanity) {
         this.humanity = humanity;
     }
 
@@ -32,7 +35,8 @@ public class CardPackParser {
      * @param name Name of the file the CardPack is contained in
      * @return CardPack or null
      */
-    public CardPack parseCardPack(final String name) {
+    @Nullable
+    public CardPack parseCardPack(@NotNull final String name) {
         final File f = new File("cardpacks", name);
         if (!f.exists() || !f.isFile()) {
             this.humanity.getLogger().warning(f.getName() + " does not exist.");
@@ -65,7 +69,8 @@ public class CardPackParser {
      * @param names Array of names of files CardPacks are contained in
      * @return Collection not containing null
      */
-    public Collection<CardPack> parseCardPacks(final String[] names) {
+    @NotNull
+    public Collection<CardPack> parseCardPacks(@NotNull final String[] names) {
         return Arrays.stream(names).map(this::parseCardPack).filter(cp -> cp != null).collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -77,8 +82,9 @@ public class CardPackParser {
          * Parsing the metadata section.
          */
         METADATA("___METADATA___") {
+            @NotNull
             @Override
-            ParseStage parseInternal(final CardPack cp, final String line) {
+            ParseStage parseInternal(@NotNull final CardPack cp, @NotNull final String line) {
                 final String[] parts = line.split("\\s*:\\s*");
                 if (parts.length < 2) return this;
                 final String key = parts[0];
@@ -98,8 +104,9 @@ public class CardPackParser {
          * Parsing the black cards section.
          */
         BLACK_CARDS("___BLACK___") {
+            @NotNull
             @Override
-            ParseStage parseInternal(final CardPack cp, final String line) {
+            ParseStage parseInternal(@NotNull final CardPack cp, @NotNull final String line) {
                 cp.addCard(new BlackCard(cp, line));
                 return this;
             }
@@ -108,8 +115,9 @@ public class CardPackParser {
          * Parsing the white cards section.
          */
         WHITE_CARDS("___WHITE___") {
+            @NotNull
             @Override
-            ParseStage parseInternal(final CardPack cp, final String line) {
+            ParseStage parseInternal(@NotNull final CardPack cp, @NotNull final String line) {
                 cp.addCard(new WhiteCard(cp, line));
                 return this;
             }
@@ -127,7 +135,8 @@ public class CardPackParser {
          * @param line Header line to match
          * @return ParseType or null if no matching header
          */
-        static ParseStage getHeaderType(final String line) {
+        @Nullable
+        static ParseStage getHeaderType(@NotNull final String line) {
             for (final ParseStage ps : ParseStage.values()) {
                 if (ps.getHeader().equals(line)) {
                     return ps;
@@ -136,7 +145,8 @@ public class CardPackParser {
             return null;
         }
 
-        abstract ParseStage parseInternal(final CardPack cp, final String line);
+        @NotNull
+        abstract ParseStage parseInternal(@NotNull final CardPack cp, @NotNull final String line);
 
         /**
          * Gets the header of this section (e.g. "___BLACK___"). The header declares the start of a new section in a
@@ -144,6 +154,7 @@ public class CardPackParser {
          *
          * @return Header
          */
+        @NotNull
         String getHeader() {
             return this.header;
         }
@@ -155,7 +166,8 @@ public class CardPackParser {
          * @param line Line to parse
          * @return The next ParseStage, never null
          */
-        ParseStage parse(final CardPack cp, final String line) {
+        @NotNull
+        ParseStage parse(@NotNull final CardPack cp, @NotNull final String line) {
             final ParseStage headerType = ParseStage.getHeaderType(line);
             if (headerType != null) {
                 return headerType;

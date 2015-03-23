@@ -1,5 +1,7 @@
 package org.royaldev.thehumanity.handlers;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.royaldev.thehumanity.commands.Command;
 import org.royaldev.thehumanity.commands.IRCCommand;
 
@@ -17,7 +19,7 @@ public class CommandHandler implements Handler<IRCCommand, String> {
     // Alias, Command
     private final Map<String, String> aliasCommands = new TreeMap<>();
 
-    private void checkCommand(final IRCCommand command) {
+    private void checkCommand(@NotNull final IRCCommand command) {
         final Command c = command.getCommandAnnotation();
         if (c == null) {
             throw new IllegalArgumentException("No Command annotation on IRCCommand.");
@@ -30,7 +32,8 @@ public class CommandHandler implements Handler<IRCCommand, String> {
      * @param name Name of the command to get
      * @return IRCCommand, or null if none registered
      */
-    public IRCCommand get(String name) {
+    @Nullable
+    public IRCCommand get(@NotNull String name) {
         name = name.toLowerCase();
         synchronized (this.commands) {
             if (this.commands.containsKey(name)) return this.commands.get(name);
@@ -46,6 +49,7 @@ public class CommandHandler implements Handler<IRCCommand, String> {
      *
      * @return Collection
      */
+    @NotNull
     public Collection<IRCCommand> getAll() {
         synchronized (this.commands) {
             return this.commands.values();
@@ -62,7 +66,7 @@ public class CommandHandler implements Handler<IRCCommand, String> {
      * @return If command was registered
      */
     @Override
-    public boolean register(final IRCCommand command) {
+    public boolean register(@NotNull final IRCCommand command) {
         this.checkCommand(command);
         final String name = command.getName().toLowerCase();
         synchronized (this.commands) {
@@ -83,7 +87,7 @@ public class CommandHandler implements Handler<IRCCommand, String> {
      * @return If command was removed
      */
     @Override
-    public boolean unregister(final IRCCommand command) {
+    public boolean unregister(@NotNull final IRCCommand command) {
         return this.unregister(command.getName());
     }
 
@@ -95,7 +99,7 @@ public class CommandHandler implements Handler<IRCCommand, String> {
      * @param name Name to remove
      * @return If command was unregistered
      */
-    public boolean unregister(String name) {
+    public boolean unregister(@NotNull String name) {
         name = name.toLowerCase();
         boolean wasRemoved = false;
         synchronized (this.commands) {

@@ -1,5 +1,7 @@
 package org.royaldev.thehumanity;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.kitteh.irc.client.library.element.Channel;
 import org.kitteh.irc.client.library.element.User;
@@ -43,7 +45,7 @@ public class Game {
     private GameStatus gameStatus = GameStatus.IDLE;
     private boolean hostWasVoiced = false;
 
-    public Game(final TheHumanity humanity, final Channel channel, final List<CardPack> cardPacks) {
+    public Game(@NotNull final TheHumanity humanity, @NotNull final Channel channel, @NotNull final List<CardPack> cardPacks) {
         this.humanity = humanity;
         this.channel = channel;
         this.deck = new Deck(cardPacks);
@@ -55,6 +57,7 @@ public class Game {
      *
      * @return House rules
      */
+    @NotNull
     private List<HouseRule> getHouseRules() {
         return this.houseRules;
     }
@@ -88,7 +91,7 @@ public class Game {
      * @param rule Rule to add
      * @return true if rule was added, false if otherwise
      */
-    public boolean addHouseRule(final HouseRule rule) {
+    public boolean addHouseRule(@NotNull final HouseRule rule) {
         if (this.hasHouseRule(rule)) return false;
         this.processAddingHouseRule(rule);
         return this.getHouseRules().add(rule);
@@ -143,7 +146,8 @@ public class Game {
      * @param message Message to reformat
      * @return Reformatted message
      */
-    public String antiPing(String message) {
+    @NotNull
+    public String antiPing(@NotNull String message) {
         for (final User u : this.channel.getUsers().keySet()) {
             if (u.getNick().length() <= 1) continue;
             message = message.replace(u.getNick(), u.getNick().substring(0, 1) + "\u200b" + u.getNick().substring(1));
@@ -157,7 +161,8 @@ public class Game {
      * @param u User to create Player from
      * @return Player
      */
-    public Player createPlayer(final User u) {
+    @Nullable
+    public Player createPlayer(@NotNull final User u) {
         if (this.hasPlayer(u.getNick())) return this.getPlayer(u.getNick());
         final Player p = new Player(u);
         this.addPlayer(p);
@@ -188,6 +193,7 @@ public class Game {
      *
      * @return String
      */
+    @NotNull
     public String getCardCounts() {
         return IRCFormat.BOLD + "Card counts: "
             + IRCFormat.RESET + this.getDeck().getUnusedBlackCardCount() + " unused/" + this.getDeck().getBlackCardCount() + " black cards, "
@@ -199,6 +205,7 @@ public class Game {
      *
      * @return Channel
      */
+    @NotNull
     public Channel getChannel() {
         return this.channel;
     }
@@ -217,6 +224,7 @@ public class Game {
      *
      * @return Round
      */
+    @Nullable
     public Round getCurrentRound() {
         return this.currentRound;
     }
@@ -226,6 +234,7 @@ public class Game {
      *
      * @return Deck
      */
+    @NotNull
     public Deck getDeck() {
         return this.deck;
     }
@@ -235,6 +244,7 @@ public class Game {
      *
      * @return GameStatus
      */
+    @NotNull
     public GameStatus getGameStatus() {
         return this.gameStatus;
     }
@@ -253,6 +263,7 @@ public class Game {
      *
      * @return List
      */
+    @NotNull
     public List<Player> getHistoricPlayers() {
         return this.allPlayers;
     }
@@ -262,6 +273,7 @@ public class Game {
      *
      * @return Player
      */
+    @NotNull
     public Player getHost() {
         return this.host;
     }
@@ -271,7 +283,7 @@ public class Game {
      *
      * @param host Player to set as host
      */
-    public void setHost(final Player host) {
+    public void setHost(@NotNull final Player host) {
         this.host = host;
         this.hostWasVoiced = this.humanity.hasChannelMode(this.channel, this.getHost().getUser(), 'v');
         if (!this.hostWasVoiced) {
@@ -285,6 +297,7 @@ public class Game {
      *
      * @return TheHumanity
      */
+    @NotNull
     public TheHumanity getHumanity() {
         return this.humanity;
     }
@@ -295,6 +308,7 @@ public class Game {
      * @param u User to get Player for
      * @return Corresponding Player
      */
+    @Nullable
     public Player getPlayer(final User u) {
         if (u == null) return null;
         return this.getPlayers().stream().filter(p -> this.humanity.usersMatch(u, p.getUser())).findFirst().orElse(null);
@@ -306,6 +320,7 @@ public class Game {
      * @param p Player to get
      * @return Player or null
      */
+    @Nullable
     public Player getPlayer(final Player p) {
         if (p == null) return null;
         return this.getPlayers().get(this.getPlayers().indexOf(p));
@@ -317,6 +332,7 @@ public class Game {
      * @param name Name of the Player to retrieve
      * @return Player or null
      */
+    @Nullable
     public Player getPlayer(final String name) {
         if (name == null) return null;
         return this.getPlayer(this.channel.getUsers().keySet().stream().filter(u -> u.getNick().equalsIgnoreCase(name)).findFirst().orElse(null));
@@ -327,6 +343,7 @@ public class Game {
      *
      * @return List&lt;Player&gt;
      */
+    @NotNull
     public List<Player> getPlayers() {
         synchronized (this.players) {
             return new ArrayList<>(this.players);
@@ -334,10 +351,11 @@ public class Game {
     }
 
     /**
-     * Gets the Player that represents Rando Cardrissian.
+     * Gets the Player that represents Rando Cardrissian. If Rando Cardrissian is not enabled, this will return null.
      *
-     * @return Player
+     * @return Player or null
      */
+    @Nullable
     public Player getRandoCardrissian() {
         if (!this.hasHouseRule(HouseRule.RANDO_CARDRISSIAN)) return null;
         return this.randoCardrissian;
@@ -423,11 +441,13 @@ public class Game {
                 break;
             case PLAYING:
                 if (!this.hasEnoughPlayers()) return;
-                if (this.getCurrentRound() != null) {
+                final Round currentRound = this.getCurrentRound();
+                final boolean hadRound = currentRound != null;
+                if (hadRound) {
                     this.showScores();
                     this.showCardCounts();
                 }
-                int index = this.getCurrentRound() == null ? 0 : this.getPlayers().indexOf(this.getCurrentRound().getCzar()) + 1;
+                int index = !hadRound ? 0 : this.getPlayers().indexOf(currentRound.getCzar()) + 1;
                 if (index >= this.getPlayers().size()) index = 0;
                 BlackCard blackCard = null;
                 do {
@@ -442,8 +462,8 @@ public class Game {
                         return;
                     }
                 } while (blackCard.getBlanks() > 10 || blackCard.getBlanks() < 1);
-                if (this.getCurrentRound() != null) this.getCurrentRound().cancelReminderTask();
-                this.currentRound = new Round(this, this.getCurrentRound() == null ? 1 : this.getCurrentRound().getNumber() + 1, blackCard, this.hasHouseRule(HouseRule.GOD_IS_DEAD) ? null : this.getPlayers().get(index));
+                if (hadRound) currentRound.cancelReminderTask();
+                this.currentRound = new Round(this, !hadRound ? 1 : currentRound.getNumber() + 1, blackCard, this.hasHouseRule(HouseRule.GOD_IS_DEAD) ? null : this.getPlayers().get(index));
                 this.deal();
                 this.sendMessage(" ");
                 this.sendMessage(IRCFormat.BOLD + "Round " + this.getCurrentRound().getNumber() + IRCFormat.RESET + "!");
@@ -582,7 +602,9 @@ public class Game {
      * Shows each Player his hand.
      */
     public void showCards() {
-        this.players.stream().filter(p -> !p.equals(this.getCurrentRound().getCzar())).forEach(this::showCards);
+        final Round currentRound = this.getCurrentRound();
+        if (currentRound == null) return;
+        this.players.stream().filter(p -> !p.equals(currentRound.getCzar())).forEach(this::showCards);
     }
 
     /**

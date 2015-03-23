@@ -1,5 +1,7 @@
 package org.royaldev.thehumanity.commands;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
 
@@ -26,7 +28,8 @@ public abstract class IRCCommand {
      * @param def      Default if expected is null
      * @return Never null
      */
-    private <T> T orDefault(final T expected, final T def) {
+    @NotNull
+    private <T> T orDefault(@Nullable final T expected, @NotNull final T def) {
         return expected == null ? def : expected;
     }
 
@@ -35,6 +38,7 @@ public abstract class IRCCommand {
      *
      * @return Array, not null
      */
+    @NotNull
     public String[] getAliases() {
         return this.orDefault(this.getCommandAnnotation().aliases(), new String[0]);
     }
@@ -48,6 +52,7 @@ public abstract class IRCCommand {
      *
      * @return CommandType
      */
+    @NotNull
     public CommandType getCommandType() {
         return this.orDefault(this.getCommandAnnotation().commandType(), CommandType.BOTH);
     }
@@ -57,6 +62,7 @@ public abstract class IRCCommand {
      *
      * @return <em>Brief</em> description
      */
+    @NotNull
     public String getDescription() {
         return this.orDefault(this.getCommandAnnotation().description(), this.getName());
     }
@@ -68,6 +74,7 @@ public abstract class IRCCommand {
      *
      * @return Name of the command.
      */
+    @NotNull
     public String getName() {
         return this.orDefault(this.getCommandAnnotation().name(), "invalid_command");
     }
@@ -79,6 +86,7 @@ public abstract class IRCCommand {
      *
      * @return Usage string
      */
+    @NotNull
     public String getUsage() {
         return this.orDefault(this.getCommandAnnotation().usage(), "<command>");
     }

@@ -1,11 +1,15 @@
 package org.royaldev.thehumanity.commands;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * This class contains information on the calling of any given command.
  */
 public class CallInfo {
 
+    @NotNull
     private final String label;
+    @NotNull
     private final UsageType usageType;
 
     /**
@@ -14,7 +18,7 @@ public class CallInfo {
      * @param label     User-provided command name
      * @param usageType Where the command was used
      */
-    public CallInfo(String label, UsageType usageType) {
+    public CallInfo(@NotNull String label, @NotNull UsageType usageType) {
         this.label = label;
         this.usageType = usageType;
     }
@@ -24,6 +28,7 @@ public class CallInfo {
      *
      * @return Name of the command (possibly alias)
      */
+    @NotNull
     public String getLabel() {
         return this.label;
     }
@@ -33,6 +38,7 @@ public class CallInfo {
      *
      * @return UsageType
      */
+    @NotNull
     public UsageType getUsageType() {
         return this.usageType;
     }

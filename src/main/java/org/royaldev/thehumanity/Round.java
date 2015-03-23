@@ -1,5 +1,7 @@
 package org.royaldev.thehumanity;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.royaldev.thehumanity.cards.Play;
 import org.royaldev.thehumanity.cards.types.BlackCard;
@@ -32,13 +34,14 @@ public class Round {
     private ScheduledFuture reminderTask;
     private RoundStage currentStage = RoundStage.IDLE;
 
-    Round(final Game game, final int number, final BlackCard blackCard, final Player czar) {
+    Round(@NotNull final Game game, final int number, @NotNull final BlackCard blackCard, @Nullable final Player czar) {
         this.game = game;
         this.number = number;
         this.blackCard = blackCard;
         this.czar = czar;
     }
 
+    @NotNull
     private ScheduledFuture makeReminderTask() {
         return this.getGame().getHumanity().getThreadPool().scheduleAtFixedRate(
             () -> this.getGame().getChannel().sendMessage(this.getCzar().getUser().getNick() + ": Wake up! You're the czar!"),
@@ -99,7 +102,7 @@ public class Round {
      *
      * @param play Play to add
      */
-    public void addPlay(final Play play) {
+    public void addPlay(@NotNull final Play play) {
         synchronized (this.plays) {
             this.plays.add(play);
         }
@@ -107,7 +110,7 @@ public class Round {
         if (this.hasAllPlaysMade()) this.advanceStage();
     }
 
-    public boolean addVote(final Player player, int index) {
+    public boolean addVote(@NotNull final Player player, int index) {
         if (this.hasVoted(player)) return false;
         index--;
         if (index < 0 || index >= this.getPlays().size()) return false;
@@ -178,6 +181,7 @@ public class Round {
      *
      * @return Cloned list of active-player plays
      */
+    @NotNull
     public List<Play> getActivePlayerPlays() { // TODO: Rename method?
         return this.plays.stream().filter(p -> this.getGame().getPlayers().contains(p.getPlayer())).collect(Collectors.toList());
     }
@@ -187,6 +191,7 @@ public class Round {
      *
      * @return Black card
      */
+    @NotNull
     public BlackCard getBlackCard() {
         return this.blackCard;
     }
@@ -196,6 +201,7 @@ public class Round {
      *
      * @return RoundStage
      */
+    @NotNull
     public RoundStage getCurrentStage() {
         return this.currentStage;
     }
@@ -205,6 +211,7 @@ public class Round {
      *
      * @return Czar
      */
+    @Nullable
     public Player getCzar() {
         return this.czar;
     }
@@ -214,6 +221,7 @@ public class Round {
      *
      * @return Game
      */
+    @NotNull
     public Game getGame() {
         return this.game;
     }
@@ -239,6 +247,7 @@ public class Round {
      *
      * @return Cloned list of plays
      */
+    @NotNull
     public List<Play> getPlays() {
         synchronized (this.plays) {
             return new ArrayList<>(this.plays);
@@ -251,6 +260,7 @@ public class Round {
      *
      * @return List of skipped players
      */
+    @NotNull
     public Set<Player> getSkippedPlayers() {
         synchronized (this.skippedPlayers) {
             return this.skippedPlayers;
@@ -275,11 +285,11 @@ public class Round {
      * @param p Player to check
      * @return true if played,false if otherwise
      */
-    public boolean hasPlayed(final Player p) {
+    public boolean hasPlayed(@NotNull final Player p) {
         return this.plays.stream().anyMatch(play -> play.getPlayer().equals(p));
     }
 
-    public boolean hasVoted(final Player player) {
+    public boolean hasVoted(@NotNull final Player player) {
         return this.voters.contains(player);
     }
 
@@ -289,7 +299,7 @@ public class Round {
      * @param p Player to check
      * @return true if skipped, false if otherwise
      */
-    public boolean isSkipped(final Player p) {
+    public boolean isSkipped(@NotNull final Player p) {
         return this.getSkippedPlayers().contains(p);
     }
 
@@ -305,7 +315,7 @@ public class Round {
      *
      * @param p Player to skip
      */
-    public boolean skip(final Player p) {
+    public boolean skip(@NotNull final Player p) {
         if (this.isSkipped(p)) return false;
         // If the total amount of players less the skipped players is less than the amount needed to play, don't skip.
         // However, if this person is the czar, it's fine.

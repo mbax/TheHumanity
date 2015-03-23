@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.commands;
 
+import org.jetbrains.annotations.NotNull;
 import org.royaldev.thehumanity.commands.IRCCommand.CommandType;
 
 import java.lang.annotation.ElementType;
@@ -16,34 +17,34 @@ public @interface Command {
      *
      * @return Array
      */
-    String[] aliases() default {};
+    @NotNull String[] aliases() default {};
 
     /**
      * The CommandType for this command.
      *
      * @return CommandType
      */
-    CommandType commandType() default CommandType.BOTH;
+    @NotNull CommandType commandType() default CommandType.BOTH;
 
     /**
      * A description of what this command does.
      *
      * @return Description
      */
-    String description();
+    @NotNull String description();
 
     /**
      * The name of this command.
      *
      * @return Name
      */
-    String name();
+    @NotNull String name();
 
     /**
      * The usage of this command.
      *
      * @return Usage
      */
-    String usage() default "<command>";
+    @NotNull String usage() default "<command>";
 
 }
