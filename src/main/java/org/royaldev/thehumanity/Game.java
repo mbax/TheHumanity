@@ -442,6 +442,7 @@ public class Game {
                         return;
                     }
                 } while (blackCard.getBlanks() > 10 || blackCard.getBlanks() < 1);
+                if (this.getCurrentRound() != null) this.getCurrentRound().cancelReminderTask();
                 this.currentRound = new Round(this, this.getCurrentRound() == null ? 1 : this.getCurrentRound().getNumber() + 1, blackCard, this.hasHouseRule(HouseRule.GOD_IS_DEAD) ? null : this.getPlayers().get(index));
                 this.deal();
                 this.sendMessage(" ");
