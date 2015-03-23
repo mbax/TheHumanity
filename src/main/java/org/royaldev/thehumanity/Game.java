@@ -639,6 +639,9 @@ public class Game {
             this.humanity.getBot().sendRawLine("MODE " + this.channel.getName() + " -v " + this.host.getUser().getNick());
         }
         if (this.countdownTask != null) this.countdownTask.cancel(true);
+        if (this.getCurrentRound() != null) {
+            this.getCurrentRound().cancelReminderTask();
+        }
         if (this.gameStatus != GameStatus.IDLE) {
             this.gameStatus = GameStatus.IDLE;
             this.sendMessage(IRCFormat.BOLD + "The game has ended.");
