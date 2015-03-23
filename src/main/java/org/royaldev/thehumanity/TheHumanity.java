@@ -29,6 +29,7 @@ import org.royaldev.thehumanity.commands.impl.HostCommand;
 import org.royaldev.thehumanity.commands.impl.JoinGameCommand;
 import org.royaldev.thehumanity.commands.impl.KickCommand;
 import org.royaldev.thehumanity.commands.impl.LeaveGameCommand;
+import org.royaldev.thehumanity.commands.impl.NeverHaveIEverCommand;
 import org.royaldev.thehumanity.commands.impl.PacksCommand;
 import org.royaldev.thehumanity.commands.impl.PickCardCommand;
 import org.royaldev.thehumanity.commands.impl.RebootTheUniverseCommand;
@@ -141,7 +142,8 @@ public class TheHumanity {
             new CardCountsCommand(this),
             new ScoreCommand(this),
             new HostCommand(this),
-            new GameCommand(this)
+            new GameCommand(this),
+            new NeverHaveIEverCommand(this)
         ).forEach(this.getCommandHandler()::register);
     }
 
