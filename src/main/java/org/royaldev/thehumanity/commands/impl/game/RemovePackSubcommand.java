@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.commands.impl.game;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
@@ -25,10 +26,9 @@ public class RemovePackSubcommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, final Game g, final String[] args) {
-        final User u = event.getActor();
-        final Player p = g.getPlayer(u);
-        if (!g.getHost().equals(p) && !this.humanity.hasChannelMode(g.getChannel(), u, 'o')) {
+    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, final String[] args) {
+        final User u = player.getUser();
+        if (!game.getHost().equals(player) && !this.humanity.hasChannelMode(game.getChannel(), u, 'o')) {
             this.notice(u, "You are not an op or the host!");
             return;
         }
@@ -41,6 +41,6 @@ public class RemovePackSubcommand extends InGameCommand {
             this.notice(u, "No such card pack.");
             return;
         }
-        ConversionHelper.respond(event, (g.removeCardPack(cp, args.length > 1 && "sweep".equalsIgnoreCase(args[1])) ? "Removed" : "Could not remove") + " " + IRCFormat.BOLD + cp.getName() + IRCFormat.RESET + " from the game.");
+        ConversionHelper.respond(event, (game.removeCardPack(cp, args.length > 1 && "sweep".equalsIgnoreCase(args[1])) ? "Removed" : "Could not remove") + " " + IRCFormat.BOLD + cp.getName() + IRCFormat.RESET + " from the game.");
     }
 }

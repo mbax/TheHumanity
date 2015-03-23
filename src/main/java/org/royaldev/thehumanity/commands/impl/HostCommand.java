@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.commands.impl;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
 import org.royaldev.thehumanity.Game;
@@ -21,22 +22,21 @@ public class HostCommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, final Game g, final String[] args) {
+    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, final String[] args) {
         if (args.length < 1) {
-            g.showHost();
+            game.showHost();
             return;
         }
-        final User u = event.getActor();
-        final Player p = g.getPlayer(u);
-        if (!this.isHostOrOp(p, g)) {
+        final User u = player.getUser();
+        if (!this.isHostOrOp(player, game)) {
             this.notice(u, "You are not an op or the host!");
             return;
         }
-        final Player t = g.getPlayer(args[0]);
+        final Player t = game.getPlayer(args[0]);
         if (t == null) {
             this.notice(u, "No such nick is playing.");
             return;
         }
-        g.setHost(t);
+        game.setHost(t);
     }
 }

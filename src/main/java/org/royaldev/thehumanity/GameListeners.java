@@ -22,7 +22,9 @@ public class GameListeners {
         final User u = event.getActor();
         final Game g = this.humanity.getGameFor(u);
         if (g == null || !g.getChannel().getName().equalsIgnoreCase(event.getChannel().getName())) return;
-        g.removePlayer(g.getPlayer(event.getActor()));
+        final Player p = g.getPlayer(event.getActor());
+        if (p == null) return;
+        g.removePlayer(p);
     }
 
     @Handler
@@ -42,7 +44,9 @@ public class GameListeners {
         final User u = event.getActor();
         final Game g = this.humanity.getGameFor(u);
         if (g == null || !g.getChannel().getName().equalsIgnoreCase(event.getChannel().getName())) return;
-        g.removePlayer(g.getPlayer(event.getActor()));
+        final Player p = g.getPlayer(event.getActor());
+        if (p == null) return;
+        g.removePlayer(p);
     }
 
     @Handler
@@ -50,7 +54,9 @@ public class GameListeners {
         final User u = event.getActor();
         final Game g = this.humanity.getGameFor(u);
         if (g == null) return;
-        g.removePlayer(g.getPlayer(u));
+        final Player p = g.getPlayer(u);
+        if (p == null) return;
+        g.removePlayer(p);
     }
 
     @Handler
@@ -60,7 +66,7 @@ public class GameListeners {
         if (g == null) return;
         final Player p = g.getPlayer(u);
         final Round r = g.getCurrentRound();
-        if (p == null || r == null || !r.getCzar().equals(p)) return;
+        if (p == null || r == null || !p.equals(r.getCzar())) return;
         // This can't prematurely cancel, since the task is only made when the stage switches to waiting for czar.
         r.cancelReminderTask();
     }

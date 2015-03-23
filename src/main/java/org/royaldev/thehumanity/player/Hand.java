@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.player;
 
+import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.royaldev.thehumanity.cards.Card;
 
@@ -14,7 +15,7 @@ import java.util.List;
  */
 public class Hand<T extends Card> implements Iterable<T> {
 
-    private final List<T> hand = Collections.synchronizedList(new ArrayList<T>());
+    private final List<T> hand = Collections.synchronizedList(new ArrayList<>());
 
     /**
      * Adds a card into this hand.
@@ -22,6 +23,7 @@ public class Hand<T extends Card> implements Iterable<T> {
      * @param card Card to add
      */
     public void addCard(@NotNull final T card) {
+        Validate.notNull(card, "card was null");
         synchronized (this.hand) {
             this.hand.add(card);
         }
@@ -33,6 +35,7 @@ public class Hand<T extends Card> implements Iterable<T> {
      * @param cards Cards to add
      */
     public void addCards(@NotNull final Collection<? extends T> cards) {
+        Validate.notNull(cards, "cards was null");
         synchronized (this.hand) {
             this.hand.addAll(cards);
         }
@@ -57,6 +60,7 @@ public class Hand<T extends Card> implements Iterable<T> {
      */
     @NotNull
     public T getCard(@NotNull final String indexString) {
+        Validate.notNull(indexString, "indexString was null");
         final int index;
         try {
             index = Integer.parseInt(indexString);
@@ -121,6 +125,7 @@ public class Hand<T extends Card> implements Iterable<T> {
      * @return true if successful, false if otherwise
      */
     public boolean removeCard(@NotNull final T card) {
+        Validate.notNull(card, "card was null");
         synchronized (this.hand) {
             return this.hand.remove(card);
         }
@@ -133,6 +138,7 @@ public class Hand<T extends Card> implements Iterable<T> {
      * @return true if the hand changed, false if otherwise
      */
     public boolean removeCards(@NotNull final Collection<? extends T> cards) {
+        Validate.notNull(cards, "cards was null");
         synchronized (this.hand) {
             return this.hand.removeAll(cards);
         }

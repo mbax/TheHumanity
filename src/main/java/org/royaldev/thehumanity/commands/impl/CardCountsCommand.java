@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.commands.impl;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
 import org.royaldev.thehumanity.Game;
@@ -7,6 +8,7 @@ import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.Command;
 import org.royaldev.thehumanity.commands.InGameCommand;
+import org.royaldev.thehumanity.player.Player;
 
 @Command(
     name = "cardcounts",
@@ -21,12 +23,12 @@ public class CardCountsCommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, final Game g, final String[] args) {
-        final User u = event.getActor();
+    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, final String[] args) {
+        final User u = player.getUser();
         if (args.length > 0 && "public".equalsIgnoreCase(args[0])) {
-            g.showCardCounts();
+            game.showCardCounts();
         } else {
-            this.notice(u, g.getCardCounts());
+            this.notice(u, game.getCardCounts());
         }
     }
 }

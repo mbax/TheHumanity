@@ -98,6 +98,10 @@ public class StartGameCommand extends NoticeableCommand {
      */
     private void rush(final ChannelMessageEvent e, final User u) {
         final Game g = this.humanity.getGameFor(e.getChannel());
+        if (g == null) {
+            this.notice(u, "There is no game in this channel.");
+            return;
+        }
         final Player p = g.getPlayer(u);
         if (p == null || !p.equals(g.getHost()) && !this.humanity.hasChannelMode(g.getChannel(), p.getUser(), 'o')) {
             this.notice(u, "There is already a game in this channel.");
@@ -124,6 +128,11 @@ public class StartGameCommand extends NoticeableCommand {
         final Game g = new Game(this.humanity, e.getChannel(), cardPacks);
         this.humanity.getGames().put(e.getChannel(), g);
         g.start();
-        g.setHost(g.createPlayer(u));
+        final Player p = g.createPlayer(u);
+        if (p == null) {
+            this.notice(u, "You could not be set as host due to an internal error.");
+            return;
+        }
+        g.setHost(p);
     }
 }

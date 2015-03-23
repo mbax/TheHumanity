@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.commands.impl.game;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
@@ -24,10 +25,9 @@ public class AddPackSubcommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, final Game g, final String[] args) {
-        final User u = event.getActor();
-        final Player p = g.getPlayer(u);
-        if (!g.getHost().equals(p) && !this.humanity.hasChannelMode(g.getChannel(), u, 'o')) {
+    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, final String[] args) {
+        final User u = player.getUser();
+        if (!game.getHost().equals(player) && !this.humanity.hasChannelMode(game.getChannel(), u, 'o')) {
             this.notice(u, "You are not an op or the host!");
             return;
         }
@@ -40,6 +40,6 @@ public class AddPackSubcommand extends InGameCommand {
             this.notice(u, "No such card pack.");
             return;
         }
-        ConversionHelper.respond(event, (g.addCardPack(cp) ? "Added" : "Could not add") + " " + IRCFormat.BOLD + cp.getName() + IRCFormat.RESET + " to the game.");
+        ConversionHelper.respond(event, (game.addCardPack(cp) ? "Added" : "Could not add") + " " + IRCFormat.BOLD + cp.getName() + IRCFormat.RESET + " to the game.");
     }
 }

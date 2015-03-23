@@ -1,5 +1,9 @@
 package org.royaldev.thehumanity.commands;
 
+import org.apache.commons.lang3.Validate;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
 import org.royaldev.thehumanity.Game;
@@ -13,7 +17,8 @@ public abstract class InGameCommand extends NoticeableCommand {
 
     protected final TheHumanity humanity;
 
-    public InGameCommand(final TheHumanity instance) {
+    public InGameCommand(@NotNull final TheHumanity instance) {
+        Validate.notNull(instance, "instance was null");
         this.humanity = instance;
     }
 
@@ -21,12 +26,13 @@ public abstract class InGameCommand extends NoticeableCommand {
      * This method is called after checking that the User performing the command is in a Game. The Game that the User is
      * playing is then provided to this method.
      *
-     * @param event Event of receiving command
-     * @param ci    Information received when this command was called
-     * @param g     The game the User is in
-     * @param args  Arguments passed to the command
+     * @param event  Event of receiving command
+     * @param ci     Information received when this command was called
+     * @param game   The game the User is in
+     * @param player Player that used the command
+     * @param args   Arguments passed to the command
      */
-    public abstract void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, final Game g, final String[] args);
+    public abstract void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, final String[] args);
 
     /**
      * Gets the Game for the given User.
@@ -34,7 +40,9 @@ public abstract class InGameCommand extends NoticeableCommand {
      * @param u User to get Game of
      * @return Game
      */
-    public Game getGame(final User u) {
+    @Nullable
+    public Game getGame(@NotNull final User u) {
+        Validate.notNull(u, "u was null");
         return this.humanity.getGameFor(u);
     }
 
@@ -45,8 +53,9 @@ public abstract class InGameCommand extends NoticeableCommand {
      * @param g Game to check
      * @return true if host or chanop, false if not
      */
+    @Contract("null, null -> false; !null, !null -> _")
     public boolean isHostOrOp(final Player p, final Game g) {
-        return g != null && (g.getHost().equals(p) || this.humanity.hasChannelMode(g.getChannel(), p.getUser(), 'o'));
+        return !(p == null || g == null) && (g.getHost().equals(p) || this.humanity.hasChannelMode(g.getChannel(), p.getUser(), 'o'));
     }
 
     /**
@@ -65,7 +74,7 @@ public abstract class InGameCommand extends NoticeableCommand {
      * @param u User to check
      * @return true if in a Game, false if otherwise
      */
-    public boolean isInGame(final User u) {
+    public boolean isInGame(@NotNull final User u) {
         return this.getGame(u) != null;
     }
 
@@ -80,10 +89,11 @@ public abstract class InGameCommand extends NoticeableCommand {
     @Override
     public final void onCommand(final ActorEvent<User> event, final CallInfo ci, final String[] args) {
         final Game g = this.getGame(event.getActor());
-        if (g == null) {
+        final Player p;
+        if (g == null || (p = g.getPlayer(event.getActor())) == null) {
             this.notice(event.getActor(), "You're not in a game.");
             return;
         }
-        this.onInGameCommand(event, ci, g, args);
+        this.onInGameCommand(event, ci, g, p, args);
     }
 }

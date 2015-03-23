@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.commands.impl;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
@@ -25,9 +26,9 @@ public class NeverHaveIEverCommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, final Game g, final String[] args) {
-        final User u = event.getActor();
-        if (!g.hasHouseRule(HouseRule.NEVER_HAVE_I_EVER)) {
+    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, final String[] args) {
+        final User u = player.getUser();
+        if (!game.hasHouseRule(HouseRule.NEVER_HAVE_I_EVER)) {
             this.notice(u, "This command may only be used when the " + HouseRule.NEVER_HAVE_I_EVER + " house rule is enabled.");
             return;
         }
@@ -43,15 +44,14 @@ public class NeverHaveIEverCommand extends InGameCommand {
             return;
         }
         index--;
-        final Player p = g.getPlayer(u);
-        if (index < 0 || index >= p.getHand().getSize()) {
+        if (index < 0 || index >= player.getHand().getSize()) {
             this.notice(u, "Invalid card.");
             return;
         }
-        final WhiteCard unknown = p.getHand().getCard(index);
-        p.getHand().removeCard(unknown);
-        g.sendMessage(IRCFormat.BOLD + u.getNick() + IRCFormat.RESET + " doesn't know what " + IRCFormat.BOLD + unknown + IRCFormat.RESET + " means and has discarded that card.");
-        g.deal(p);
-        g.showCards(p);
+        final WhiteCard unknown = player.getHand().getCard(index);
+        player.getHand().removeCard(unknown);
+        game.sendMessage(IRCFormat.BOLD + u.getNick() + IRCFormat.RESET + " doesn't know what " + IRCFormat.BOLD + unknown + IRCFormat.RESET + " means and has discarded that card.");
+        game.deal(player);
+        game.showCards(player);
     }
 }

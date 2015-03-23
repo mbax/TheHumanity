@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity;
 
+import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.IRCFormat;
@@ -35,16 +36,23 @@ public class Round {
     private RoundStage currentStage = RoundStage.IDLE;
 
     Round(@NotNull final Game game, final int number, @NotNull final BlackCard blackCard, @Nullable final Player czar) {
+        Validate.notNull(game, "game was null");
+        Validate.notNull(blackCard, "blackCard was null");
+        Validate.notNull(czar, "czar was null");
         this.game = game;
         this.number = number;
         this.blackCard = blackCard;
         this.czar = czar;
     }
 
-    @NotNull
+    @Nullable
     private ScheduledFuture makeReminderTask() {
+        final Player czar = this.getCzar();
+        if (czar == null) {
+            return null;
+        }
         return this.getGame().getHumanity().getThreadPool().scheduleAtFixedRate(
-            () -> this.getGame().getChannel().sendMessage(this.getCzar().getUser().getNick() + ": Wake up! You're the czar!"),
+            () -> this.getGame().getChannel().sendMessage(czar.getUser().getNick() + ": Wake up! You're the czar!"),
             45000L,
             22500L,
             TimeUnit.MILLISECONDS
@@ -84,7 +92,7 @@ public class Round {
                     this.displayPlays();
                     this.getGame().sendMessage("Send " + IRCFormat.BOLD + this.getGame().getHumanity().getPrefix() + "pick" + IRCFormat.RESET + " followed by the number you think should win.");
                 }
-                if (this.czar == null) break;
+                if (this.getCzar() == null) break;
                 Collections.shuffle(this.plays);
                 this.displayPlays();
                 this.getGame().sendMessage(IRCFormat.BOLD + this.getCzar().getUser().getNick() + IRCFormat.RESET + " is picking a winner.");
@@ -103,6 +111,7 @@ public class Round {
      * @param play Play to add
      */
     public void addPlay(@NotNull final Play play) {
+        Validate.notNull(play, "play was null");
         synchronized (this.plays) {
             this.plays.add(play);
         }
@@ -111,6 +120,7 @@ public class Round {
     }
 
     public boolean addVote(@NotNull final Player player, int index) {
+        Validate.notNull(player, "player was null");
         if (this.hasVoted(player)) return false;
         index--;
         if (index < 0 || index >= this.getPlays().size()) return false;
@@ -286,10 +296,12 @@ public class Round {
      * @return true if played,false if otherwise
      */
     public boolean hasPlayed(@NotNull final Player p) {
+        Validate.notNull(p, "p was null");
         return this.plays.stream().anyMatch(play -> play.getPlayer().equals(p));
     }
 
     public boolean hasVoted(@NotNull final Player player) {
+        Validate.notNull(player, "player was null");
         return this.voters.contains(player);
     }
 
@@ -300,6 +312,7 @@ public class Round {
      * @return true if skipped, false if otherwise
      */
     public boolean isSkipped(@NotNull final Player p) {
+        Validate.notNull(p, "p was null");
         return this.getSkippedPlayers().contains(p);
     }
 
@@ -316,6 +329,7 @@ public class Round {
      * @param p Player to skip
      */
     public boolean skip(@NotNull final Player p) {
+        Validate.notNull(p, "p was null");
         if (this.isSkipped(p)) return false;
         // If the total amount of players less the skipped players is less than the amount needed to play, don't skip.
         // However, if this person is the czar, it's fine.

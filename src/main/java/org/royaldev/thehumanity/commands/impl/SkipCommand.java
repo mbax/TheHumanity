@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.commands.impl;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
 import org.royaldev.thehumanity.Game;
@@ -22,20 +23,23 @@ public class SkipCommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, final Game g, final String[] args) {
-        final User u = event.getActor();
+    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, final String[] args) {
+        final User u = player.getUser();
         if (args.length < 1) {
             this.notice(u, "Usage: " + this.getUsage().replace("<command>", ci.getLabel()));
             return;
         }
-        final Player p = g.getPlayer(u);
-        final Player t = g.getPlayer(args[0]);
+        final Player t = game.getPlayer(args[0]);
         if (t == null) {
             this.notice(u, "That person is not playing in this game.");
             return;
         }
-        final Round r = g.getCurrentRound();
-        if (!u.getNick().equalsIgnoreCase(args[0]) && !this.isHostOrOp(p, g)) {
+        final Round r = game.getCurrentRound();
+        if (r == null) {
+            this.notice(u, "No round to skip in.");
+            return;
+        }
+        if (!u.getNick().equalsIgnoreCase(args[0]) && !this.isHostOrOp(player, game)) {
             this.notice(u, "You're not an op, the host, or skipping yourself!");
             return;
         }

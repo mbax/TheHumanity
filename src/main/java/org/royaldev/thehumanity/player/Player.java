@@ -1,6 +1,8 @@
 package org.royaldev.thehumanity.player;
 
+import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.element.User;
 import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
@@ -19,11 +21,12 @@ public class Player {
     }
 
     public void addWin(@NotNull final BlackCard win) {
+        Validate.notNull(win, "win was null");
         this.getWins().addCard(win);
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(@Nullable final Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof Player)) return false;
         final Player p = (Player) obj;
@@ -44,7 +47,7 @@ public class Player {
         return this.user;
     }
 
-    public void setUser(final User user) {
+    public void setUser(@Nullable final User user) {
         this.user = user;
     }
 

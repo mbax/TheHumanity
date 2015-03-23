@@ -1,7 +1,10 @@
 package org.royaldev.thehumanity;
 
+import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
 
 public enum HouseRule {
     HAPPY_ENDING("Happy Ending"),
@@ -21,12 +24,11 @@ public enum HouseRule {
 
     @Nullable
     public static HouseRule getByFriendlyName(@NotNull final String friendlyName) {
-        for (final HouseRule hr : HouseRule.values()) {
-            if (hr.getFriendlyName().equalsIgnoreCase(friendlyName)) {
-                return hr;
-            }
-        }
-        return null;
+        Validate.notNull(friendlyName, "friendlyName was null");
+        return Arrays.stream(HouseRule.values())
+            .filter(hr -> hr.getFriendlyName().equalsIgnoreCase(friendlyName))
+            .findFirst()
+            .orElse(null);
     }
 
     @NotNull

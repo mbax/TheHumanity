@@ -1,6 +1,7 @@
 package org.royaldev.thehumanity;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.royaldev.thehumanity.cards.CardPack;
@@ -25,6 +26,7 @@ public class CardPackParser {
     private final TheHumanity humanity;
 
     public CardPackParser(@NotNull final TheHumanity humanity) {
+        Validate.notNull(humanity, "humanity was null");
         this.humanity = humanity;
     }
 
@@ -37,6 +39,7 @@ public class CardPackParser {
      */
     @Nullable
     public CardPack parseCardPack(@NotNull final String name) {
+        Validate.notNull(name, "name was null");
         final File f = new File("cardpacks", name);
         if (!f.exists() || !f.isFile()) {
             this.humanity.getLogger().warning(f.getName() + " does not exist.");
@@ -71,6 +74,7 @@ public class CardPackParser {
      */
     @NotNull
     public Collection<CardPack> parseCardPacks(@NotNull final String[] names) {
+        Validate.notNull(names, "names was null");
         return Arrays.stream(names).map(this::parseCardPack).filter(cp -> cp != null).collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -85,6 +89,8 @@ public class CardPackParser {
             @NotNull
             @Override
             ParseStage parseInternal(@NotNull final CardPack cp, @NotNull final String line) {
+                Validate.notNull(cp, "cp was null");
+                Validate.notNull(line, "line was null");
                 final String[] parts = line.split("\\s*:\\s*");
                 if (parts.length < 2) return this;
                 final String key = parts[0];
@@ -107,6 +113,8 @@ public class CardPackParser {
             @NotNull
             @Override
             ParseStage parseInternal(@NotNull final CardPack cp, @NotNull final String line) {
+                Validate.notNull(cp, "cp was null");
+                Validate.notNull(line, "line was null");
                 cp.addCard(new BlackCard(cp, line));
                 return this;
             }
@@ -118,6 +126,8 @@ public class CardPackParser {
             @NotNull
             @Override
             ParseStage parseInternal(@NotNull final CardPack cp, @NotNull final String line) {
+                Validate.notNull(cp, "cp was null");
+                Validate.notNull(line, "line was null");
                 cp.addCard(new WhiteCard(cp, line));
                 return this;
             }
@@ -137,12 +147,11 @@ public class CardPackParser {
          */
         @Nullable
         static ParseStage getHeaderType(@NotNull final String line) {
-            for (final ParseStage ps : ParseStage.values()) {
-                if (ps.getHeader().equals(line)) {
-                    return ps;
-                }
-            }
-            return null;
+            Validate.notNull(line, "line was null");
+            return Arrays.stream(ParseStage.values())
+                .filter(ps -> ps.getHeader().equals(line))
+                .findFirst()
+                .orElse(null);
         }
 
         @NotNull
@@ -168,6 +177,8 @@ public class CardPackParser {
          */
         @NotNull
         ParseStage parse(@NotNull final CardPack cp, @NotNull final String line) {
+            Validate.notNull(cp, "cp was null");
+            Validate.notNull(line, "line was null");
             final ParseStage headerType = ParseStage.getHeaderType(line);
             if (headerType != null) {
                 return headerType;

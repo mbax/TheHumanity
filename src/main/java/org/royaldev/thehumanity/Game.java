@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity;
 
+import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.IRCFormat;
@@ -46,6 +47,9 @@ public class Game {
     private boolean hostWasVoiced = false;
 
     public Game(@NotNull final TheHumanity humanity, @NotNull final Channel channel, @NotNull final List<CardPack> cardPacks) {
+        Validate.notNull(humanity, "humanity was null");
+        Validate.notNull(channel, "channel was null");
+        Validate.notNull(cardPacks, "cardPacks was null");
         this.humanity = humanity;
         this.channel = channel;
         this.deck = new Deck(cardPacks);
@@ -67,7 +71,8 @@ public class Game {
      *
      * @param hr Rule being added
      */
-    private void processAddingHouseRule(final HouseRule hr) {
+    private void processAddingHouseRule(@NotNull final HouseRule hr) {
+        Validate.notNull(hr, "hr was null");
         switch (hr) {
             case RANDO_CARDRISSIAN:
                 this.allPlayers.add(this.randoCardrissian);
@@ -81,7 +86,8 @@ public class Game {
      * @param cp CardPack to add.
      * @return true if pack was added, false if otherwise
      */
-    public boolean addCardPack(final CardPack cp) {
+    public boolean addCardPack(@NotNull final CardPack cp) {
+        Validate.notNull(cp, "cp was null");
         return this.deck.addCardPack(cp);
     }
 
@@ -92,6 +98,7 @@ public class Game {
      * @return true if rule was added, false if otherwise
      */
     public boolean addHouseRule(@NotNull final HouseRule rule) {
+        Validate.notNull(rule, "rule was null");
         if (this.hasHouseRule(rule)) return false;
         this.processAddingHouseRule(rule);
         return this.getHouseRules().add(rule);
@@ -103,7 +110,8 @@ public class Game {
      *
      * @param player Player to add to the game
      */
-    public void addPlayer(final Player player) {
+    public void addPlayer(@NotNull final Player player) {
+        Validate.notNull(player, "player was null");
         if (this.hasPlayer(player)) return;
         if (!this.setOldUserData(player)) {
             synchronized (this.players) {
@@ -148,6 +156,7 @@ public class Game {
      */
     @NotNull
     public String antiPing(@NotNull String message) {
+        Validate.notNull(message, "message was null");
         for (final User u : this.channel.getUsers().keySet()) {
             if (u.getNick().length() <= 1) continue;
             message = message.replace(u.getNick(), u.getNick().substring(0, 1) + "\u200b" + u.getNick().substring(1));
@@ -163,6 +172,7 @@ public class Game {
      */
     @Nullable
     public Player createPlayer(@NotNull final User u) {
+        Validate.notNull(u, "u was null");
         if (this.hasPlayer(u.getNick())) return this.getPlayer(u.getNick());
         final Player p = new Player(u);
         this.addPlayer(p);
@@ -215,7 +225,8 @@ public class Game {
      *
      * @param channel Channel
      */
-    private void setChannel(final Channel channel) {
+    private void setChannel(@NotNull final Channel channel) {
+        Validate.notNull(channel, "channel was null");
         this.channel = channel;
     }
 
@@ -287,7 +298,7 @@ public class Game {
         this.host = host;
         this.hostWasVoiced = this.humanity.hasChannelMode(this.channel, this.getHost().getUser(), 'v');
         if (!this.hostWasVoiced) {
-            this.humanity.getBot().sendRawLine("MODE " + this.channel.getName() + " +v " + this.host.getUser().getNick());
+            this.getChannel().newModeCommand().addModeChange(true, 'v', this.getHost().getUser()).execute();
         }
         this.showHost();
     }
@@ -410,7 +421,7 @@ public class Game {
      */
     public void nextHost() {
         if (this.host != null && !this.hostWasVoiced) {
-            this.humanity.getBot().sendRawLine("MODE " + this.channel.getName() + " -v " + this.host.getUser().getNick());
+            this.getChannel().newModeCommand().addModeChange(false, 'v', this.host.getUser()).execute();
             this.host = null;
         }
         synchronized (this.players) {
@@ -512,7 +523,8 @@ public class Game {
      *
      * @param p Player to remove
      */
-    public void removePlayer(final Player p) {
+    public void removePlayer(@NotNull final Player p) {
+        Validate.notNull(p, "p was null");
         synchronized (this.players) {
             if (!this.players.remove(p)) return;
         }
@@ -521,7 +533,7 @@ public class Game {
         this.update();
         if (this.getCurrentRound() != null) {
             if (!this.hasEnoughPlayers()) return;
-            if (this.getCurrentRound().getCzar().equals(p)) {
+            if (p.equals(this.getCurrentRound().getCzar())) {
                 this.sendMessage(IRCFormat.BOLD + "The czar has left!" + IRCFormat.RESET + " Returning your cards and starting a new round.");
                 this.getCurrentRound().returnCards();
                 this.advanceStage();
@@ -538,7 +550,8 @@ public class Game {
      *
      * @param name Name of Player to remove
      */
-    public void removePlayer(final String name) {
+    public void removePlayer(@NotNull final String name) {
+        Validate.notNull(name, "name was null");
         this.removePlayer(this.getPlayer(name));
     }
 
@@ -588,7 +601,8 @@ public class Game {
      *
      * @param p Player to show cards to
      */
-    public void showCards(final Player p) {
+    public void showCards(@NotNull final Player p) {
+        Validate.notNull(p, "p was null");
         final StringBuilder sb = new StringBuilder();
         final Hand<WhiteCard> hand = p.getHand();
         for (int i = 0; i < hand.getSize(); i++) {
@@ -659,7 +673,7 @@ public class Game {
     public void stop() {
         this.humanity.getGames().remove(this.channel);
         if (this.host != null && !this.hostWasVoiced) {
-            this.humanity.getBot().sendRawLine("MODE " + this.channel.getName() + " -v " + this.host.getUser().getNick());
+            this.getChannel().newModeCommand().addModeChange(false, 'v', this.host.getUser()).execute();
         }
         if (this.countdownTask != null) this.countdownTask.cancel(true);
         if (this.getCurrentRound() != null) {

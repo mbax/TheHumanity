@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.commands.impl;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
 import org.royaldev.thehumanity.Game;
@@ -48,11 +49,11 @@ public class RebootTheUniverseCommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, final Game g, final String[] args) {
-        final User u = event.getActor();
-        if (!g.hasHouseRule(HouseRule.REBOOTING_THE_UNIVERSE)) {
+    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, final String[] args) {
+        final User u = player.getUser();
+        if (!game.hasHouseRule(HouseRule.REBOOTING_THE_UNIVERSE)) {
             this.notice(u, "The house rule \"Rebooting the Universe\" must be enabled to use this command.");
-            if (this.isHostOrOp(g.getPlayer(u))) {
+            if (this.isHostOrOp(game.getPlayer(u))) {
                 this.notice(u, "Try " + this.humanity.getPrefix() + "game hr list.");
             }
             return;
@@ -61,16 +62,15 @@ public class RebootTheUniverseCommand extends InGameCommand {
             this.notice(u, "Usage: " + this.getUsage().replace("<command>", ci.getLabel()));
             return;
         }
-        final Player p = g.getPlayer(u);
-        if (p.getScore() < 1) {
+        if (player.getScore() < 1) {
             this.notice(u, "You must have points to use this command.");
             return;
         }
-        final List<WhiteCard> cardsToRemove = this.getCardsFromNumbers(args, p, u);
+        final List<WhiteCard> cardsToRemove = this.getCardsFromNumbers(args, player, u);
         if (cardsToRemove == null) return;
-        p.getHand().removeCards(cardsToRemove);
-        g.deal(p);
-        p.getWins().removeCard(p.getWins().getCard(0));
+        player.getHand().removeCards(cardsToRemove);
+        game.deal(player);
+        player.getWins().removeCard(player.getWins().getCard(0));
         this.notice(u, "In exchange for a point, you have replaced " + cardsToRemove.size() + " cards with new ones.");
     }
 }

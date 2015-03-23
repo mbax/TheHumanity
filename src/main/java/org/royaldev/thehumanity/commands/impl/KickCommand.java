@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.commands.impl;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
 import org.royaldev.thehumanity.Game;
@@ -22,17 +23,17 @@ public class KickCommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, final Game g, final String[] args) {
-        final User u = event.getActor();
+    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, final String[] args) {
+        final User u = player.getUser();
         if (args.length < 1) {
             this.notice(u, "Usage: " + this.getUsage().replace("<command>", ci.getLabel()));
             return;
         }
-        final Player p = g.getPlayer(u);
-        if (!this.isHostOrOp(p, g)) {
+        final Player p = game.getPlayer(u);
+        if (!this.isHostOrOp(p, game)) {
             this.notice(u, "You're not an op or the host!");
             return;
         }
-        g.removePlayer(args[0]);
+        game.removePlayer(args[0]);
     }
 }

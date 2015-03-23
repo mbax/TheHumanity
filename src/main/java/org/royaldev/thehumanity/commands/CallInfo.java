@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.commands;
 
+import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -19,6 +20,8 @@ public class CallInfo {
      * @param usageType Where the command was used
      */
     public CallInfo(@NotNull String label, @NotNull UsageType usageType) {
+        Validate.notNull(label, "label was null");
+        Validate.notNull(usageType, "usageType was null");
         this.label = label;
         this.usageType = usageType;
     }

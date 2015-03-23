@@ -2,6 +2,9 @@ package org.royaldev.thehumanity.commands.impl.game;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
@@ -27,9 +30,8 @@ public class HouseRulesSubCommand extends InGameCommand {
         super(instance);
     }
 
-    private void add(final ActorEvent<User> event, final Game g, final String[] args) {
-        final User u = event.getActor();
-        final Player p = g.getPlayer(u);
+    private void add(final ActorEvent<User> event, final Game g, final Player p, final String[] args) {
+        final User u = p.getUser();
         if (!this.isHostOrOp(p)) {
             this.notice(u, "You must be either the host or an operator to add house rules.");
             return;
@@ -51,7 +53,9 @@ public class HouseRulesSubCommand extends InGameCommand {
         ConversionHelper.respond(event, "Added house rule: " + IRCFormat.BOLD + hr + IRCFormat.RESET + ".");
     }
 
-    private HouseRule getHouseRule(final String name) {
+    @Nullable
+    private HouseRule getHouseRule(@NotNull final String name) {
+        Validate.notNull(name, "name was null");
         try {
             return HouseRule.valueOf(name.toUpperCase());
         } catch (final IllegalArgumentException ex) {
@@ -69,9 +73,8 @@ public class HouseRulesSubCommand extends InGameCommand {
         ConversionHelper.respond(event, sb.substring(0, sb.length() - 2));
     }
 
-    private void remove(final ActorEvent<User> event, final Game g, final String[] args) {
-        final User u = event.getActor();
-        final Player p = g.getPlayer(u);
+    private void remove(final ActorEvent<User> event, final Game g, final Player p, final String[] args) {
+        final User u = p.getUser();
         if (!this.isHostOrOp(p)) {
             this.notice(u, "You must be either the host or an operator to remove house rules.");
             return;
@@ -94,8 +97,8 @@ public class HouseRulesSubCommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, final Game g, final String[] args) {
-        final User u = event.getActor();
+    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, final String[] args) {
+        final User u = player.getUser();
         if (args.length < 1) {
             this.notice(u, "Not enough arguments.");
             this.notice(u, "Subcommands: (add, a), (remove, r), (list, l)");
@@ -105,15 +108,15 @@ public class HouseRulesSubCommand extends InGameCommand {
         switch (args[0].toLowerCase()) {
             case "add":
             case "a":
-                this.add(event, g, newArgs);
+                this.add(event, game, player, newArgs);
                 break;
             case "remove":
             case "r":
-                this.remove(event, g, newArgs);
+                this.remove(event, game, player, newArgs);
                 break;
             case "list":
             case "l":
-                this.list(event, g);
+                this.list(event, game);
                 break;
             default:
                 this.notice(u, "Unknown subcommand.");

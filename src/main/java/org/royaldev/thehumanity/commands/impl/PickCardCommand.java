@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.commands.impl;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
@@ -34,6 +35,10 @@ public class PickCardCommand extends InGameCommand {
 
     private void vote(final Game g, final User u, final Player p, final String[] args) {
         final Round r = g.getCurrentRound();
+        if (r == null) {
+            this.notice(u, "No round to vote in.");
+            return;
+        }
         final int winningPlay;
         try {
             winningPlay = Integer.parseInt(args[0]);
@@ -60,6 +65,10 @@ public class PickCardCommand extends InGameCommand {
      */
     private void czarPick(final Game g, final User u, final Player p, final String[] args) {
         final Round r = g.getCurrentRound();
+        if (r == null) {
+            this.notice(u, "No round to play in.");
+            return;
+        }
         if (g.hasHouseRule(HouseRule.GOD_IS_DEAD)) {
             this.vote(g, u, p, args);
             return;
@@ -88,7 +97,7 @@ public class PickCardCommand extends InGameCommand {
      * @return true if Player is czar of the Round, false if otherwise
      */
     private boolean isCzar(final Round r, final Player p) {
-        return r.getCzar().equals(p);
+        return p.equals(r.getCzar());
     }
 
     /**
@@ -101,6 +110,10 @@ public class PickCardCommand extends InGameCommand {
      */
     private void playerPick(final Game g, final User u, final Player p, final String[] args) {
         final Round r = g.getCurrentRound();
+        if (r == null) {
+            this.notice(u, "No round to play in.");
+            return;
+        }
         if (!g.hasHouseRule(HouseRule.GOD_IS_DEAD) && this.isCzar(r, p)) {
             this.notice(u, "You're the card czar! Wait until all the players have chosen their cards.");
             return;
@@ -154,22 +167,25 @@ public class PickCardCommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, final Game g, final String[] args) {
-        final User u = event.getActor();
+    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, final String[] args) {
+        final User u = player.getUser();
         if (args.length < 1) {
             this.notice(u, "Usage: " + this.getUsage().replace("<command>", ci.getLabel()));
             return;
         }
-        if (g.getGameStatus() != GameStatus.PLAYING) {
+        if (game.getGameStatus() != GameStatus.PLAYING) {
             this.notice(u, "The game has not started!");
             return;
         }
-        final Player p = g.getPlayer(u);
-        final Round r = g.getCurrentRound();
+        final Round r = game.getCurrentRound();
+        if (r == null) {
+            this.notice(u, "No round to play in.");
+            return;
+        }
         if (r.getCurrentStage() == RoundStage.WAITING_FOR_CZAR) {
-            this.czarPick(g, u, p, args);
+            this.czarPick(game, u, player, args);
         } else if (r.getCurrentStage() == RoundStage.WAITING_FOR_PLAYERS) {
-            this.playerPick(g, u, p, args);
+            this.playerPick(game, u, player, args);
         } else {
             this.notice(u, "You cannot pick a card right now.");
         }

@@ -10,6 +10,7 @@ import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.Command;
 import org.royaldev.thehumanity.commands.IRCCommand.CommandType;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
+import org.royaldev.thehumanity.player.Player;
 
 @Command(
     name = "join",
@@ -44,6 +45,11 @@ public class JoinGameCommand extends NoticeableCommand {
             this.notice(u, "You can't be in more than one game at a time!");
             return;
         }
-        g.addPlayer(g.createPlayer(u));
+        final Player p = g.createPlayer(u);
+        if (p == null) {
+            this.notice(u, "Could not join due to an internal error.");
+            return;
+        }
+        g.addPlayer(p);
     }
 }

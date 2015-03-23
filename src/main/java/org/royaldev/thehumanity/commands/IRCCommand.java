@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.commands;
 
+import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.element.User;
@@ -30,6 +31,7 @@ public abstract class IRCCommand {
      */
     @NotNull
     private <T> T orDefault(@Nullable final T expected, @NotNull final T def) {
+        Validate.notNull(def, "def was null");
         return expected == null ? def : expected;
     }
 
@@ -43,6 +45,7 @@ public abstract class IRCCommand {
         return this.orDefault(this.getCommandAnnotation().aliases(), new String[0]);
     }
 
+    @NotNull
     public final Command getCommandAnnotation() {
         return this.getClass().getAnnotation(Command.class);
     }
