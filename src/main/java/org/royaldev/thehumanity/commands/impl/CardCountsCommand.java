@@ -23,7 +23,7 @@ public class CardCountsCommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, final String[] args) {
+    public void onInGameCommand(@NotNull final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, @NotNull final String[] args) {
         final User u = player.getUser();
         if (args.length > 0 && "public".equalsIgnoreCase(args[0])) {
             game.showCardCounts();

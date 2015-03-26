@@ -1,6 +1,6 @@
 package org.royaldev.thehumanity.commands;
 
-import org.apache.commons.lang3.Validate;
+import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.element.User;
 
@@ -16,8 +16,8 @@ public abstract class NoticeableCommand extends IRCCommand {
      * @param message Message to send
      */
     public void notice(@NotNull final User u, @NotNull final String message) {
-        Validate.notNull(u, "u was null");
-        Validate.notNull(message, "message was null");
+        Preconditions.checkNotNull(u, "u was null");
+        Preconditions.checkNotNull(message, "message was null");
         u.sendNotice(message);
     }
 

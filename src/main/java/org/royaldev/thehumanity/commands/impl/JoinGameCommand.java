@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.commands.impl;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
@@ -27,7 +28,7 @@ public class JoinGameCommand extends NoticeableCommand {
     }
 
     @Override
-    public void onCommand(final ActorEvent<User> event, final CallInfo ci, final String[] args) {
+    public void onCommand(@NotNull final ActorEvent<User> event, @NotNull final CallInfo ci, @NotNull final String[] args) {
         if (!(event instanceof ChannelMessageEvent)) return;
         final ChannelMessageEvent e = (ChannelMessageEvent) event;
         final User u = e.getActor();

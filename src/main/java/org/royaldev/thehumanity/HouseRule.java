@@ -1,6 +1,6 @@
 package org.royaldev.thehumanity;
 
-import org.apache.commons.lang3.Validate;
+import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,7 +24,7 @@ public enum HouseRule {
 
     @Nullable
     public static HouseRule getByFriendlyName(@NotNull final String friendlyName) {
-        Validate.notNull(friendlyName, "friendlyName was null");
+        Preconditions.checkNotNull(friendlyName, "friendlyName was null");
         return Arrays.stream(HouseRule.values())
             .filter(hr -> hr.getFriendlyName().equalsIgnoreCase(friendlyName))
             .findFirst()

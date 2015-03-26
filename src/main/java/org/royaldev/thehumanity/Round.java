@@ -1,6 +1,9 @@
 package org.royaldev.thehumanity;
 
-import org.apache.commons.lang3.Validate;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.Multisets;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.IRCFormat;
@@ -8,20 +11,19 @@ import org.royaldev.thehumanity.cards.Play;
 import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
 import org.royaldev.thehumanity.player.Player;
-import org.royaldev.thehumanity.util.DescendingValueComparator;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+/**
+ * Represents a single round of the game.
+ */
 public class Round {
 
     private final Game game;
@@ -30,21 +32,35 @@ public class Round {
     private final Player czar;
     private final Set<Player> skippedPlayers = Collections.synchronizedSet(new HashSet<>());
     private final List<Play> plays = Collections.synchronizedList(new ArrayList<>());
-    private final Map<Play, Integer> votes = new HashMap<>();
+    private final Multiset<Play> votes = HashMultiset.create();
     private final Set<Player> voters = new HashSet<>();
     private ScheduledFuture reminderTask;
     private RoundStage currentStage = RoundStage.IDLE;
 
+    /**
+     * Creates a new round for the given game.
+     *
+     * @param game      Game the round belongs to
+     * @param number    Round number
+     * @param blackCard The black card used for this round
+     * @param czar      The czar, or null if playing a mode with no czar
+     */
     Round(@NotNull final Game game, final int number, @NotNull final BlackCard blackCard, @Nullable final Player czar) {
-        Validate.notNull(game, "game was null");
-        Validate.notNull(blackCard, "blackCard was null");
-        Validate.notNull(czar, "czar was null");
+        Preconditions.checkNotNull(game, "game was null");
+        Preconditions.checkNotNull(blackCard, "blackCard was null");
         this.game = game;
         this.number = number;
         this.blackCard = blackCard;
         this.czar = czar;
     }
 
+    /**
+     * Makes a reminder for the czar. The reminder will ping the czar after 45 seconds, and continually every 22.5
+     * seconds after the initial period. This will return null if there is no czar. The task is canceled by a listener,
+     * which is fired when the czar speaks.
+     *
+     * @return ScheduledFuture or null
+     */
     @Nullable
     private ScheduledFuture makeReminderTask() {
         final Player czar = this.getCzar();
@@ -87,16 +103,16 @@ public class Round {
                 this.game.showCards();
                 break;
             case WAITING_FOR_CZAR:
+                Collections.shuffle(this.plays);
                 if (this.game.hasHouseRule(HouseRule.GOD_IS_DEAD)) {
-                    Collections.shuffle(this.plays);
                     this.displayPlays();
                     this.getGame().sendMessage("Send " + IRCFormat.BOLD + this.getGame().getHumanity().getPrefix() + "pick" + IRCFormat.RESET + " followed by the number you think should win.");
                 }
-                if (this.getCzar() == null) break;
-                Collections.shuffle(this.plays);
+                final Player czar = this.getCzar();
+                if (czar == null) break;
                 this.displayPlays();
-                this.getGame().sendMessage(IRCFormat.BOLD + this.getCzar().getUser().getNick() + IRCFormat.RESET + " is picking a winner.");
-                this.getCzar().getUser().sendNotice("Send " + IRCFormat.BOLD + this.getGame().getHumanity().getPrefix() + "pick" + IRCFormat.RESET + " followed by the number you think should win.");
+                this.getGame().sendMessage(IRCFormat.BOLD + czar.getUser().getNick() + IRCFormat.RESET + " is picking a winner.");
+                czar.getUser().sendNotice("Send " + IRCFormat.BOLD + this.getGame().getHumanity().getPrefix() + "pick" + IRCFormat.RESET + " followed by the number you think should win.");
                 this.reminderTask = this.makeReminderTask();
                 break;
             case ENDED:
@@ -111,7 +127,7 @@ public class Round {
      * @param play Play to add
      */
     public void addPlay(@NotNull final Play play) {
-        Validate.notNull(play, "play was null");
+        Preconditions.checkNotNull(play, "play was null");
         synchronized (this.plays) {
             this.plays.add(play);
         }
@@ -119,15 +135,22 @@ public class Round {
         if (this.hasAllPlaysMade()) this.advanceStage();
     }
 
+    /**
+     * Adds a vote for a choice in the God is Dead house rule mode.
+     *
+     * @param player Player voting
+     * @param index  Number of the play that is being voted for
+     * @return true if vote was successful, false if not
+     */
     public boolean addVote(@NotNull final Player player, int index) {
-        Validate.notNull(player, "player was null");
+        Preconditions.checkNotNull(player, "player was null");
         if (this.hasVoted(player)) return false;
         index--;
         if (index < 0 || index >= this.getPlays().size()) return false;
         this.voters.add(player);
         final Play p = this.getPlays().get(index);
-        this.votes.compute(p, (k, v) -> v == null ? 1 : v + 1);
-        if (this.votes.values().stream().mapToInt(i -> i).sum() >= this.getGame().getPlayers().size()) {
+        this.votes.add(p);
+        if (this.votes.size() >= this.getGame().getPlayers().size()) {
             final Play winner = this.getMostVoted();
             final int winningIndex = this.plays.indexOf(winner);
             this.chooseWinningPlay(winningIndex + 1);
@@ -153,6 +176,10 @@ public class Round {
         this.processStage();
     }
 
+    /**
+     * Cancels the reminder for the czar, if one has been started and it is not canceled or finished. This is always
+     * safe to call.
+     */
     public void cancelReminderTask() {
         if (this.reminderTask == null || this.reminderTask.isCancelled() || this.reminderTask.isDone()) {
             return;
@@ -236,10 +263,14 @@ public class Round {
         return this.game;
     }
 
+    /**
+     * Gets the play that has the highest amount of votes in the God is Dead house rule mode. Ties are handled by
+     * returning the play that was first in the iteration.
+     *
+     * @return Play that had the highest amount of votes
+     */
     public Play getMostVoted() {
-        final Map<Play, Integer> sortedPlays = new TreeMap<>(new DescendingValueComparator<>(this.votes));
-        sortedPlays.putAll(this.votes);
-        return sortedPlays.entrySet().iterator().next().getKey();
+        return Multisets.copyHighestCountFirst(this.votes).iterator().next();
     }
 
     /**
@@ -296,12 +327,12 @@ public class Round {
      * @return true if played,false if otherwise
      */
     public boolean hasPlayed(@NotNull final Player p) {
-        Validate.notNull(p, "p was null");
+        Preconditions.checkNotNull(p, "p was null");
         return this.plays.stream().anyMatch(play -> play.getPlayer().equals(p));
     }
 
     public boolean hasVoted(@NotNull final Player player) {
-        Validate.notNull(player, "player was null");
+        Preconditions.checkNotNull(player, "player was null");
         return this.voters.contains(player);
     }
 
@@ -312,7 +343,7 @@ public class Round {
      * @return true if skipped, false if otherwise
      */
     public boolean isSkipped(@NotNull final Player p) {
-        Validate.notNull(p, "p was null");
+        Preconditions.checkNotNull(p, "p was null");
         return this.getSkippedPlayers().contains(p);
     }
 
@@ -329,7 +360,7 @@ public class Round {
      * @param p Player to skip
      */
     public boolean skip(@NotNull final Player p) {
-        Validate.notNull(p, "p was null");
+        Preconditions.checkNotNull(p, "p was null");
         if (this.isSkipped(p)) return false;
         // If the total amount of players less the skipped players is less than the amount needed to play, don't skip.
         // However, if this person is the czar, it's fine.

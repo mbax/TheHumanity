@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.commands.impl;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
 import org.royaldev.thehumanity.TheHumanity;
@@ -33,7 +34,7 @@ public class HelpCommand extends NoticeableCommand {
     }
 
     @Override
-    public void onCommand(final ActorEvent<User> event, final CallInfo ci, final String[] args) {
+    public void onCommand(@NotNull final ActorEvent<User> event, @NotNull final CallInfo ci, @NotNull final String[] args) {
         final User u = event.getActor();
         final StringBuilder sb = new StringBuilder();
         for (final IRCCommand ic : this.humanity.getCommandHandler().getAll()) {

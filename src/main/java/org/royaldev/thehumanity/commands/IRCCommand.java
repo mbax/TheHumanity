@@ -1,6 +1,6 @@
 package org.royaldev.thehumanity.commands;
 
-import org.apache.commons.lang3.Validate;
+import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.element.User;
@@ -20,7 +20,7 @@ public abstract class IRCCommand {
      * @param ci    Information received when this command was called
      * @param args  Arguments passed to the command
      */
-    public abstract void onCommand(final ActorEvent<User> event, final CallInfo ci, final String[] args);
+    public abstract void onCommand(@NotNull final ActorEvent<User> event, @NotNull final CallInfo ci, @NotNull final String[] args);
 
     /**
      * Returns the first parameter, unless it is null, in which case, the second parameter is returned.
@@ -31,7 +31,7 @@ public abstract class IRCCommand {
      */
     @NotNull
     private <T> T orDefault(@Nullable final T expected, @NotNull final T def) {
-        Validate.notNull(def, "def was null");
+        Preconditions.checkNotNull(def, "def was null");
         return expected == null ? def : expected;
     }
 
@@ -45,7 +45,6 @@ public abstract class IRCCommand {
         return this.orDefault(this.getCommandAnnotation().aliases(), new String[0]);
     }
 
-    @NotNull
     public final Command getCommandAnnotation() {
         return this.getClass().getAnnotation(Command.class);
     }

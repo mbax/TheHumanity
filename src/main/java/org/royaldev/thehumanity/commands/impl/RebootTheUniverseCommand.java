@@ -49,11 +49,11 @@ public class RebootTheUniverseCommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, final String[] args) {
+    public void onInGameCommand(@NotNull final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, @NotNull final String[] args) {
         final User u = player.getUser();
         if (!game.hasHouseRule(HouseRule.REBOOTING_THE_UNIVERSE)) {
             this.notice(u, "The house rule \"Rebooting the Universe\" must be enabled to use this command.");
-            if (this.isHostOrOp(game.getPlayer(u))) {
+            if (this.isHostOrOp(player)) {
                 this.notice(u, "Try " + this.humanity.getPrefix() + "game hr list.");
             }
             return;
@@ -70,7 +70,7 @@ public class RebootTheUniverseCommand extends InGameCommand {
         if (cardsToRemove == null) return;
         player.getHand().removeCards(cardsToRemove);
         game.deal(player);
-        player.getWins().removeCard(player.getWins().getCard(0));
+        player.removeWin(player.getWins().get(0));
         this.notice(u, "In exchange for a point, you have replaced " + cardsToRemove.size() + " cards with new ones.");
     }
 }

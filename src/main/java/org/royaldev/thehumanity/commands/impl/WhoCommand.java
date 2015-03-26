@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.commands.impl;
 
+import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.kitteh.irc.client.library.element.User;
@@ -30,15 +31,21 @@ public class WhoCommand extends InGameCommand {
      * @param g Game to build this String for
      * @return Built String, ready to be sent
      */
-    private String getStatusString(final Game g) {
+    @NotNull
+    private String getStatusString(@NotNull final Game g) {
+        Preconditions.checkNotNull(g, "g was null");
         final Round r = g.getCurrentRound();
         if (r == null) {
             return "No round in progress.";
         }
         final StringBuilder sb = new StringBuilder();
-        sb.append(IRCFormat.BOLD).append("Czar: ").append(IRCFormat.RESET).append(r.getCzar() == null ? "None" : r.getCzar().getUser().getNick()).append(", ").append(IRCFormat.BOLD).append("Players: ").append(IRCFormat.RESET);
+        final Player czar = r.getCzar();
+        if (czar != null) {
+            sb.append(IRCFormat.BOLD).append("Czar: ").append(IRCFormat.RESET).append(czar.getUser().getNick()).append(", ");
+        }
+        sb.append(IRCFormat.BOLD).append("Players: ").append(IRCFormat.RESET);
         for (final Player player : g.getPlayers()) {
-            if (player.equals(r.getCzar())) continue;
+            if (player.equals(czar)) continue;
             final String c = (r.hasPlayed(player) ? IRCFormat.GREEN : r.getCurrentStage() == RoundStage.WAITING_FOR_CZAR ? IRCFormat.BLUE : IRCFormat.RED).toString();
             sb.append(c).append(player.getUser().getNick()).append(IRCFormat.RESET).append(", ");
         }
@@ -46,7 +53,7 @@ public class WhoCommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, final String[] args) {
+    public void onInGameCommand(@NotNull final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, @NotNull final String[] args) {
         final User u = player.getUser();
         final Round r = game.getCurrentRound();
         if (r == null || r.getCurrentStage() != RoundStage.WAITING_FOR_CZAR && r.getCurrentStage() != RoundStage.WAITING_FOR_PLAYERS) {

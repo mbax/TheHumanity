@@ -25,7 +25,7 @@ public class AddPackSubcommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, final String[] args) {
+    public void onInGameCommand(@NotNull final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, @NotNull final String[] args) {
         final User u = player.getUser();
         if (!game.getHost().equals(player) && !this.humanity.hasChannelMode(game.getChannel(), u, 'o')) {
             this.notice(u, "You are not an op or the host!");

@@ -22,7 +22,7 @@ public class HostCommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, final String[] args) {
+    public void onInGameCommand(@NotNull final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, @NotNull final String[] args) {
         if (args.length < 1) {
             game.showHost();
             return;

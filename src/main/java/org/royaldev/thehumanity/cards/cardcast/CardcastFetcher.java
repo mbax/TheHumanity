@@ -1,10 +1,10 @@
 package org.royaldev.thehumanity.cards.cardcast;
 
+import com.google.common.base.Joiner;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.royaldev.thehumanity.cards.Card;
@@ -46,7 +46,7 @@ public class CardcastFetcher {
         for (int i = 0; i < parts.length(); i++) {
             listParts.add(parts.getString(i));
         }
-        return StringUtils.join(listParts, "_");
+        return Joiner.on('_').join(listParts);
     }
 
     /**

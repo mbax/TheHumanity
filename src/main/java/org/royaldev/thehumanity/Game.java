@@ -1,6 +1,6 @@
 package org.royaldev.thehumanity;
 
-import org.apache.commons.lang3.Validate;
+import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.IRCFormat;
@@ -11,6 +11,7 @@ import org.royaldev.thehumanity.cards.CardPack;
 import org.royaldev.thehumanity.cards.Deck;
 import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
+import org.royaldev.thehumanity.exceptions.MissingCzarException;
 import org.royaldev.thehumanity.player.Hand;
 import org.royaldev.thehumanity.player.Player;
 import org.royaldev.thehumanity.util.DescendingValueComparator;
@@ -47,9 +48,9 @@ public class Game {
     private boolean hostWasVoiced = false;
 
     public Game(@NotNull final TheHumanity humanity, @NotNull final Channel channel, @NotNull final List<CardPack> cardPacks) {
-        Validate.notNull(humanity, "humanity was null");
-        Validate.notNull(channel, "channel was null");
-        Validate.notNull(cardPacks, "cardPacks was null");
+        Preconditions.checkNotNull(humanity, "humanity was null");
+        Preconditions.checkNotNull(channel, "channel was null");
+        Preconditions.checkNotNull(cardPacks, "cardPacks was null");
         this.humanity = humanity;
         this.channel = channel;
         this.deck = new Deck(cardPacks);
@@ -72,7 +73,7 @@ public class Game {
      * @param hr Rule being added
      */
     private void processAddingHouseRule(@NotNull final HouseRule hr) {
-        Validate.notNull(hr, "hr was null");
+        Preconditions.checkNotNull(hr, "hr was null");
         switch (hr) {
             case RANDO_CARDRISSIAN:
                 this.allPlayers.add(this.randoCardrissian);
@@ -87,7 +88,7 @@ public class Game {
      * @return true if pack was added, false if otherwise
      */
     public boolean addCardPack(@NotNull final CardPack cp) {
-        Validate.notNull(cp, "cp was null");
+        Preconditions.checkNotNull(cp, "cp was null");
         return this.deck.addCardPack(cp);
     }
 
@@ -98,7 +99,7 @@ public class Game {
      * @return true if rule was added, false if otherwise
      */
     public boolean addHouseRule(@NotNull final HouseRule rule) {
-        Validate.notNull(rule, "rule was null");
+        Preconditions.checkNotNull(rule, "rule was null");
         if (this.hasHouseRule(rule)) return false;
         this.processAddingHouseRule(rule);
         return this.getHouseRules().add(rule);
@@ -111,7 +112,7 @@ public class Game {
      * @param player Player to add to the game
      */
     public void addPlayer(@NotNull final Player player) {
-        Validate.notNull(player, "player was null");
+        Preconditions.checkNotNull(player, "player was null");
         if (this.hasPlayer(player)) return;
         if (!this.setOldUserData(player)) {
             synchronized (this.players) {
@@ -123,7 +124,7 @@ public class Game {
         }
         this.update();
         final int totalCards = this.getDeck().getCardPacks().stream().mapToInt(cp -> cp.getWhiteCards().size()).sum();
-        if (this.players.size() * 7 >= totalCards) {
+        if (this.players.size() * 10 >= totalCards) {
             this.sendMessage(IRCFormat.BOLD + "Not enough white cards to play!");
             this.stop();
             return;
@@ -156,7 +157,7 @@ public class Game {
      */
     @NotNull
     public String antiPing(@NotNull String message) {
-        Validate.notNull(message, "message was null");
+        Preconditions.checkNotNull(message, "message was null");
         for (final User u : this.channel.getUsers().keySet()) {
             if (u.getNick().length() <= 1) continue;
             message = message.replace(u.getNick(), u.getNick().substring(0, 1) + "\u200b" + u.getNick().substring(1));
@@ -172,7 +173,7 @@ public class Game {
      */
     @Nullable
     public Player createPlayer(@NotNull final User u) {
-        Validate.notNull(u, "u was null");
+        Preconditions.checkNotNull(u, "u was null");
         if (this.hasPlayer(u.getNick())) return this.getPlayer(u.getNick());
         final Player p = new Player(u);
         this.addPlayer(p);
@@ -184,7 +185,8 @@ public class Game {
      *
      * @param player Player to deal to
      */
-    public void deal(final Player player) {
+    public void deal(@NotNull final Player player) {
+        Preconditions.checkNotNull(player, "player was null");
         final Hand<WhiteCard> hand = player.getHand();
         while (hand.getSize() < 10) hand.addCard(this.getDeck().getRandomWhiteCard(null));
     }
@@ -226,7 +228,7 @@ public class Game {
      * @param channel Channel
      */
     private void setChannel(@NotNull final Channel channel) {
-        Validate.notNull(channel, "channel was null");
+        Preconditions.checkNotNull(channel, "channel was null");
         this.channel = channel;
     }
 
@@ -295,6 +297,7 @@ public class Game {
      * @param host Player to set as host
      */
     public void setHost(@NotNull final Player host) {
+        Preconditions.checkNotNull(host, "host was null");
         this.host = host;
         this.hostWasVoiced = this.humanity.hasChannelMode(this.channel, this.getHost().getUser(), 'v');
         if (!this.hostWasVoiced) {
@@ -322,7 +325,10 @@ public class Game {
     @Nullable
     public Player getPlayer(final User u) {
         if (u == null) return null;
-        return this.getPlayers().stream().filter(p -> this.humanity.usersMatch(u, p.getUser())).findFirst().orElse(null);
+        return this.getPlayers().stream()
+            .filter(p -> this.humanity.usersMatch(u, p.getUser()))
+            .findFirst()
+            .orElse(null);
     }
 
     /**
@@ -334,7 +340,9 @@ public class Game {
     @Nullable
     public Player getPlayer(final Player p) {
         if (p == null) return null;
-        return this.getPlayers().get(this.getPlayers().indexOf(p));
+        final int index = this.getPlayers().indexOf(p);
+        if (index < 0) return null;
+        return this.getPlayers().get(index);
     }
 
     /**
@@ -346,7 +354,12 @@ public class Game {
     @Nullable
     public Player getPlayer(final String name) {
         if (name == null) return null;
-        return this.getPlayer(this.channel.getUsers().keySet().stream().filter(u -> u.getNick().equalsIgnoreCase(name)).findFirst().orElse(null));
+        return this.getPlayer(
+            this.channel.getUsers().keySet().stream()
+                .filter(u -> u.getNick().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null)
+        );
     }
 
     /**
@@ -479,7 +492,11 @@ public class Game {
                 this.sendMessage(" ");
                 this.sendMessage(IRCFormat.BOLD + "Round " + this.getCurrentRound().getNumber() + IRCFormat.RESET + "!");
                 if (!this.hasHouseRule(HouseRule.GOD_IS_DEAD)) {
-                    this.sendMessage(IRCFormat.BOLD + this.getCurrentRound().getCzar().getUser().getNick() + IRCFormat.RESET + " is the card czar.");
+                    final Player czar = this.getCurrentRound().getCzar();
+                    if (czar == null) {
+                        throw new MissingCzarException();
+                    }
+                    this.sendMessage(IRCFormat.BOLD + czar.getUser().getNick() + IRCFormat.RESET + " is the card czar.");
                 }
                 this.sendMessage(IRCFormat.BOLD + this.getCurrentRound().getBlackCard().getText());
                 this.getCurrentRound().advanceStage();
@@ -523,8 +540,8 @@ public class Game {
      *
      * @param p Player to remove
      */
-    public void removePlayer(@NotNull final Player p) {
-        Validate.notNull(p, "p was null");
+    public void removePlayer(final Player p) {
+        Preconditions.checkNotNull(p, "p was null");
         synchronized (this.players) {
             if (!this.players.remove(p)) return;
         }
@@ -551,7 +568,7 @@ public class Game {
      * @param name Name of Player to remove
      */
     public void removePlayer(@NotNull final String name) {
-        Validate.notNull(name, "name was null");
+        Preconditions.checkNotNull(name, "name was null");
         this.removePlayer(this.getPlayer(name));
     }
 
@@ -580,9 +597,8 @@ public class Game {
         final Hand<WhiteCard> hand = newPlayer.getHand();
         hand.clearHand();
         hand.addCards(oldPlayer.getHand().getCards());
-        final Hand<BlackCard> wins = newPlayer.getWins();
-        wins.clearHand();
-        wins.addCards(oldPlayer.getWins().getCards());
+        newPlayer.clearWins();
+        oldPlayer.getWins().forEach(newPlayer::addWin);
         synchronized (this.players) {
             this.players.add(oldPlayer);
         }
@@ -602,7 +618,7 @@ public class Game {
      * @param p Player to show cards to
      */
     public void showCards(@NotNull final Player p) {
-        Validate.notNull(p, "p was null");
+        Preconditions.checkNotNull(p, "p was null");
         final StringBuilder sb = new StringBuilder();
         final Hand<WhiteCard> hand = p.getHand();
         for (int i = 0; i < hand.getSize(); i++) {

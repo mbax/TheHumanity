@@ -1,6 +1,6 @@
 package org.royaldev.thehumanity.commands;
 
-import org.apache.commons.lang3.Validate;
+import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +18,7 @@ public abstract class InGameCommand extends NoticeableCommand {
     protected final TheHumanity humanity;
 
     public InGameCommand(@NotNull final TheHumanity instance) {
-        Validate.notNull(instance, "instance was null");
+        Preconditions.checkNotNull(instance, "instance was null");
         this.humanity = instance;
     }
 
@@ -32,7 +32,7 @@ public abstract class InGameCommand extends NoticeableCommand {
      * @param player Player that used the command
      * @param args   Arguments passed to the command
      */
-    public abstract void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, final String[] args);
+    public abstract void onInGameCommand(@NotNull final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, @NotNull final String[] args);
 
     /**
      * Gets the Game for the given User.
@@ -42,7 +42,7 @@ public abstract class InGameCommand extends NoticeableCommand {
      */
     @Nullable
     public Game getGame(@NotNull final User u) {
-        Validate.notNull(u, "u was null");
+        Preconditions.checkNotNull(u, "u was null");
         return this.humanity.getGameFor(u);
     }
 
@@ -87,7 +87,7 @@ public abstract class InGameCommand extends NoticeableCommand {
      * @param args  Arguments passed to the command
      */
     @Override
-    public final void onCommand(final ActorEvent<User> event, final CallInfo ci, final String[] args) {
+    public final void onCommand(@NotNull final ActorEvent<User> event, @NotNull final CallInfo ci, @NotNull final String[] args) {
         final Game g = this.getGame(event.getActor());
         final Player p;
         if (g == null || (p = g.getPlayer(event.getActor())) == null) {

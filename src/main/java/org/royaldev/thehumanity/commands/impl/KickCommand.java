@@ -23,14 +23,13 @@ public class KickCommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, final String[] args) {
+    public void onInGameCommand(@NotNull final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, @NotNull final String[] args) {
         final User u = player.getUser();
         if (args.length < 1) {
             this.notice(u, "Usage: " + this.getUsage().replace("<command>", ci.getLabel()));
             return;
         }
-        final Player p = game.getPlayer(u);
-        if (!this.isHostOrOp(p, game)) {
+        if (!this.isHostOrOp(player, game)) {
             this.notice(u, "You're not an op or the host!");
             return;
         }

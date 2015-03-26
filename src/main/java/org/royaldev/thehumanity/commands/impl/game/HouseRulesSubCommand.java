@@ -1,8 +1,7 @@
 package org.royaldev.thehumanity.commands.impl.game;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.IRCFormat;
@@ -40,7 +39,7 @@ public class HouseRulesSubCommand extends InGameCommand {
             this.notice(u, "Please provide a house rule.");
             return;
         }
-        final HouseRule hr = this.getHouseRule(StringUtils.join(args, ' '));
+        final HouseRule hr = this.getHouseRule(Joiner.on(' ').join(args));
         if (hr == null) {
             this.notice(u, "No such house rule.");
             return;
@@ -55,7 +54,7 @@ public class HouseRulesSubCommand extends InGameCommand {
 
     @Nullable
     private HouseRule getHouseRule(@NotNull final String name) {
-        Validate.notNull(name, "name was null");
+        Preconditions.checkNotNull(name, "name was null");
         try {
             return HouseRule.valueOf(name.toUpperCase());
         } catch (final IllegalArgumentException ex) {
@@ -83,7 +82,7 @@ public class HouseRulesSubCommand extends InGameCommand {
             this.notice(u, "Please provide a house rule.");
             return;
         }
-        final HouseRule hr = this.getHouseRule(StringUtils.join(args, ' '));
+        final HouseRule hr = this.getHouseRule(Joiner.on(' ').join(args));
         if (hr == null) {
             this.notice(u, "No such house rule.");
             return;
@@ -97,14 +96,14 @@ public class HouseRulesSubCommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, final String[] args) {
+    public void onInGameCommand(@NotNull final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, @NotNull final String[] args) {
         final User u = player.getUser();
         if (args.length < 1) {
             this.notice(u, "Not enough arguments.");
             this.notice(u, "Subcommands: (add, a), (remove, r), (list, l)");
             return;
         }
-        final String[] newArgs = ArrayUtils.subarray(args, 1, args.length);
+        final String[] newArgs = Arrays.copyOfRange(args, 1, args.length);
         switch (args[0].toLowerCase()) {
             case "add":
             case "a":

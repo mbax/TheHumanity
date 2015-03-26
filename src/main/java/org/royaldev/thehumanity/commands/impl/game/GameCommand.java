@@ -1,7 +1,6 @@
 package org.royaldev.thehumanity.commands.impl.game;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.Validate;
+import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
@@ -50,12 +49,12 @@ public class GameCommand extends InGameCommand {
     }
 
     private IRCCommand getSubcommand(@NotNull final String name) {
-        Validate.notNull(name, "name was null");
-        return this.subcommands.stream().filter(c -> c.getName().equalsIgnoreCase(name) || ArrayUtils.contains(c.getAliases(), name.toLowerCase())).findFirst().orElse(null);
+        Preconditions.checkNotNull(name, "name was null");
+        return this.subcommands.stream().filter(c -> c.getName().equalsIgnoreCase(name) || Arrays.asList(c.getAliases()).contains(name.toLowerCase())).findFirst().orElse(null);
     }
 
     @Override
-    public void onInGameCommand(final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, final String[] args) {
+    public void onInGameCommand(@NotNull final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, @NotNull final String[] args) {
         final User u = player.getUser();
         if (args.length < 1) {
             this.notice(u, "Provide a subcommand.");
@@ -67,6 +66,6 @@ public class GameCommand extends InGameCommand {
             this.notice(u, "No such subcommand.");
             return;
         }
-        subcommand.onCommand(event, ci, ArrayUtils.subarray(args, 1, args.length));
+        subcommand.onCommand(event, ci, Arrays.copyOfRange(args, 1, args.length));
     }
 }

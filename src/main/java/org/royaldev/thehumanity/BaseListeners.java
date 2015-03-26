@@ -1,17 +1,19 @@
 package org.royaldev.thehumanity;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.kitteh.irc.client.library.event.channel.ChannelInviteEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelJoinEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelKickEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelPartEvent;
 import org.kitteh.irc.client.library.event.client.ClientConnectedEvent;
+import org.kitteh.irc.client.library.event.client.ClientConnectionClosedEvent;
 import org.kitteh.irc.client.library.event.user.PrivateMessageEvent;
 import org.kitteh.irc.lib.net.engio.mbassy.listener.Handler;
 import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.IRCCommand;
 import org.royaldev.thehumanity.util.ConversionHelper;
+
+import java.util.Arrays;
 
 /**
  * The basic listeners of the bot that allow it to function.
@@ -22,6 +24,22 @@ final class BaseListeners {
 
     BaseListeners(final TheHumanity instance) {
         this.humanity = instance;
+    }
+
+    @Handler
+    public void joining(final ChannelJoinEvent e) {
+        if (!e.getActor().getNick().equals(e.getClient().getNick()) || e.getClient().getMessageDelay() == 1) return;
+        e.getClient().setMessageDelay(1);
+    }
+
+    @Handler
+    public void connected(final ClientConnectedEvent e) {
+        this.humanity.getLogger().info("Connected to " + e.getServerInfo().getNetworkName() + " (" + e.getServer().getName() + ").");
+    }
+
+    @Handler
+    public void disconnected(final ClientConnectionClosedEvent e) {
+        this.humanity.getLogger().info("Disconnected. " + (e.isReconnecting() ? "R" : "Not r") + "econnecting.");
     }
 
     @Handler
@@ -36,7 +54,7 @@ final class BaseListeners {
         if (commandType != IRCCommand.CommandType.MESSAGE && commandType != IRCCommand.CommandType.BOTH) return;
         this.humanity.getLogger().info(e.getChannel().getName() + "/" + e.getActor().getNick() + ": " + e.getMessage());
         try {
-            command.onCommand(e, new CallInfo(commandString, CallInfo.UsageType.MESSAGE), ArrayUtils.subarray(split, 1, split.length));
+            command.onCommand(e, new CallInfo(commandString, CallInfo.UsageType.MESSAGE), Arrays.copyOfRange(split, 1, split.length));
         } catch (final Throwable t) {
             t.printStackTrace();
             final StringBuilder sb = new StringBuilder("Unhandled command exception! ");
@@ -94,7 +112,7 @@ final class BaseListeners {
         }
         this.humanity.getLogger().info(e.getActor().getNick() + ": " + e.getMessage());
         try {
-            command.onCommand(e, new CallInfo(commandString, CallInfo.UsageType.PRIVATE), ArrayUtils.subarray(split, 1, split.length));
+            command.onCommand(e, new CallInfo(commandString, CallInfo.UsageType.PRIVATE), Arrays.copyOfRange(split, 1, split.length));
         } catch (final Throwable t) {
             t.printStackTrace();
             final StringBuilder sb = new StringBuilder("Unhandled command exception! ");

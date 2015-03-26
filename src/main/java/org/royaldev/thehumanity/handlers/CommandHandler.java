@@ -1,6 +1,6 @@
 package org.royaldev.thehumanity.handlers;
 
-import org.apache.commons.lang3.Validate;
+import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.royaldev.thehumanity.commands.Command;
@@ -21,7 +21,7 @@ public class CommandHandler implements Handler<IRCCommand, String> {
     private final Map<String, String> aliasCommands = new TreeMap<>();
 
     private void checkCommand(@NotNull final IRCCommand command) {
-        Validate.notNull(command, "command was null");
+        Preconditions.checkNotNull(command, "command was null");
         final Command c = command.getCommandAnnotation();
         if (c == null) {
             throw new IllegalArgumentException("No Command annotation on IRCCommand.");
@@ -36,7 +36,7 @@ public class CommandHandler implements Handler<IRCCommand, String> {
      */
     @Nullable
     public IRCCommand get(@NotNull String name) {
-        Validate.notNull(name, "name was null");
+        Preconditions.checkNotNull(name, "name was null");
         name = name.toLowerCase();
         synchronized (this.commands) {
             if (this.commands.containsKey(name)) return this.commands.get(name);
@@ -70,7 +70,7 @@ public class CommandHandler implements Handler<IRCCommand, String> {
      */
     @Override
     public boolean register(@NotNull final IRCCommand command) {
-        Validate.notNull(command, "command was null");
+        Preconditions.checkNotNull(command, "command was null");
         this.checkCommand(command);
         final String name = command.getName().toLowerCase();
         synchronized (this.commands) {
@@ -92,7 +92,7 @@ public class CommandHandler implements Handler<IRCCommand, String> {
      */
     @Override
     public boolean unregister(@NotNull final IRCCommand command) {
-        Validate.notNull(command, "command was null");
+        Preconditions.checkNotNull(command, "command was null");
         return this.unregister(command.getName());
     }
 
@@ -105,17 +105,16 @@ public class CommandHandler implements Handler<IRCCommand, String> {
      * @return If command was unregistered
      */
     public boolean unregister(@NotNull String name) {
-        Validate.notNull(name, "name was null");
+        Preconditions.checkNotNull(name, "name was null");
         name = name.toLowerCase();
-        boolean wasRemoved = false;
+        final boolean wasRemoved;
         synchronized (this.commands) {
-            if (this.commands.containsKey(name)) {
-                this.commands.remove(name);
-                wasRemoved = true;
-            }
+            wasRemoved = this.commands.remove(name) != null;
         }
         synchronized (this.aliasCommands) {
-            if (this.aliasCommands.containsKey(name)) this.aliasCommands.remove(name);
+            if (this.aliasCommands.containsKey(name)) {
+                this.aliasCommands.remove(name);
+            }
         }
         return wasRemoved;
     }

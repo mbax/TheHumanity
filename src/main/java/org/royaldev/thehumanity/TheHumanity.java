@@ -1,11 +1,11 @@
 package org.royaldev.thehumanity;
 
+import com.google.common.base.Preconditions;
+import com.google.common.hash.Hashing;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONWriter;
@@ -93,7 +93,7 @@ public class TheHumanity {
     private ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(1);
 
     private TheHumanity(@NotNull final String[] args) {
-        Validate.notNull(args, "args was null");
+        Preconditions.checkNotNull(args, "args was null");
         this.setUpLogger();
         this.parseArguments(args);
         this.loadCardPacks();
@@ -114,7 +114,6 @@ public class TheHumanity {
             cb.serverPassword(this.serverPassword);
         }
         this.bot = cb.build();
-        this.bot.setMessageDelay(1);
         this.bot.addChannel(this.channels);
         final EventManager em = this.bot.getEventManager();
         em.registerEventListener(new BaseListeners(this));
@@ -175,7 +174,7 @@ public class TheHumanity {
     }
 
     public void addCardPack(@NotNull final CardPack cp) {
-        Validate.notNull(cp, "cp was null");
+        Preconditions.checkNotNull(cp, "cp was null");
         synchronized (this.loadedCardPacks) {
             this.loadedCardPacks.add(cp);
         }
@@ -192,7 +191,7 @@ public class TheHumanity {
 
     @Nullable
     public CardPack getCardPack(@NotNull final String name) {
-        Validate.notNull(name, "name was null");
+        Preconditions.checkNotNull(name, "name was null");
         synchronized (this.loadedCardPacks) {
             return this.loadedCardPacks.stream().filter(cp -> cp.getName().equals(name)).findFirst().orElse(null);
         }
@@ -210,13 +209,16 @@ public class TheHumanity {
 
     @Nullable
     public Game getGameFor(@NotNull final User u) {
-        Validate.notNull(u, "u was null");
-        return this.getGames().values().stream().filter(g -> g.hasPlayer(u.getNick())).findFirst().orElse(null);
+        Preconditions.checkNotNull(u, "u was null");
+        return this.getGames().values().stream()
+            .filter(g -> g.hasPlayer(u.getNick()))
+            .findFirst()
+            .orElse(null);
     }
 
     @Nullable
     public Game getGameFor(@NotNull final Channel c) {
-        Validate.notNull(c, "c was null");
+        Preconditions.checkNotNull(c, "c was null");
         return this.getGames().get(c);
     }
 
@@ -261,12 +263,12 @@ public class TheHumanity {
      */
     @NotNull
     public String gist(@NotNull final String id, @NotNull final String cacheString, @NotNull final String fileName, @NotNull final String contents) {
-        Validate.notNull(id, "id was null");
-        Validate.notNull(cacheString, "cacheString was null");
-        Validate.notNull(fileName, "fileName was null");
-        Validate.notNull(contents, "contents was null");
+        Preconditions.checkNotNull(id, "id was null");
+        Preconditions.checkNotNull(cacheString, "cacheString was null");
+        Preconditions.checkNotNull(fileName, "fileName was null");
+        Preconditions.checkNotNull(contents, "contents was null");
         final Pair<String, String> hashGist = this.gistCache.get(id);
-        final String hash = DigestUtils.md5Hex(cacheString);
+        final String hash = Hashing.md5().hashUnencodedChars(cacheString).toString();
         if (hashGist == null || !hash.equals(hashGist.getLeft())) {
             final StringWriter sw = new StringWriter();
             final JSONWriter jw = new JSONWriter(sw);
@@ -291,15 +293,15 @@ public class TheHumanity {
     }
 
     public boolean hasChannelMode(@NotNull final Channel c, @NotNull final User u, final char mode) {
-        Validate.notNull(c, "Channel was null");
-        Validate.notNull(u, "User was null");
+        Preconditions.checkNotNull(c, "Channel was null");
+        Preconditions.checkNotNull(u, "User was null");
         final Map<User, Set<ChannelUserMode>> users = c.getUsers();
         return users.containsKey(u) && users.get(u).stream().anyMatch(m -> m.getMode() == mode);
     }
 
     public boolean usersMatch(@NotNull final User u, @NotNull final User u2) {
-        Validate.notNull(u, "User was null");
-        Validate.notNull(u2, "Second user was null");
+        Preconditions.checkNotNull(u, "User was null");
+        Preconditions.checkNotNull(u2, "Second user was null");
         return u.getNick().equals(u2.getNick());
     }
 }
