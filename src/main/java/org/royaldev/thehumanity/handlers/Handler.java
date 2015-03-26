@@ -17,14 +17,14 @@ public interface Handler<T, U> {
      * @param identifier Identifier attached to a registered object
      * @return Object if an object was registered with the supplied identifier, null if otherwise
      */
-    public T get(final U identifier);
+    T get(final U identifier);
 
     /**
      * Gets all registered objects in this Handler.
      *
      * @return Collection of all registered objects in this Handler. Never null
      */
-    public Collection<T> getAll();
+    Collection<T> getAll();
 
     /**
      * Registers the object in this Handler.
@@ -32,7 +32,7 @@ public interface Handler<T, U> {
      * @param obj Object to register
      * @return If object was registered
      */
-    public boolean register(final T obj);
+    boolean register(final T obj);
 
     /**
      * Unregisters the object from this Handler.
@@ -40,6 +40,6 @@ public interface Handler<T, U> {
      * @param obj Object to unregister
      * @return If object was unregistered
      */
-    public boolean unregister(final T obj);
+    boolean unregister(final T obj);
 
 }

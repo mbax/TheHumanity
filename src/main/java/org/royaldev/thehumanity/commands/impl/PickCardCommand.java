@@ -33,28 +33,6 @@ public class PickCardCommand extends InGameCommand {
         super(instance);
     }
 
-    private void vote(final Game g, final User u, final Player p, final String[] args) {
-        final Round r = g.getCurrentRound();
-        if (r == null) {
-            this.notice(u, "No round to vote in.");
-            return;
-        }
-        final int winningPlay;
-        try {
-            winningPlay = Integer.parseInt(args[0]);
-        } catch (NumberFormatException ex) {
-            this.notice(u, args[0] + " is not a valid number.");
-            return;
-        }
-        final int index = winningPlay - 1;
-        if (index < 0 || index >= r.getPlays().size()) {
-            this.notice(u, "Invalid play.");
-            return;
-        }
-        this.notice(u, r.hasVoted(p) ? "You have already voted!" : "Vote cast!");
-        r.addVote(p, winningPlay);
-    }
-
     /**
      * Processes any use of this command during the WAITING_FOR_CZAR stage.
      *
@@ -164,6 +142,28 @@ public class PickCardCommand extends InGameCommand {
             play.add(toPlay);
         }
         return play;
+    }
+
+    private void vote(final Game g, final User u, final Player p, final String[] args) {
+        final Round r = g.getCurrentRound();
+        if (r == null) {
+            this.notice(u, "No round to vote in.");
+            return;
+        }
+        final int winningPlay;
+        try {
+            winningPlay = Integer.parseInt(args[0]);
+        } catch (NumberFormatException ex) {
+            this.notice(u, args[0] + " is not a valid number.");
+            return;
+        }
+        final int index = winningPlay - 1;
+        if (index < 0 || index >= r.getPlays().size()) {
+            this.notice(u, "Invalid play.");
+            return;
+        }
+        this.notice(u, r.hasVoted(p) ? "You have already voted!" : "Vote cast!");
+        r.addVote(p, winningPlay);
     }
 
     @Override

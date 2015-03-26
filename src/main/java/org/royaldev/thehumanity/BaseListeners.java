@@ -27,12 +27,6 @@ final class BaseListeners {
     }
 
     @Handler
-    public void joining(final ChannelJoinEvent e) {
-        if (!e.getActor().getNick().equals(e.getClient().getNick()) || e.getClient().getMessageDelay() == 1) return;
-        e.getClient().setMessageDelay(1);
-    }
-
-    @Handler
     public void connected(final ClientConnectedEvent e) {
         this.humanity.getLogger().info("Connected to " + e.getServerInfo().getNetworkName() + " (" + e.getServer().getName() + ").");
     }
@@ -40,6 +34,12 @@ final class BaseListeners {
     @Handler
     public void disconnected(final ClientConnectionClosedEvent e) {
         this.humanity.getLogger().info("Disconnected. " + (e.isReconnecting() ? "R" : "Not r") + "econnecting.");
+    }
+
+    @Handler
+    public void joining(final ChannelJoinEvent e) {
+        if (!e.getActor().getNick().equals(e.getClient().getNick()) || e.getClient().getMessageDelay() == 1) return;
+        e.getClient().setMessageDelay(1);
     }
 
     @Handler

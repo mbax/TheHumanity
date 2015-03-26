@@ -46,16 +46,6 @@ public class Player {
     }
 
     /**
-     * Removes a win from this player's wins. This should always be used to remove a winning card.
-     *
-     * @param win Card to remove
-     */
-    public void removeWin(@NotNull final BlackCard win) {
-        Preconditions.checkNotNull(win, "win was null");
-        this.wins.removeCard(win);
-    }
-
-    /**
      * Checks equality with another player. This will return true if and only if the objects are the same object or have
      * the same (case-insensitive) nickname.
      *
@@ -118,5 +108,15 @@ public class Player {
     @NotNull
     public List<BlackCard> getWins() {
         return Collections.unmodifiableList(this.wins.getCards());
+    }
+
+    /**
+     * Removes a win from this player's wins. This should always be used to remove a winning card.
+     *
+     * @param win Card to remove
+     */
+    public void removeWin(@NotNull final BlackCard win) {
+        Preconditions.checkNotNull(win, "win was null");
+        this.wins.removeCard(win);
     }
 }

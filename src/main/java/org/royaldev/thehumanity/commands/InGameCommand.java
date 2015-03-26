@@ -53,7 +53,7 @@ public abstract class InGameCommand extends NoticeableCommand {
      * @param g Game to check
      * @return true if host or chanop, false if not
      */
-    @Contract("null, null -> false; !null, !null -> _")
+    @Contract("null, _ -> false; _, null -> false; !null, !null -> _")
     public boolean isHostOrOp(final Player p, final Game g) {
         return !(p == null || g == null) && (g.getHost().equals(p) || this.humanity.hasChannelMode(g.getChannel(), p.getUser(), 'o'));
     }
