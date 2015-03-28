@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.commands.impl.game;
 
+import com.google.common.base.Joiner;
 import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.kitteh.irc.client.library.element.User;
@@ -36,7 +37,10 @@ public class RemovePackSubcommand extends InGameCommand {
             this.notice(u, "Not enough arguments.");
             return;
         }
-        final CardPack cp = this.humanity.getCardPack(args[0]);
+        final CardPack cp = game.getDeck().getCardPacks().stream()
+            .filter(c -> c.getName().equalsIgnoreCase(Joiner.on(' ').join(args)))
+            .findFirst()
+            .orElse(null);
         if (cp == null) {
             this.notice(u, "No such card pack.");
             return;

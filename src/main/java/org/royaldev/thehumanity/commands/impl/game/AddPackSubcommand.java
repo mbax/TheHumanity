@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.commands.impl.game;
 
+import com.google.common.base.Joiner;
 import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.kitteh.irc.client.library.element.User;
@@ -35,7 +36,7 @@ public class AddPackSubcommand extends InGameCommand {
             this.notice(u, "Not enough arguments.");
             return;
         }
-        final CardPack cp = this.humanity.getCardPack(args[0]);
+        final CardPack cp = this.humanity.getOrDownloadCardPack(Joiner.on(' ').join(args));
         if (cp == null) {
             this.notice(u, "No such card pack.");
             return;

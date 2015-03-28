@@ -25,6 +25,7 @@ import org.kohsuke.args4j.spi.IntOptionHandler;
 import org.kohsuke.args4j.spi.StringArrayOptionHandler;
 import org.kohsuke.args4j.spi.StringOptionHandler;
 import org.royaldev.thehumanity.cards.CardPack;
+import org.royaldev.thehumanity.cards.cardcast.CardcastFetcher;
 import org.royaldev.thehumanity.commands.impl.CardCountsCommand;
 import org.royaldev.thehumanity.commands.impl.CardsCommand;
 import org.royaldev.thehumanity.commands.impl.HelpCommand;
@@ -237,6 +238,15 @@ public class TheHumanity {
     @NotNull
     public Logger getLogger() {
         return this.l;
+    }
+
+    @Nullable
+    public CardPack getOrDownloadCardPack(@NotNull final String name) {
+        Preconditions.checkNotNull(name, "name was null");
+        final CardPack cp = this.getCardPack(name);
+        if (cp != null) return cp;
+        if (!name.toLowerCase().startsWith("cc:")) return null;
+        return new CardcastFetcher(name.substring(3)).getCardPack();
     }
 
     public char getPrefix() {
