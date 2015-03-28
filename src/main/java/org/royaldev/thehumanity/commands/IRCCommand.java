@@ -110,7 +110,7 @@ public abstract class IRCCommand {
     /**
      * CommandType defines where a command can be used.
      */
-    public static enum CommandType {
+    public enum CommandType {
         /**
          * Command can be used in channel messages only.
          */

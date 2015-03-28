@@ -81,7 +81,7 @@ public class CardPackParser {
     /**
      * Stages of parsing for {@link org.royaldev.thehumanity.CardPackParser}.
      */
-    private static enum ParseStage {
+    private enum ParseStage {
         /**
          * Parsing the metadata section.
          */

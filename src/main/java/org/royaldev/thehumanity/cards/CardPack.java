@@ -1,6 +1,10 @@
 package org.royaldev.thehumanity.cards;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
+import org.jetbrains.annotations.NotNull;
 import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
 
@@ -33,11 +37,11 @@ public class CardPack {
      * @param fileName File name
      * @return Pack name
      */
-    public static String getNameFromFileName(final String fileName) {
-        final String[] split = fileName.split("\\.");
-        final StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < split.length - 1; i++) sb.append(split[i]);
-        return sb.toString();
+    @NotNull
+    public static String getNameFromFileName(@NotNull final String fileName) {
+        Preconditions.checkNotNull(fileName, "fileName was null");
+        final List<String> parts = Splitter.on('.').splitToList(fileName);
+        return Joiner.on('.').join(parts.subList(0, parts.size() - 1));
     }
 
     /**
