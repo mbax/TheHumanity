@@ -1,6 +1,7 @@
 package org.royaldev.thehumanity.commands.impl;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
 import org.royaldev.thehumanity.Game;
@@ -35,7 +36,8 @@ public class RebootTheUniverseCommand extends InGameCommand {
      * @param u    User that the Player represents
      * @return A list of WhiteCards of null
      */
-    private List<WhiteCard> getCardsFromNumbers(final String[] args, final Player p, final User u) {
+    @Nullable
+    private List<WhiteCard> getCardsFromNumbers(@NotNull final String[] args, @NotNull final Player p, @NotNull final User u) {
         final List<WhiteCard> cardsToRemove = new ArrayList<>();
         for (final String index : args) {
             try {
