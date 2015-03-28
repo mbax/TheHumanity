@@ -40,6 +40,7 @@ final class BaseListeners {
     public void joining(final ChannelJoinEvent e) {
         if (!e.getActor().getNick().equals(e.getClient().getNick()) || e.getClient().getMessageDelay() == 1) return;
         e.getClient().setMessageDelay(1);
+        this.humanity.getLogger().info("Set message delay to 1ms.");
     }
 
     @Handler
