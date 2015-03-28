@@ -1,5 +1,7 @@
 package org.royaldev.thehumanity.util;
 
+import com.google.common.base.MoreObjects;
+
 /**
  * A pair of objects.
  *
@@ -71,6 +73,9 @@ public class Pair<L, R> {
      */
     @Override
     public String toString() {
-        return String.format("Pair{left = %s, right = %s}", this.getLeft(), this.getRight());
+        return MoreObjects.toStringHelper(this)
+            .add("left", this.left)
+            .add("right", this.right)
+            .toString();
     }
 }

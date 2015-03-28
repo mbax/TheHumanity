@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -701,6 +702,20 @@ public class Game {
             if (this.gameStatus != GameStatus.JOINING) this.showScores();
         }
         this.gameStatus = GameStatus.ENDED;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("allPlayers", this.allPlayers)
+            .add("players", this.players)
+            .add("deck", this.deck)
+            .add("houseRules", this.houseRules)
+            .add("channel", this.channel)
+            .add("currentRound", this.currentRound)
+            .add("host", this.host)
+            .add("gameStatus", this.gameStatus)
+            .toString();
     }
 
     /**

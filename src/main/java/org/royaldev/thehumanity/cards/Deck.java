@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.cards;
 
+import com.google.common.base.MoreObjects;
 import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
 import org.royaldev.thehumanity.player.Hand;
@@ -178,6 +179,13 @@ public class Deck {
      */
     public void repopulateWhiteCards() {
         this.repopulateWhiteCards(null);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("cardPacks", this.cardPacks)
+            .toString();
     }
 
 }

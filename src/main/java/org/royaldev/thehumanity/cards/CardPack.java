@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.cards;
 
+import com.google.common.base.MoreObjects;
 import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
 
@@ -63,6 +64,15 @@ public class CardPack {
         if (!(obj instanceof CardPack)) return false;
         final CardPack cp = (CardPack) obj;
         return cp.getName().equals(this.getName());
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("name", this.name)
+            .add("description", this.description)
+            .add("author", this.author)
+            .toString();
     }
 
     /**

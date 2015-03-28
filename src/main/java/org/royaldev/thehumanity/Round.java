@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -385,6 +386,17 @@ public class Round {
                 break;
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("number", this.number)
+            .add("game", this.game)
+            .add("blackCard", this.blackCard)
+            .add("czar", this.czar)
+            .add("currentStage", this.currentStage)
+            .toString();
     }
 
     public enum RoundStage {

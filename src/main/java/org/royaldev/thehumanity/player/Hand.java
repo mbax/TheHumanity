@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.player;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.royaldev.thehumanity.cards.Card;
@@ -142,5 +143,12 @@ public class Hand<T extends Card> implements Iterable<T> {
         synchronized (this.hand) {
             return this.hand.removeAll(cards);
         }
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("hand", this.hand)
+            .toString();
     }
 }

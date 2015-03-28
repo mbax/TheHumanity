@@ -1,10 +1,13 @@
 package org.royaldev.thehumanity.commands;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
+
+import java.util.Arrays;
 
 /**
  * The basis for all commands handled by the bot.
@@ -91,6 +94,17 @@ public abstract class IRCCommand {
     @NotNull
     public String getUsage() {
         return this.orDefault(this.getCommandAnnotation().usage(), "<command>");
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("name", this.getName())
+            .add("description", this.getDescription())
+            .add("aliases", Arrays.toString(this.getAliases()))
+            .add("commandType", this.getCommandType())
+            .add("usage", this.getUsage())
+            .toString();
     }
 
     /**

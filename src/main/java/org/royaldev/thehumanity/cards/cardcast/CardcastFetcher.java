@@ -1,6 +1,7 @@
 package org.royaldev.thehumanity.cards.cardcast;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.MoreObjects;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -123,6 +124,15 @@ public class CardcastFetcher {
             whiteCards.add(new WhiteCard(cp, response.getJSONArray("text").getString(0).replaceAll("\\.$", "")));
         }
         return whiteCards;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .omitNullValues()
+            .add("id", id)
+            .add("name", name)
+            .toString();
     }
 
 }

@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.player;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -60,6 +61,15 @@ public class Player {
         if (!(obj instanceof Player)) return false;
         final Player p = (Player) obj;
         return p.getUser().getNick().equalsIgnoreCase(this.getUser().getNick());
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("hand", this.hand)
+            .add("wins", this.wins)
+            .add("user", this.user)
+            .toString();
     }
 
     /**
