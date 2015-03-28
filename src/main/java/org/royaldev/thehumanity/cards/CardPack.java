@@ -73,6 +73,7 @@ public class CardPack {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
+            .omitNullValues()
             .add("name", this.name)
             .add("description", this.description)
             .add("author", this.author)
