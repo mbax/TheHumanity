@@ -88,7 +88,9 @@ public class Round {
             this.addPlay(new Play(this.game.getRandoCardrissian(), randoPlay));
         }
         if (this.game.hasHouseRule(HouseRule.PACKING_HEAT)) {
-            this.game.getPlayers().forEach(p -> p.getHand().addCard(this.game.getDeck().getRandomWhiteCard(null)));
+            if (this.getBlackCard().getBlanks() > 1) {
+                this.game.getPlayers().stream().filter(p -> !p.equals(this.getCzar())).forEach(p -> p.getHand().addCard(this.game.getDeck().getRandomWhiteCard(null)));
+            }
         }
     }
 
