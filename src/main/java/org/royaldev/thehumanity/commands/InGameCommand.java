@@ -64,6 +64,7 @@ public abstract class InGameCommand extends NoticeableCommand {
      * @param p Player to check
      * @return true if host or chanop, false if not
      */
+    @Contract("null -> false")
     public boolean isHostOrOp(final Player p) {
         return this.isHostOrOp(p, this.getGame(p.getUser()));
     }
@@ -74,6 +75,7 @@ public abstract class InGameCommand extends NoticeableCommand {
      * @param u User to check
      * @return true if in a Game, false if otherwise
      */
+    @Contract("null -> fail")
     public boolean isInGame(@NotNull final User u) {
         return this.getGame(u) != null;
     }
