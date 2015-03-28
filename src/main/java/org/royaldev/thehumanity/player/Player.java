@@ -1,6 +1,8 @@
 package org.royaldev.thehumanity.player;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.element.User;
@@ -8,7 +10,7 @@ import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a player in one game of Cards Against Humanity.
@@ -16,7 +18,7 @@ import java.util.List;
 public class Player {
 
     private final Hand<WhiteCard> hand = new Hand<>();
-    private final Hand<BlackCard> wins = new Hand<>();
+    private final Multiset<BlackCard> wins = HashMultiset.create();
     private User user;
 
     /**
@@ -35,14 +37,14 @@ public class Player {
      */
     public void addWin(@NotNull final BlackCard win) {
         Preconditions.checkNotNull(win, "win was null");
-        this.wins.addCard(win);
+        this.wins.add(win);
     }
 
     /**
      * Removes all wins from this player.
      */
     public void clearWins() {
-        this.wins.clearHand();
+        this.wins.clear();
     }
 
     /**
@@ -99,15 +101,15 @@ public class Player {
     }
 
     /**
-     * Returns an unmodifiable list of the cards representing points for this player.
+     * Returns an unmodifiable set of the cards representing points for this player.
      *
-     * @return Unmodifiable list
+     * @return Unmodifiable set
      * @see Player#addWin(BlackCard)
      * @see Player#removeWin(BlackCard)
      */
     @NotNull
-    public List<BlackCard> getWins() {
-        return Collections.unmodifiableList(this.wins.getCards());
+    public Set<BlackCard> getWins() {
+        return Collections.unmodifiableSet(this.wins.elementSet());
     }
 
     /**
@@ -117,6 +119,6 @@ public class Player {
      */
     public void removeWin(@NotNull final BlackCard win) {
         Preconditions.checkNotNull(win, "win was null");
-        this.wins.removeCard(win);
+        this.wins.remove(win);
     }
 }

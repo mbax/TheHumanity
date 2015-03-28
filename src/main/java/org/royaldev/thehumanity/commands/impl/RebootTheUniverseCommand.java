@@ -72,7 +72,7 @@ public class RebootTheUniverseCommand extends InGameCommand {
         if (cardsToRemove == null) return;
         player.getHand().removeCards(cardsToRemove);
         game.deal(player);
-        player.removeWin(player.getWins().get(0));
+        player.removeWin(player.getWins().iterator().next());
         game.showCards(player);
         this.notice(u, "In exchange for a point, you have replaced " + cardsToRemove.size() + " cards with new ones.");
     }
