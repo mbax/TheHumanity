@@ -2,10 +2,13 @@ package org.royaldev.thehumanity.cards.cardcast;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Preconditions;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.royaldev.thehumanity.cards.Card;
@@ -31,7 +34,8 @@ public class CardcastFetcher {
      *
      * @param id ID of the Cardcast pack
      */
-    public CardcastFetcher(final String id) {
+    public CardcastFetcher(@NotNull final String id) {
+        Preconditions.checkNotNull(id, "id was null");
         this.id = id;
         this.getInfo();
     }
@@ -42,7 +46,9 @@ public class CardcastFetcher {
      * @param parts Parts of the black card
      * @return Complete text
      */
-    private String getBlackCardText(final JSONArray parts) {
+    @NotNull
+    private String getBlackCardText(@NotNull final JSONArray parts) {
+        Preconditions.checkNotNull(parts, "parts was null");
         final List<String> listParts = new ArrayList<>();
         for (int i = 0; i < parts.length(); i++) {
             listParts.add(parts.getString(i));
@@ -67,7 +73,10 @@ public class CardcastFetcher {
      * @param calls Cardcast black cards
      * @return All converted black cards
      */
-    public List<Card> getBlackCards(final CardPack cp, final JSONArray calls) {
+    @NotNull
+    public List<Card> getBlackCards(@NotNull final CardPack cp, @NotNull final JSONArray calls) {
+        Preconditions.checkNotNull(cp, "cp was null");
+        Preconditions.checkNotNull(calls, "calls was null");
         final List<Card> blackCards = new ArrayList<>();
         for (int i = 0; i < calls.length(); i++) {
             final JSONObject call = calls.getJSONObject(i);
@@ -81,6 +90,7 @@ public class CardcastFetcher {
      *
      * @return CardPack or null
      */
+    @Nullable
     public CardPack getCardPack() {
         final HttpResponse<JsonNode> hr;
         try {
@@ -117,7 +127,10 @@ public class CardcastFetcher {
      * @param responses Cardcast white cards
      * @return All converted white cards
      */
-    public List<Card> getWhiteCards(final CardPack cp, final JSONArray responses) {
+    @NotNull
+    public List<Card> getWhiteCards(@NotNull final CardPack cp, @NotNull final JSONArray responses) {
+        Preconditions.checkNotNull(cp, "cp was null");
+        Preconditions.checkNotNull(responses, "responses was null");
         final List<Card> whiteCards = new ArrayList<>();
         for (int i = 0; i < responses.length(); i++) {
             final JSONObject response = responses.getJSONObject(i);

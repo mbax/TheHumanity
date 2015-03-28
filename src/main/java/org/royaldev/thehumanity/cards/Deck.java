@@ -1,6 +1,9 @@
 package org.royaldev.thehumanity.cards;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Preconditions;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
 import org.royaldev.thehumanity.player.Hand;
@@ -30,7 +33,8 @@ public class Deck {
      *
      * @param cardPacks Card packs to add to this deck
      */
-    public Deck(final Collection<CardPack> cardPacks) {
+    public Deck(@NotNull final Collection<CardPack> cardPacks) {
+        Preconditions.checkNotNull(cardPacks, "cardPacks was null");
         synchronized (this.cardPacks) {
             this.cardPacks.addAll(cardPacks);
         }
@@ -44,7 +48,8 @@ public class Deck {
      * @param cp CardPack to add
      * @return true if the pack was added, false if otherwise
      */
-    public boolean addCardPack(final CardPack cp) {
+    public boolean addCardPack(@NotNull final CardPack cp) {
+        Preconditions.checkNotNull(cp, "cp was null");
         if (!this.cardPacks.add(cp)) return false;
         cp.getWhiteCards().forEach(this.whiteCards::add);
         cp.getBlackCards().forEach(this.blackCards::add);
@@ -61,13 +66,14 @@ public class Deck {
     }
 
     /**
-     * Gets the card packs that this Deck was created with.
+     * Gets an unmodifiable copy of the list of card packs that this Deck was created with.
      *
-     * @return List of CardPacks
+     * @return Unmodifiable list of CardPacks
      */
+    @NotNull
     public List<CardPack> getCardPacks() {
         synchronized (this.cardPacks) {
-            return new ArrayList<>(this.cardPacks);
+            return Collections.unmodifiableList(this.cardPacks);
         }
     }
 
@@ -78,6 +84,7 @@ public class Deck {
      *
      * @return A random black card or null
      */
+    @Nullable
     public BlackCard getRandomBlackCard() {
         synchronized (this.blackCards) {
             if (this.blackCards.size() < 1) return null;
@@ -94,7 +101,8 @@ public class Deck {
      * @param repopulateExcludes Hands with cards not to include or null
      * @return A random white card
      */
-    public WhiteCard getRandomWhiteCard(final Collection<Hand> repopulateExcludes) {
+    @NotNull
+    public WhiteCard getRandomWhiteCard(@Nullable final Collection<Hand> repopulateExcludes) {
         synchronized (this.whiteCards) {
             if (this.whiteCards.size() < 1) this.repopulateWhiteCards(repopulateExcludes);
             Collections.shuffle(this.whiteCards);
@@ -135,7 +143,8 @@ public class Deck {
      * @param cp CardPack to remove
      * @return true if pack was removed, false if otherwise
      */
-    public boolean removeCardPack(final CardPack cp) {
+    public boolean removeCardPack(@NotNull final CardPack cp) {
+        Preconditions.checkNotNull(cp, "cp was null");
         return !(!this.cardPacks.contains(cp) || !this.cardPacks.remove(cp)) && this.whiteCards.removeAll(this.whiteCards.stream().filter(wc -> wc.getCardPack().equals(cp)).collect(Collectors.toCollection(ArrayList::new)));
     }
 
@@ -156,7 +165,7 @@ public class Deck {
      *
      * @param exclude Hands of Cards to exclude
      */
-    public void repopulateWhiteCards(final Collection<Hand> exclude) {
+    public void repopulateWhiteCards(@Nullable final Collection<Hand> exclude) {
         synchronized (this.cardPacks) {
             synchronized (this.whiteCards) {
                 for (final CardPack cp : this.cardPacks) {

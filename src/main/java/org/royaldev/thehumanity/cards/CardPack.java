@@ -5,6 +5,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
 
@@ -27,7 +28,8 @@ public class CardPack {
      *
      * @param name Name of the pack
      */
-    public CardPack(final String name) {
+    public CardPack(@NotNull final String name) {
+        Preconditions.checkNotNull(name, "name was null");
         this.name = name;
     }
 
@@ -50,7 +52,8 @@ public class CardPack {
      * @param c Card to add
      * @throws java.lang.IllegalArgumentException If card wasn't a white card or black card.
      */
-    public void addCard(final Card c) {
+    public void addCard(@NotNull final Card c) {
+        Preconditions.checkNotNull(c, "c was null");
         if (c instanceof BlackCard) this.blackCards.add((BlackCard) c);
         else if (c instanceof WhiteCard) this.whiteCards.add((WhiteCard) c);
         else throw new IllegalArgumentException("Unknown card type!");
@@ -85,6 +88,7 @@ public class CardPack {
      *
      * @return Name of author or null
      */
+    @Nullable
     public String getAuthor() {
         return this.author;
     }
@@ -94,7 +98,7 @@ public class CardPack {
      *
      * @param author New author
      */
-    public void setAuthor(final String author) {
+    public void setAuthor(@Nullable final String author) {
         this.author = author;
     }
 
@@ -104,6 +108,7 @@ public class CardPack {
      *
      * @return Cloned list of black cards
      */
+    @NotNull
     public List<BlackCard> getBlackCards() {
         return new ArrayList<>(this.blackCards);
     }
@@ -113,6 +118,7 @@ public class CardPack {
      *
      * @return Description of pack or null
      */
+    @Nullable
     public String getDescription() {
         return this.description;
     }
@@ -122,7 +128,7 @@ public class CardPack {
      *
      * @param description New description
      */
-    public void setDescription(final String description) {
+    public void setDescription(@Nullable final String description) {
         this.description = description;
     }
 
@@ -131,6 +137,7 @@ public class CardPack {
      *
      * @return Name
      */
+    @NotNull
     public String getName() {
         return this.name;
     }
@@ -141,6 +148,7 @@ public class CardPack {
      *
      * @return Cloned list of white cards
      */
+    @NotNull
     public List<WhiteCard> getWhiteCards() {
         return new ArrayList<>(this.whiteCards);
     }

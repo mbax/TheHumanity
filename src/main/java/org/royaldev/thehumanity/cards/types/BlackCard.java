@@ -1,5 +1,7 @@
 package org.royaldev.thehumanity.cards.types;
 
+import com.google.common.base.Preconditions;
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.royaldev.thehumanity.cards.Card;
 import org.royaldev.thehumanity.cards.CardPack;
@@ -33,7 +35,9 @@ public class BlackCard extends Card {
      * @param toCount String to count matche sin
      * @return Number of matches
      */
-    private int countMatches(final Pattern p, final String toCount) {
+    private int countMatches(@NotNull final Pattern p, @NotNull final String toCount) {
+        Preconditions.checkNotNull(p, "p was null");
+        Preconditions.checkNotNull(toCount, "toCount was null");
         final Matcher m = p.matcher(toCount);
         int count = 0;
         while (m.find()) count++;
@@ -46,7 +50,8 @@ public class BlackCard extends Card {
      * @param p Play containing cards to fill blanks in with.
      * @return Filled in black card text
      */
-    public String fillInBlanks(final Play p) {
+    public String fillInBlanks(@NotNull final Play p) {
+        Preconditions.checkNotNull(p, "p was null");
         String filled = this.rawText;
         for (final WhiteCard wc : p.getWhiteCards()) {
             final Matcher m = BlackCard.blankPattern.matcher(filled);
@@ -74,8 +79,10 @@ public class BlackCard extends Card {
      * @param rawText Internal text
      * @return Processed text
      */
+    @NotNull
     @Override
-    protected String processText(final String rawText) {
+    protected String processText(@NotNull final String rawText) {
+        Preconditions.checkNotNull(rawText, "rawText was null");
         return BlackCard.blankPattern.matcher(rawText).replaceAll("<BLANK>").replace("\\_", "_");
     }
 }

@@ -1,5 +1,7 @@
 package org.royaldev.thehumanity.cards.types;
 
+import com.google.common.base.Preconditions;
+import org.jetbrains.annotations.NotNull;
 import org.royaldev.thehumanity.cards.Card;
 import org.royaldev.thehumanity.cards.CardPack;
 
@@ -24,8 +26,10 @@ public class WhiteCard extends Card {
      * @param rawText Internal text
      * @return Public-viewable text
      */
+    @NotNull
     @Override
-    protected String processText(final String rawText) {
+    protected String processText(@NotNull final String rawText) {
+        Preconditions.checkNotNull(rawText, "rawText was null");
         return rawText.replace("\\#", "#");
     }
 }

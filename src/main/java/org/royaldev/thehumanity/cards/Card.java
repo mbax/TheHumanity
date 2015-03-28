@@ -1,5 +1,8 @@
 package org.royaldev.thehumanity.cards;
 
+import com.google.common.base.Preconditions;
+import org.jetbrains.annotations.NotNull;
+
 /**
  * A card in general.
  */
@@ -15,7 +18,9 @@ public abstract class Card {
      * @param cardPack Pack the card belongs to
      * @param rawText  Text on the card
      */
-    protected Card(final CardPack cardPack, final String rawText) {
+    protected Card(@NotNull final CardPack cardPack, @NotNull final String rawText) {
+        Preconditions.checkNotNull(cardPack, "cardPack was null");
+        Preconditions.checkNotNull(rawText, "rawText was null");
         this.cardPack = cardPack;
         this.rawText = rawText;
         this.processedText = this.processText(this.rawText);
@@ -27,7 +32,8 @@ public abstract class Card {
      * @param rawText Internal text
      * @return Public-viewable text
      */
-    protected abstract String processText(final String rawText);
+    @NotNull
+    protected abstract String processText(@NotNull final String rawText);
 
     /**
      * Checks to see if the cards have the same text and belong to the same pack.
@@ -49,6 +55,7 @@ public abstract class Card {
      * @return {@link #getText}.
      */
     @Override
+    @NotNull
     public String toString() {
         return this.getText();
     }
@@ -58,6 +65,7 @@ public abstract class Card {
      *
      * @return Pack
      */
+    @NotNull
     public CardPack getCardPack() {
         return this.cardPack;
     }
@@ -67,6 +75,7 @@ public abstract class Card {
      *
      * @return Text
      */
+    @NotNull
     public String getText() {
         return this.processedText;
     }
