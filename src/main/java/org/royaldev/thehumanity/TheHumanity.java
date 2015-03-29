@@ -25,6 +25,7 @@ import org.kohsuke.args4j.spi.IntOptionHandler;
 import org.kohsuke.args4j.spi.StringArrayOptionHandler;
 import org.kohsuke.args4j.spi.StringOptionHandler;
 import org.royaldev.thehumanity.cards.CardPack;
+import org.royaldev.thehumanity.cards.CardPackParser;
 import org.royaldev.thehumanity.cards.cardcast.CardcastFetcher;
 import org.royaldev.thehumanity.commands.impl.CardCountsCommand;
 import org.royaldev.thehumanity.commands.impl.CardsCommand;

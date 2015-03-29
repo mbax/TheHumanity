@@ -1,10 +1,10 @@
-package org.royaldev.thehumanity;
+package org.royaldev.thehumanity.cards;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.royaldev.thehumanity.cards.CardPack;
+import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
 
@@ -79,7 +79,7 @@ public class CardPackParser {
     }
 
     /**
-     * Stages of parsing for {@link org.royaldev.thehumanity.CardPackParser}.
+     * Stages of parsing for {@link CardPackParser}.
      */
     private enum ParseStage {
         /**
