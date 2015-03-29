@@ -58,19 +58,13 @@ public class WhoCommand extends NoticeableCommand {
     @Override
     public void onCommand(@NotNull final ActorEvent<User> event, @NotNull final CallInfo ci, @NotNull final String[] args) {
         final User u = event.getActor();
-        final Game game;
-        if (event instanceof ChannelMessageEvent) {
-            game = this.humanity.getGameFor(((ChannelMessageEvent) event).getChannel());
-            if (game == null) {
-                this.notice(u, "No game in progress.");
-                return;
-            }
-        } else {
-            game = this.humanity.getGameFor(event.getActor());
-            if (game == null) {
-                this.notice(event.getActor(), "You're not in a game.");
-                return;
-            }
+        final boolean isChannelMessage = event instanceof ChannelMessageEvent;
+        final Game game = isChannelMessage
+            ? this.humanity.getGameFor(((ChannelMessageEvent) event).getChannel())
+            : this.humanity.getGameFor(event.getActor());
+        if (game == null) {
+            this.notice(u, isChannelMessage ? "No game in progress." : "You're not in a game.");
+            return;
         }
         final Round r = game.getCurrentRound();
         if (r == null || r.getCurrentStage() != RoundStage.WAITING_FOR_CZAR && r.getCurrentStage() != RoundStage.WAITING_FOR_PLAYERS) {
