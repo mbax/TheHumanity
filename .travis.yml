@@ -1,6 +1,6 @@
 language: java
 
-script: "mvn -U clean package"
+script: "mvn -P travis test"
 
 jdk:
   - oraclejdk8
@@ -9,8 +9,12 @@ notifications:
   email: false
   irc:
     channels:
-      - "irc.esper.net#CAHdev"
-    on_success: change
+      - secure: "hNFprAL62g7kmKXpFS4ICLqmL0tGO/18yfqR87vajLxv9NNCwulMol/2AUB2qSd9rhLPkw/bZAnnRCeoHDI7CD1vTRD7cIWCq90OvyGgssonjfaTc3ghRTwaGHOgtsk0GhhNffif90ZHtqyvIIjDtn20gfwgMK3tJTU3b0FMZWo="
+    nick:
+      - secure: "hh4R3Ada/Z+dNHizbhnaCtBA9s3F1OgS2Hf+dYm2S5Hyv/+9bkpNpJknSnVLk2hBNRk9wPLCLKJKLZTl6KQpSogkSnhh5cB0XeYC+w01gt7+gDGPmySkqMfqgGuUoiVeMiGAXPLVJ9F3FPMlu/lUAz3YigrkUNA59F9FIESEYsc="
+    password:
+      - secure: "W4aY8bPN5z7OEKTDWspWsFQ3Aj9itUzzFRypwP2RIMyx7vdwjU6FEWonACNXVIrZM3dyBtH8Z1eOC/dp6NllkinQckOK9t8N7g/YbG6mpQUbViz7rKe+F959kglTM8M1zbQmXPk5xzkshwpUbfMiixwoC45okOp9P6PUc9WNZfg="
+    on_success: always
     on_failure: always
     template:
       - "%{repository} (%{branch}:%{commit} by %{author}): %{message} (%{build_url})"
