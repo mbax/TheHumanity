@@ -70,6 +70,8 @@ public class TheHumanity {
     private final CommandHandler ch = new CommandHandler();
     private final Map<Channel, Game> games = new HashMap<>();
     private final Map<String, Pair<String, String>> gistCache = new HashMap<>();
+    private final Logger l = Logger.getLogger("org.royaldev.thehumanity");
+    private final ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(1);
     @Option(name = "-c", usage = "Channels to join.", required = true, handler = StringArrayOptionHandler.class)
     private String[] channels;
     @Option(name = "-s", usage = "Server to connect to.", required = true, handler = StringOptionHandler.class)
@@ -92,8 +94,6 @@ public class TheHumanity {
     private String[] defaultPacks = new String[0];
     @Option(name = "-k", usage = "Keep Cardcast packs loaded once they are downloaded?", handler = BooleanOptionHandler.class)
     private boolean keepCardcastPacks = false;
-    private Logger l = Logger.getLogger("org.royaldev.thehumanity");
-    private ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(1);
 
     private TheHumanity(@NotNull final String[] args) {
         Preconditions.checkNotNull(args, "args was null");

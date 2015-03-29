@@ -49,7 +49,7 @@ public class CallInfo {
     /**
      * Usage of the command.
      */
-    public static enum UsageType {
+    public enum UsageType {
         /**
          * Command was used in a channel message.
          */
