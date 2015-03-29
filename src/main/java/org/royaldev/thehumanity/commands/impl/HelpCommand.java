@@ -25,7 +25,7 @@ public class HelpCommand extends NoticeableCommand {
 
     /**
      * Gets the names of all commands, in alphabetical order, concatenated together with no delimiter. Used for a cache
-     * String by the {@link org.royaldev.thehumanity.TheHumanity#gist TheHumanity#gist()} method.
+     * String by the {@link org.royaldev.thehumanity.TheHumanity#cachedGist TheHumanity#gist()} method.
      *
      * @return String, as specified above
      */
@@ -47,6 +47,6 @@ public class HelpCommand extends NoticeableCommand {
                 sb.append("**Aliases:** ").append(String.join(", ", ic.getAliases())).append("\n");
             }
         }
-        this.notice(u, this.humanity.gist("help", this.getNames(), "help.md", sb.toString()));
+        this.notice(u, this.humanity.cachedGist("help", this.getNames(), "help.md", sb.toString()));
     }
 }

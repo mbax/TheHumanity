@@ -76,6 +76,6 @@ public class PacksCommand extends IRCCommand {
         for (final CardPack cp : this.humanity.getLoadedCardPacks()) {
             sb.append(this.generateCardPackMarkdown(cp));
         }
-        ConversionHelper.respond(event, this.humanity.gist("packs", allPackNames, "packs.md", sb.toString()));
+        ConversionHelper.respond(event, this.humanity.cachedGist("packs", allPackNames, "packs.md", sb.toString()));
     }
 }

@@ -1,6 +1,8 @@
 package org.royaldev.thehumanity;
 
 import com.google.common.base.Preconditions;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.hash.Hashing;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -8,6 +10,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONException;
 import org.json.JSONWriter;
 import org.kitteh.irc.client.library.AuthType;
 import org.kitteh.irc.client.library.Client;
@@ -69,7 +72,7 @@ public class TheHumanity {
     private final Client bot;
     private final CommandHandler ch = new CommandHandler();
     private final Map<Channel, Game> games = new HashMap<>();
-    private final Map<String, Pair<String, String>> gistCache = new HashMap<>();
+    private final Cache<String, Pair<String, String>> gistCache = CacheBuilder.newBuilder().build();
     private final Logger l = Logger.getLogger("org.royaldev.thehumanity");
     private final ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(1);
     @Option(name = "-c", usage = "Channels to join.", required = true, handler = StringArrayOptionHandler.class)
@@ -188,6 +191,43 @@ public class TheHumanity {
         return this.keepCardcastPacks;
     }
 
+    /**
+     * Gists the given contents under the given file name. This returns the URL to the Gist or a string of the following
+     * format: "An error occurred: [error message]"
+     * <p/>
+     * The given ID is used for caching purposes. The cacheString should be a String that identifies the contents. If
+     * cacheString changes, then the current cache for the given ID will be invalidated, and a new Gist will be made.
+     *
+     * @param key         Key of this cached gist
+     * @param cacheString Identifier for the contents
+     * @param fileName    Filename for the contents
+     * @param contents    Contents of the Gist
+     * @return URL of Gist or error message
+     */
+    @NotNull
+    public String cachedGist(@NotNull final String key, @NotNull final String cacheString, @NotNull final String fileName, @NotNull final String contents) {
+        // Ensure nothing is null
+        Preconditions.checkNotNull(key, "key was null");
+        Preconditions.checkNotNull(cacheString, "cacheString was null");
+        Preconditions.checkNotNull(fileName, "fileName was null");
+        Preconditions.checkNotNull(contents, "contents was null");
+        // Get the pair of hashed cacheString and gist URL from the given key. If key is missing, this will be null
+        final Pair<String, String> hashGist = this.gistCache.getIfPresent(key);
+        // Compute the hash of the given cacheString. This has a cost, but saves on memory required to store long
+        // strings
+        final String hash = Hashing.md5().hashUnencodedChars(cacheString).toString();
+        // If the cache didn't have anything or if the hashes are no longer equal
+        if (hashGist == null || !hash.equals(hashGist.getLeft())) {
+            // First, let's invalidate the key, since it is no longer valid
+            this.gistCache.invalidate(key);
+            // Now, let's gist and return the URL or error message
+            return this.gist(fileName, contents);
+        } else { // What if cache was not kill?
+            // Return the cached gist URL
+            return hashGist.getRight();
+        }
+    }
+
     @NotNull
     public Client getBot() {
         return this.bot;
@@ -264,44 +304,33 @@ public class TheHumanity {
     /**
      * Gists the given contents under the given file name. This returns the URL to the Gist or a string of the following
      * format: "An error occurred: [error message]"
-     * <p/>
-     * The given ID is used for caching purposes. The cacheString should be a String that identifies the contents. If
-     * cacheString changes, then the current cache for the given ID will be invalidated, and a new Gist will be made.
      *
-     * @param id          ID of this cached gist
-     * @param cacheString Identifier for the contents
-     * @param fileName    Filename for the contents
-     * @param contents    Contents of the Gist
+     * @param fileName Filename for the contents
+     * @param contents Contents of the Gist
      * @return URL of Gist or error message
      */
     @NotNull
-    public String gist(@NotNull final String id, @NotNull final String cacheString, @NotNull final String fileName, @NotNull final String contents) {
-        Preconditions.checkNotNull(id, "id was null");
-        Preconditions.checkNotNull(cacheString, "cacheString was null");
-        Preconditions.checkNotNull(fileName, "fileName was null");
-        Preconditions.checkNotNull(contents, "contents was null");
-        final Pair<String, String> hashGist = this.gistCache.get(id);
-        final String hash = Hashing.md5().hashUnencodedChars(cacheString).toString();
-        if (hashGist == null || !hash.equals(hashGist.getLeft())) {
-            final StringWriter sw = new StringWriter();
-            final JSONWriter jw = new JSONWriter(sw);
-            jw.object().key("files")
-                .object().key(fileName)
-                .object().key("content").value(contents)
-                .endObject().endObject().endObject();
-            try {
-                final HttpResponse<JsonNode> response = Unirest
-                    .post("https://api.github.com/gists")
-                    .body(sw.toString())
-                    .asJson();
-                final String gist = response.getBody().getObject().getString("html_url");
-                this.gistCache.put(id, new Pair<>(hash, gist));
-                return gist;
-            } catch (final UnirestException ex) {
-                return "An error occurred: " + ex.getMessage();
-            }
-        } else {
-            return hashGist.getRight();
+    public String gist(@NotNull final String fileName, @NotNull final String contents) {
+        // Let's gist the contents using the given fileName.
+        // Make a StringWriter to turn this JSON into a String, easily
+        final StringWriter sw = new StringWriter();
+        final JSONWriter jw = new JSONWriter(sw);
+        // Create the gist object for sending to the API
+        jw.object().key("files")
+            .object().key(fileName)
+            .object().key("content").value(contents)
+            .endObject().endObject().endObject();
+        try {
+            // POST the gist object to the appropriate API URL and grab the response as JSON
+            final HttpResponse<JsonNode> response = Unirest
+                .post("https://api.github.com/gists")
+                .body(sw.toString())
+                .asJson();
+            // This should be the URL at which the gist can be accessed. Will throw exception if key isn't present
+            // Finally, let's give the caller the URL to the gist
+            return response.getBody().getObject().getString("html_url");
+        } catch (final UnirestException | JSONException ex) {
+            return "An error occurred: " + ex.getMessage();
         }
     }
 
