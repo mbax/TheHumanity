@@ -78,7 +78,7 @@ final class BaseListeners {
 
     @Handler
     public void onJoin(final ChannelJoinEvent e) {
-        if (e.getChannel().getUsers().size() < 1) e.getChannel().part("Alone.");
+        if (e.getChannel().getNicknames().size() < 1) e.getChannel().part("Alone.");
         if (!e.getActor().getNick().equals(this.humanity.getBot().getNick())) return;
         this.humanity.getLogger().info("Joined " + e.getChannel().getName() + ".");
     }
@@ -90,7 +90,7 @@ final class BaseListeners {
 
     @Handler
     public void onPart(final ChannelPartEvent e) {
-        if (e.getChannel().getUsers().size() <= 2) e.getChannel().part("Alone.");
+        if (e.getChannel().getNicknames().size() <= 2) e.getChannel().part("Alone.");
         if (!e.getActor().getNick().equals(this.humanity.getBot().getNick())) return;
         this.humanity.getLogger().info("Parted from " + e.getChannel().getName() + ".");
     }

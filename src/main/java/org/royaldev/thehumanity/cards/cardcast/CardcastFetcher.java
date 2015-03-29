@@ -28,6 +28,8 @@ public class CardcastFetcher {
     private static final String CARDS_URL = CardcastFetcher.INFO_URL + "/cards";
     private final String id;
     private String name;
+    private String description;
+    private String author;
 
     /**
      * Constructs a new fether for the given Cardcast ID.
@@ -101,6 +103,8 @@ public class CardcastFetcher {
         }
         final JSONObject root = hr.getBody().getObject();
         final CardPack cp = new CardPack(this.name);
+        cp.setDescription(this.description);
+        cp.setAuthor(this.author);
         this.addCards(cp, this.getWhiteCards(cp, root.getJSONArray("responses")));
         this.addCards(cp, this.getBlackCards(cp, root.getJSONArray("calls")));
         return cp;
@@ -113,11 +117,17 @@ public class CardcastFetcher {
         final HttpResponse<JsonNode> hr;
         try {
             hr = Unirest.get(String.format(CardcastFetcher.INFO_URL, this.id)).asJson();
-        } catch (UnirestException e) {
-            e.printStackTrace();
+        } catch (final UnirestException ex) {
+            ex.printStackTrace();
             return;
         }
-        this.name = hr.getBody().getObject().getString("name");
+        final JSONObject info = hr.getBody().getObject();
+        this.name = info.optString("name", this.id);
+        this.description = info.optString("description");
+        final JSONObject authorInfo = info.optJSONObject("author");
+        if (authorInfo != null) {
+            this.author = authorInfo.optString("username");
+        }
     }
 
     /**
@@ -143,8 +153,10 @@ public class CardcastFetcher {
     public String toString() {
         return MoreObjects.toStringHelper(this)
             .omitNullValues()
-            .add("id", id)
-            .add("name", name)
+            .add("id", this.id)
+            .add("name", this.name)
+            .add("description", this.description)
+            .add("author", this.author)
             .toString();
     }
 

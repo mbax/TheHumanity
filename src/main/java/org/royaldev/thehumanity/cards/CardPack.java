@@ -51,9 +51,13 @@ public class CardPack {
      *
      * @param c Card to add
      * @throws java.lang.IllegalArgumentException If card wasn't a white card or black card.
+     * @throws IllegalArgumentException If card didn't belong to this pack
      */
     public void addCard(@NotNull final Card c) {
         Preconditions.checkNotNull(c, "c was null");
+        if (!c.getCardPack().equals(this)) {
+            throw new IllegalArgumentException("Card did not belong to this CardPack");
+        }
         if (c instanceof BlackCard) this.blackCards.add((BlackCard) c);
         else if (c instanceof WhiteCard) this.whiteCards.add((WhiteCard) c);
         else throw new IllegalArgumentException("Unknown card type!");

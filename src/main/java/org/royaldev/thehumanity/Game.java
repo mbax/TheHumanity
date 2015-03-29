@@ -159,9 +159,9 @@ public class Game {
     @NotNull
     public String antiPing(@NotNull String message) {
         Preconditions.checkNotNull(message, "message was null");
-        for (final User u : this.channel.getUsers().keySet()) {
-            if (u.getNick().length() <= 1) continue;
-            message = message.replace(u.getNick(), u.getNick().substring(0, 1) + "\u200b" + u.getNick().substring(1));
+        for (final String nickname : this.channel.getNicknames()) {
+            if (nickname.length() <= 1) continue;
+            message = message.replace(nickname, nickname.substring(0, 1) + "\u200b" + nickname.substring(1));
         }
         return message;
     }
@@ -356,8 +356,8 @@ public class Game {
     public Player getPlayer(final String name) {
         if (name == null) return null;
         return this.getPlayer(
-            this.channel.getUsers().keySet().stream()
-                .filter(u -> u.getNick().equalsIgnoreCase(name))
+            this.channel.getNicknames().stream()
+                .filter(nickname -> nickname.equalsIgnoreCase(name))
                 .findFirst()
                 .orElse(null)
         );
@@ -744,7 +744,7 @@ public class Game {
     public void updateUsers() {
         this.getHistoricPlayers().stream()
             .forEach(p -> {
-                    final User newUser = this.channel.getUsers().keySet().stream()
+                    final User newUser = this.channel.getUsers().stream()
                         .filter(u -> u.getNick().equalsIgnoreCase(p.getUser().getNick()))
                         .findFirst()
                         .orElse(null);

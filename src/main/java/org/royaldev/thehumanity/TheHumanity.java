@@ -17,7 +17,6 @@ import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.ClientBuilder;
 import org.kitteh.irc.client.library.EventManager;
 import org.kitteh.irc.client.library.element.Channel;
-import org.kitteh.irc.client.library.element.ChannelUserMode;
 import org.kitteh.irc.client.library.element.User;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -58,7 +57,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Formatter;
@@ -340,8 +338,7 @@ public class TheHumanity {
     public boolean hasChannelMode(@NotNull final Channel c, @NotNull final User u, final char mode) {
         Preconditions.checkNotNull(c, "Channel was null");
         Preconditions.checkNotNull(u, "User was null");
-        final Map<User, Set<ChannelUserMode>> users = c.getUsers();
-        return users.containsKey(u) && users.get(u).stream().anyMatch(m -> m.getMode() == mode);
+        return c.getUserModes(u.getNick()).stream().anyMatch(m -> m.getMode() == mode);
     }
 
     public boolean usersMatch(@NotNull final User u, @NotNull final User u2) {

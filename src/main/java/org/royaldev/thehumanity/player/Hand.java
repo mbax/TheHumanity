@@ -65,7 +65,7 @@ public class Hand<T extends Card> implements Iterable<T> {
         final int index;
         try {
             index = Integer.parseInt(indexString);
-        } catch (NumberFormatException ex) {
+        } catch (final NumberFormatException ex) {
             throw new NumberFormatException(ex.getMessage());
         }
         return this.getCard(index - 1);
