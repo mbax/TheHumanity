@@ -37,7 +37,7 @@ public class Game {
     /**
      * A list of all the players that have ever played in this game.
      */
-    private final List<Player> allPlayers = Collections.synchronizedList(new ArrayList<>());
+    private final List<Player> historicPlayers = Collections.synchronizedList(new ArrayList<>());
     private final Deck deck;
     private final List<HouseRule> houseRules = new ArrayList<>();
     private final Player randoCardrissian = new Player(new FakeUser("Rando Cardrissian"));
@@ -77,7 +77,7 @@ public class Game {
         Preconditions.checkNotNull(hr, "hr was null");
         switch (hr) {
             case RANDO_CARDRISSIAN:
-                this.allPlayers.add(this.randoCardrissian);
+                this.historicPlayers.add(this.randoCardrissian);
                 break;
         }
     }
@@ -119,8 +119,8 @@ public class Game {
             synchronized (this.players) {
                 this.players.add(player);
             }
-            synchronized (this.allPlayers) {
-                this.allPlayers.add(player);
+            synchronized (this.historicPlayers) {
+                this.historicPlayers.add(player);
             }
         }
         this.update();
@@ -279,7 +279,7 @@ public class Game {
      */
     @NotNull
     public List<Player> getHistoricPlayers() {
-        return this.allPlayers;
+        return this.historicPlayers;
     }
 
     /**
@@ -517,7 +517,7 @@ public class Game {
     public boolean removeCardPack(final CardPack cp, final boolean sweep) {
         if (!this.deck.removeCardPack(cp)) return false;
         if (!sweep) return true;
-        this.allPlayers.forEach(p -> {
+        this.historicPlayers.forEach(p -> {
             if (!p.getHand().removeCards(cp.getWhiteCards())) return;
             this.deal(p);
             p.getUser().sendNotice("Your hand has changed as a result of card pack changes. Here's your new hand!");
@@ -590,9 +590,9 @@ public class Game {
      */
     public boolean setOldUserData(final Player newPlayer) {
         final Player oldPlayer;
-        synchronized (this.allPlayers) {
-            if (this.allPlayers.contains(newPlayer)) {
-                oldPlayer = this.allPlayers.get(this.allPlayers.indexOf(newPlayer));
+        synchronized (this.historicPlayers) {
+            if (this.historicPlayers.contains(newPlayer)) {
+                oldPlayer = this.historicPlayers.get(this.historicPlayers.indexOf(newPlayer));
             } else return false;
         }
         final Hand<WhiteCard> hand = newPlayer.getHand();
@@ -650,8 +650,8 @@ public class Game {
      */
     public void showScores() {
         final Map<Player, Integer> scores = new HashMap<>();
-        synchronized (this.allPlayers) {
-            this.allPlayers.stream().forEach(p -> scores.put(p, p.getScore()));
+        synchronized (this.historicPlayers) {
+            this.historicPlayers.stream().forEach(p -> scores.put(p, p.getScore()));
         }
         final Map<Player, Integer> sortedScores = new TreeMap<>(new DescendingValueComparator<>(scores));
         sortedScores.putAll(scores);
@@ -707,7 +707,7 @@ public class Game {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("allPlayers", this.allPlayers)
+            .add("historicPlayers", this.historicPlayers)
             .add("players", this.players)
             .add("deck", this.deck)
             .add("houseRules", this.houseRules)
