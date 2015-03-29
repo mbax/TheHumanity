@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 )
 public class HelpCommand extends NoticeableCommand {
 
+    private static final String GIST_ID = "thehumanity:help";
     private final TheHumanity humanity;
 
     public HelpCommand(final TheHumanity instance) {
@@ -47,6 +48,6 @@ public class HelpCommand extends NoticeableCommand {
                 sb.append("**Aliases:** ").append(String.join(", ", ic.getAliases())).append("\n");
             }
         }
-        this.notice(u, this.humanity.cachedGist("help", this.getNames(), "help.md", sb.toString()));
+        this.notice(u, this.humanity.cachedGist(HelpCommand.GIST_ID, this.getNames(), "help.md", sb.toString()));
     }
 }

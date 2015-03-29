@@ -22,6 +22,7 @@ public class PacksCommand extends IRCCommand {
 
     private static final DecimalFormat df = new DecimalFormat("0.##%");
     private static final Random r = new Random();
+    private static final String GIST_ID = "thehumanity:packs";
     private final TheHumanity humanity;
 
     public PacksCommand(final TheHumanity instance) {
@@ -76,6 +77,6 @@ public class PacksCommand extends IRCCommand {
         for (final CardPack cp : this.humanity.getLoadedCardPacks()) {
             sb.append(this.generateCardPackMarkdown(cp));
         }
-        ConversionHelper.respond(event, this.humanity.cachedGist("packs", allPackNames, "packs.md", sb.toString()));
+        ConversionHelper.respond(event, this.humanity.cachedGist(PacksCommand.GIST_ID, allPackNames, "packs.md", sb.toString()));
     }
 }
