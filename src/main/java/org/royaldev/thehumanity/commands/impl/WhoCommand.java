@@ -61,7 +61,7 @@ public class WhoCommand extends NoticeableCommand {
         final boolean isChannelMessage = event instanceof ChannelMessageEvent;
         final Game game = isChannelMessage
             ? this.humanity.getGameFor(((ChannelMessageEvent) event).getChannel())
-            : this.humanity.getGameFor(event.getActor());
+            : this.humanity.getGameFor(u);
         if (game == null) {
             this.notice(u, isChannelMessage ? "No game in progress." : "You're not in a game.");
             return;
