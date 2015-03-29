@@ -5,13 +5,14 @@ import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
+import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 import org.royaldev.thehumanity.Game;
 import org.royaldev.thehumanity.Round;
 import org.royaldev.thehumanity.Round.RoundStage;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.Command;
-import org.royaldev.thehumanity.commands.InGameCommand;
+import org.royaldev.thehumanity.commands.NoticeableCommand;
 import org.royaldev.thehumanity.player.Player;
 import org.royaldev.thehumanity.util.ConversionHelper;
 
@@ -19,10 +20,12 @@ import org.royaldev.thehumanity.util.ConversionHelper;
     name = "who",
     description = "Shows the players in this game and their status."
 )
-public class WhoCommand extends InGameCommand {
+public class WhoCommand extends NoticeableCommand {
 
-    public WhoCommand(final TheHumanity instance) {
-        super(instance);
+    protected final TheHumanity humanity;
+
+    public WhoCommand(final TheHumanity humanity) {
+        this.humanity = humanity;
     }
 
     /**
@@ -53,8 +56,24 @@ public class WhoCommand extends InGameCommand {
     }
 
     @Override
-    public void onInGameCommand(@NotNull final ActorEvent<User> event, final CallInfo ci, @NotNull final Game game, @NotNull final Player player, @NotNull final String[] args) {
-        final User u = player.getUser();
+    public void onCommand(@NotNull final ActorEvent<User> event, @NotNull final CallInfo ci, @NotNull final String[] args) {
+        final User u = event.getActor();
+        final Game game;
+
+        if (event instanceof ChannelMessageEvent) {
+            game = this.humanity.getGameFor(((ChannelMessageEvent) event).getChannel());
+            if (game == null) {
+                this.notice(u, "No game in progress.");
+                return;
+            }
+        } else {
+            game = this.humanity.getGameFor(event.getActor());
+            if (game == null) {
+                this.notice(event.getActor(), "You're not in a game.");
+                return;
+            }
+        }
+
         final Round r = game.getCurrentRound();
         if (r == null || r.getCurrentStage() != RoundStage.WAITING_FOR_CZAR && r.getCurrentStage() != RoundStage.WAITING_FOR_PLAYERS) {
             this.notice(u, "The game has not yet started.");
