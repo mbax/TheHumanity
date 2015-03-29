@@ -1,0 +1,16 @@
+language: java
+
+script: "mvn -U clean package"
+
+jdk:
+  - oraclejdk8
+
+notifications:
+  email: false
+  irc:
+    channels:
+      - "irc.esper.net#CAHdev"
+    on_success: change
+    on_failure: always
+    template:
+      - "%{repository} (%{branch}:%{commit} by %{author}): %{message} (%{build_url})"
