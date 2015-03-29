@@ -59,7 +59,6 @@ public class WhoCommand extends NoticeableCommand {
     public void onCommand(@NotNull final ActorEvent<User> event, @NotNull final CallInfo ci, @NotNull final String[] args) {
         final User u = event.getActor();
         final Game game;
-
         if (event instanceof ChannelMessageEvent) {
             game = this.humanity.getGameFor(((ChannelMessageEvent) event).getChannel());
             if (game == null) {
@@ -73,7 +72,6 @@ public class WhoCommand extends NoticeableCommand {
                 return;
             }
         }
-
         final Round r = game.getCurrentRound();
         if (r == null || r.getCurrentStage() != RoundStage.WAITING_FOR_CZAR && r.getCurrentStage() != RoundStage.WAITING_FOR_PLAYERS) {
             this.notice(u, "The game has not yet started.");
