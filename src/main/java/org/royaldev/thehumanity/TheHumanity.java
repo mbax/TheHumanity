@@ -311,6 +311,9 @@ public class TheHumanity {
      */
     @NotNull
     public String gist(@NotNull final String fileName, @NotNull final String contents) {
+        // Ensure nothing is null
+        Preconditions.checkNotNull(fileName, "fileName was null");
+        Preconditions.checkNotNull(contents, "contents was null");
         // Let's gist the contents using the given fileName.
         // Make a StringWriter to turn this JSON into a String, easily
         final StringWriter sw = new StringWriter();
