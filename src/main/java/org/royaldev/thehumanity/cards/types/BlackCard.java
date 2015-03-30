@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.royaldev.thehumanity.cards.Card;
-import org.royaldev.thehumanity.cards.CardPack;
+import org.royaldev.thehumanity.cards.packs.CardPack;
 import org.royaldev.thehumanity.cards.Play;
 
 import java.util.regex.Matcher;

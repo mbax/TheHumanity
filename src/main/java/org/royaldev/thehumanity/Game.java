@@ -8,7 +8,7 @@ import org.kitteh.irc.client.library.IRCFormat;
 import org.kitteh.irc.client.library.element.Channel;
 import org.kitteh.irc.client.library.element.User;
 import org.royaldev.thehumanity.Round.RoundStage;
-import org.royaldev.thehumanity.cards.CardPack;
+import org.royaldev.thehumanity.cards.packs.CardPack;
 import org.royaldev.thehumanity.cards.Deck;
 import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;

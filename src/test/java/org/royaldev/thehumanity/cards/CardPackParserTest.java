@@ -1,6 +1,7 @@
 package org.royaldev.thehumanity.cards;
 
 import org.junit.Test;
+import org.royaldev.thehumanity.cards.packs.CardPackParser;
 
 import java.util.List;
 

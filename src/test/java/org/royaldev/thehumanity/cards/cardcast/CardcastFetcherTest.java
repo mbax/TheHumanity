@@ -3,7 +3,8 @@ package org.royaldev.thehumanity.cards.cardcast;
 import org.junit.Test;
 import org.royaldev.thehumanity.CardHelper;
 import org.royaldev.thehumanity.cards.Card;
-import org.royaldev.thehumanity.cards.CardPack;
+import org.royaldev.thehumanity.cards.packs.CardPack;
+import org.royaldev.thehumanity.cards.packs.MemoryCardPack;
 
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -17,7 +18,7 @@ public class CardcastFetcherTest {
     private final CardcastFetcher ccf = new CardcastFetcher("XWUGF");
 
     private CardPack makeTestCardPack() {
-        final CardPack cp = new CardPack("TheHumanity Local Test Pack");
+        final CardPack cp = new MemoryCardPack("TheHumanity Local Test Pack");
         CardHelper.makeBlackCards(
             cp,
             "_ made the unit test for _.",

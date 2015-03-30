@@ -2,6 +2,7 @@ package org.royaldev.thehumanity.cards;
 
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
+import org.royaldev.thehumanity.cards.packs.CardPack;
 
 /**
  * A card in general.

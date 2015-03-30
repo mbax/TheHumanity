@@ -5,8 +5,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.royaldev.thehumanity.CardHelper;
-import org.royaldev.thehumanity.cards.CardPack;
 import org.royaldev.thehumanity.cards.Play;
+import org.royaldev.thehumanity.cards.packs.MemoryCardPack;
 import org.royaldev.thehumanity.player.Player;
 
 import static org.junit.Assert.assertEquals;

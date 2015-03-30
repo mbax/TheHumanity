@@ -1,7 +1,8 @@
 package org.royaldev.thehumanity;
 
-import org.royaldev.thehumanity.cards.CardPack;
+import org.royaldev.thehumanity.cards.packs.CardPack;
 import org.royaldev.thehumanity.cards.Deck;
+import org.royaldev.thehumanity.cards.packs.MemoryCardPack;
 import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
 
@@ -13,7 +14,7 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 
 public final class CardHelper {
 
-    private static final CardPack cp = mock(CardPack.class);
+    private static final CardPack cp = mock(MemoryCardPack.class);
 
     public static BlackCard makeBlackCard(final CardPack cp, final String text) {
         return new BlackCard(cp, text);
@@ -32,7 +33,7 @@ public final class CardHelper {
     }
 
     public static CardPack makeCardPack(final String name, final List<String> whiteCards, final List<String> blackCards) {
-        final CardPack cp = new CardPack(name);
+        final CardPack cp = new MemoryCardPack(name);
         whiteCards.stream().map(text -> CardHelper.makeWhiteCard(cp, text)).forEach(cp::addCard);
         blackCards.stream().map(text -> CardHelper.makeBlackCard(cp, text)).forEach(cp::addCard);
         return cp;

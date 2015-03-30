@@ -4,6 +4,8 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.royaldev.thehumanity.cards.packs.CardPack;
+import org.royaldev.thehumanity.cards.packs.MemoryCardPack;
 import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
 import org.royaldev.thehumanity.player.Hand;
@@ -15,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Deck class. A deck is a collection of {@link CardPack CardPacks}. When playing, the Deck pays no heed to which pack a
+ * Deck class. A deck is a collection of {@link MemoryCardPack CardPacks}. When playing, the Deck pays no heed to which pack a
  * card belongs to when dealing.
  * <p/>
  * Each game should have one deck, which contains both white and black cards. Decks are repopulating,

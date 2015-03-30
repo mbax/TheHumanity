@@ -6,6 +6,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.royaldev.thehumanity.CardHelper;
+import org.royaldev.thehumanity.cards.packs.CardPack;
+import org.royaldev.thehumanity.cards.packs.MemoryCardPack;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -20,7 +22,7 @@ public class CardPackTest {
 
     @Before
     public void setUp() throws Exception {
-        this.cp = new CardPack(CardPackTest.NAME);
+        this.cp = new MemoryCardPack(CardPackTest.NAME);
     }
 
     @After
@@ -54,7 +56,7 @@ public class CardPackTest {
         this.thrown.expect(IllegalArgumentException.class);
         this.thrown.expectMessage("Card did not belong to this CardPack");
         // Try adding a card that doesn't belong to this pack. Should throw an exception
-        this.cp.addCard(CardHelper.makeWhiteCard(new CardPack("Not the same pack"), "Some card"));
+        this.cp.addCard(CardHelper.makeWhiteCard(new MemoryCardPack("Not the same pack"), "Some card"));
     }
 
     @Test
@@ -88,11 +90,11 @@ public class CardPackTest {
         // The extension should be removed
         assertEquals(
             "My.Dog",
-            CardPack.getNameFromFileName("My.Dog.cards")
+            MemoryCardPack.getNameFromFileName("My.Dog.cards")
         );
         assertEquals(
             "My.Dog",
-            CardPack.getNameFromFileName("My.Dog.derpherp")
+            MemoryCardPack.getNameFromFileName("My.Dog.derpherp")
         );
     }
 }

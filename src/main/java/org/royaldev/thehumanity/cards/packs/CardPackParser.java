@@ -1,4 +1,4 @@
-package org.royaldev.thehumanity.cards;
+package org.royaldev.thehumanity.cards.packs;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -44,12 +44,16 @@ public class CardPackParser {
      * @return List of names
      */
     @NotNull
-    public static List<String> getListOfCardPackNames(final String[] args) {
+    public static List<String> getListOfCardPackNames(final String[] args, final String[] defaultPacks) {
         final List<String> names = Lists.newArrayList();
         final String joined = Joiner.on(' ').join(args);
         final Matcher m = CardPackParser.cardPackArgumentPattern.matcher(joined);
         while (m.find()) {
             String name = m.group(1).replaceAll("(\\\\(?!\\s))", "");
+            if (name.equalsIgnoreCase("default") || name.equalsIgnoreCase("defaults")) {
+                names.addAll(Arrays.asList(defaultPacks));
+                continue;
+            }
             if (name.length() > 1 && (name.startsWith("\"") && name.endsWith("\"") || name.startsWith("'") && name.endsWith("'"))) {
                 name = name.substring(1, name.length() - 1);
             }
@@ -77,7 +81,7 @@ public class CardPackParser {
             this.humanity.getLogger().warning("Cannot read " + f.getName() + ".");
             return null;
         }
-        final CardPack cp = new CardPack(CardPack.getNameFromFileName(f.getName()));
+        final CardPack cp = new MemoryCardPack(MemoryCardPack.getNameFromFileName(f.getName()));
         try (final BufferedReader br = new BufferedReader(new FileReader(f))) {
             String line;
             ParseStage ps = ParseStage.METADATA;
