@@ -13,7 +13,7 @@ notifications:
     nick:
       - secure: "hh4R3Ada/Z+dNHizbhnaCtBA9s3F1OgS2Hf+dYm2S5Hyv/+9bkpNpJknSnVLk2hBNRk9wPLCLKJKLZTl6KQpSogkSnhh5cB0XeYC+w01gt7+gDGPmySkqMfqgGuUoiVeMiGAXPLVJ9F3FPMlu/lUAz3YigrkUNA59F9FIESEYsc="
     password:
-      - secure: "W4aY8bPN5z7OEKTDWspWsFQ3Aj9itUzzFRypwP2RIMyx7vdwjU6FEWonACNXVIrZM3dyBtH8Z1eOC/dp6NllkinQckOK9t8N7g/YbG6mpQUbViz7rKe+F959kglTM8M1zbQmXPk5xzkshwpUbfMiixwoC45okOp9P6PUc9WNZfg="
+      - secure: "O1iZtD6VTewU80cHMHnahgZk2MytK6733xTtXKFU2Zm4SIblkvns8FpGxKzUpvpRhzOf4bq6EeA5fpDcZEsOU0XEsD4JSwZjwpS15d6PX4/66LgKtB5+rVFDne4RWgpNwO6WhjZlO7G/d/ITgYS4jZxIN/y59hJv/IeQ+KPN4lE="
     on_success: always
     on_failure: always
     template:

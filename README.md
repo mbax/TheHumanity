@@ -1,6 +1,8 @@
 TheHumanity
 ===========
 
+[![Build Status](https://travis-ci.org/RoyalDev/TheHumanity.svg?branch=newkitteh)](https://travis-ci.org/RoyalDev/TheHumanity)
+
 *Oh, the humanity!*
 
 An IRC bot for Cards Against Humanity.
