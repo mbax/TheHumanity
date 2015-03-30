@@ -356,8 +356,8 @@ public class Game {
     public Player getPlayer(final String name) {
         if (name == null) return null;
         return this.getPlayer(
-            this.channel.getNicknames().stream()
-                .filter(nickname -> nickname.equalsIgnoreCase(name))
+            this.channel.getUsers().stream()
+                .filter(user -> user.getNick().equalsIgnoreCase(name))
                 .findFirst()
                 .orElse(null)
         );
