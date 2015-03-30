@@ -36,5 +36,4 @@ package
 # Files for testing
 /start.sh
 /dev.sh
-jssecacerts
 pid

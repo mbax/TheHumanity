@@ -5,25 +5,6 @@
     <artifactId>TheHumanity</artifactId>
     <version>2.0.0-SNAPSHOT</version>
     <name>TheHumanity</name>
-    <profiles>
-        <profile>
-            <id>travis</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <version>2.18.1</version>
-                        <configuration>
-                            <excludes>
-                                <exclude>**/CardcastFetcherTest.class</exclude>
-                            </excludes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
     <build>
         <finalName>${project.name}-${project.version}</finalName>
         <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
