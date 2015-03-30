@@ -2,6 +2,7 @@ package org.royaldev.thehumanity.cards;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.royaldev.thehumanity.TheHumanity;
@@ -15,6 +16,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -22,12 +26,36 @@ import java.util.stream.Collectors;
  */
 public class CardPackParser {
 
+    private static final Pattern cardPackArgumentPattern = Pattern.compile("(\".+?(?<!\\\\)\"|'.+?(?<!\\\\)'|\\S+)");
     @NotNull
     private final TheHumanity humanity;
 
     public CardPackParser(@NotNull final TheHumanity humanity) {
         Preconditions.checkNotNull(humanity, "humanity was null");
         this.humanity = humanity;
+    }
+
+    /**
+     * Takes arguments, usually passed to a command, for a list of CardPacks, then converts them into a list of names.
+     * This supports quoted card packs to allow spaces and quotes.
+     * <p>See <a href="http://rubular.com/r/XYxY0EFyLt">this</a> regex.
+     *
+     * @param args Array of arguments
+     * @return List of names
+     */
+    @NotNull
+    public static List<String> getListOfCardPackNames(final String[] args) {
+        final List<String> names = Lists.newArrayList();
+        final String joined = Joiner.on(' ').join(args);
+        final Matcher m = CardPackParser.cardPackArgumentPattern.matcher(joined);
+        while (m.find()) {
+            String name = m.group(1).replaceAll("(\\\\(?!\\s))", "");
+            if (name.length() > 1 && (name.startsWith("\"") && name.endsWith("\"") || name.startsWith("'") && name.endsWith("'"))) {
+                name = name.substring(1, name.length() - 1);
+            }
+            names.add(name);
+        }
+        return names;
     }
 
     /**

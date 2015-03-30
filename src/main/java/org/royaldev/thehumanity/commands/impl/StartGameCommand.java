@@ -7,6 +7,7 @@ import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 import org.royaldev.thehumanity.Game;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.cards.CardPack;
+import org.royaldev.thehumanity.cards.CardPackParser;
 import org.royaldev.thehumanity.cards.cardcast.CardcastFetcher;
 import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.Command;
@@ -60,7 +61,7 @@ public class StartGameCommand extends NoticeableCommand {
     private List<CardPack> getCardPacks(final String[] args) {
         final List<CardPack> cardPacks = new ArrayList<>();
         boolean useDefaults = false;
-        for (final String cardPack : args) {
+        for (final String cardPack : CardPackParser.getListOfCardPackNames(args)) {
             if ("default".equalsIgnoreCase(cardPack)) {
                 useDefaults = true;
                 continue;
