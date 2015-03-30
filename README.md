@@ -1,7 +1,7 @@
 TheHumanity
 ===========
 
-[![Build Status](https://travis-ci.org/RoyalDev/TheHumanity.svg?branch=newkitteh)](https://travis-ci.org/RoyalDev/TheHumanity)
+[![Build Status](https://travis-ci.org/RoyalDev/TheHumanity.svg?branch=master)](https://travis-ci.org/RoyalDev/TheHumanity)
 
 *Oh, the humanity!*
 
