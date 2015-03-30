@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
 import org.royaldev.thehumanity.TheHumanity;
-import org.royaldev.thehumanity.cards.CardPack;
+import org.royaldev.thehumanity.cards.packs.CardPack;
 import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.Command;
 import org.royaldev.thehumanity.commands.IRCCommand;
@@ -60,8 +60,12 @@ public class PacksCommand extends IRCCommand {
         sb.append("|Total cards|").append(totalCards).append("|\n");
         sb.append("|Black cards|").append(blackCards).append(" (").append(PacksCommand.df.format((double) blackCards / (double) totalCards)).append(")|\n");
         sb.append("|White cards|").append(whiteCards).append(" (").append(PacksCommand.df.format((double) whiteCards / (double) totalCards)).append(")|\n");
-        sb.append("|Random black card|").append("```").append(cp.getBlackCards().get(PacksCommand.r.nextInt(blackCards))).append("```|\n");
-        sb.append("|Random white card|").append("```").append(cp.getWhiteCards().get(PacksCommand.r.nextInt(whiteCards))).append("```|\n");
+        if (cp.getBlackCards().size() > 0) {
+            sb.append("|Random black card|").append("```").append(cp.getBlackCards().get(PacksCommand.r.nextInt(blackCards))).append("```|\n");
+        }
+        if (cp.getWhiteCards().size() > 0) {
+            sb.append("|Random white card|").append("```").append(cp.getWhiteCards().get(PacksCommand.r.nextInt(whiteCards))).append("```|\n");
+        }
         return sb.toString();
     }
 
