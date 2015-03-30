@@ -7,6 +7,8 @@ jdk:
 
 notifications:
   email: false
+  webhooks:
+    - secure: "Hvvd0IkBRrJAbZ22DqUuZsoDyMtou49Fpak4KFHvK+N2bGOsnsPt8MgyJ5IqRGBcW5AMgEZTRhG1nRc294QfDV3dza9MoZbHGR20m4jZspAz0+UHD57o/H2Tyh2W6yGCHbHc2XthrNzIJcRVFVIHApk9fqetqehjlh8euo/SyDg="
   irc:
     channels:
       - secure: "hNFprAL62g7kmKXpFS4ICLqmL0tGO/18yfqR87vajLxv9NNCwulMol/2AUB2qSd9rhLPkw/bZAnnRCeoHDI7CD1vTRD7cIWCq90OvyGgssonjfaTc3ghRTwaGHOgtsk0GhhNffif90ZHtqyvIIjDtn20gfwgMK3tJTU3b0FMZWo="
