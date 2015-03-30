@@ -50,7 +50,7 @@ public class CardPack {
      * Adds a card to this pack. Only {@link WhiteCard WhiteCards} and {@link BlackCard BlackCards} are accepted.
      *
      * @param c Card to add
-     * @throws java.lang.IllegalArgumentException If card wasn't a white card or black card.
+     * @throws IllegalArgumentException If card wasn't a white card or black card.
      * @throws IllegalArgumentException If card didn't belong to this pack
      */
     public void addCard(@NotNull final Card c) {
