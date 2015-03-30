@@ -19,8 +19,8 @@ public class BlackCardTest {
 
     @Before
     public void setUp() throws Exception {
-        this.oneBlank = new BlackCard(mock(CardPack.class), "Who is the guy? _");
-        this.twoBlanks = new BlackCard(mock(CardPack.class), "Who are the guys? _ _");
+        this.oneBlank = new BlackCard(mock(MemoryCardPack.class), "Who is the guy? _");
+        this.twoBlanks = new BlackCard(mock(MemoryCardPack.class), "Who are the guys? _ _");
     }
 
     @After

@@ -3,6 +3,9 @@ package org.royaldev.thehumanity.cards.cardcast;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -13,11 +16,15 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.royaldev.thehumanity.cards.Card;
 import org.royaldev.thehumanity.cards.packs.CardPack;
+import org.royaldev.thehumanity.cards.packs.CardcastCardPack;
 import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class the creates CardPacks based on Cardcast IDs.
@@ -30,16 +37,47 @@ public class CardcastFetcher {
     private String name;
     private String description;
     private String author;
+    // Cache these, in case someone tries to download them shortly after
+    private static final LoadingCache<String, CardcastCardPack> cache = CacheBuilder.newBuilder()
+        .expireAfterWrite(12L, TimeUnit.HOURS)
+        .build(new CacheLoader<String, CardcastCardPack>() {
+            @Override
+            public CardcastCardPack load(@NotNull final String key) throws Exception {
+                return new CardcastFetcher(key).buildCardPack();
+            }
+        });
+
+    public static void invalidateCacheFor(final String... cardcastIDs) {
+        CardcastFetcher.cache.invalidateAll(Arrays.asList(cardcastIDs));
+    }
 
     /**
-     * Constructs a new fether for the given Cardcast ID.
+     * Constructs a new fetcher for the given Cardcast ID.
      *
      * @param id ID of the Cardcast pack
      */
     public CardcastFetcher(@NotNull final String id) {
         Preconditions.checkNotNull(id, "id was null");
-        this.id = id;
+        this.id = id.toUpperCase(); // Standardize uppercase for cache purposes
         this.getInfo();
+    }
+
+    /**
+     * Builds a CardPack for storage in the cache.
+     *
+     * @return CardPack, never null
+     * @throws Exception If an error contacting Cardcast occurs
+     */
+    @NotNull
+    private CardcastCardPack buildCardPack() throws Exception {
+        final HttpResponse<JsonNode> hr = Unirest.get(String.format(CardcastFetcher.CARDS_URL, this.id)).asJson();
+        final JSONObject root = hr.getBody().getObject();
+        final CardcastCardPack cp = new CardcastCardPack(this.name, this.id);
+        cp.setDescription(this.description);
+        cp.setAuthor(this.author);
+        this.addCards(cp, this.getWhiteCards(cp, root.getJSONArray("responses")));
+        this.addCards(cp, this.getBlackCards(cp, root.getJSONArray("calls")));
+        return cp;
     }
 
     /**
@@ -94,20 +132,11 @@ public class CardcastFetcher {
      */
     @Nullable
     public CardPack getCardPack() {
-        final HttpResponse<JsonNode> hr;
         try {
-            hr = Unirest.get(String.format(CardcastFetcher.CARDS_URL, this.id)).asJson();
-        } catch (final UnirestException e) {
-            e.printStackTrace();
+            return CardcastFetcher.cache.get(this.id);
+        } catch (final ExecutionException ex) {
             return null;
         }
-        final JSONObject root = hr.getBody().getObject();
-        final CardPack cp = new CardPack(this.name);
-        cp.setDescription(this.description);
-        cp.setAuthor(this.author);
-        this.addCards(cp, this.getWhiteCards(cp, root.getJSONArray("responses")));
-        this.addCards(cp, this.getBlackCards(cp, root.getJSONArray("calls")));
-        return cp;
     }
 
     /**

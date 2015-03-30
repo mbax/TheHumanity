@@ -5,6 +5,7 @@ import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.cards.packs.CardPack;
+import org.royaldev.thehumanity.cards.packs.CardcastCardPack;
 import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.Command;
 import org.royaldev.thehumanity.commands.IRCCommand;
@@ -53,6 +54,9 @@ public class PacksCommand extends IRCCommand {
             }
             if (author != null) {
                 sb.append("|Author|").append(author).append("|\n");
+            }
+            if (cp instanceof CardcastCardPack) {
+                sb.append("|Cardcast ID|").append(((CardcastCardPack) cp).getID()).append("|\n");
             }
         }
         sb.append("### Information\n");
