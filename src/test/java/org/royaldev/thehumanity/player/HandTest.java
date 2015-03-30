@@ -3,34 +3,22 @@ package org.royaldev.thehumanity.player;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.royaldev.thehumanity.CardHelper;
 import org.royaldev.thehumanity.ReflectiveToStringHelper;
 import org.royaldev.thehumanity.ReflectiveToStringHelper.Include;
-import org.royaldev.thehumanity.cards.CardPack;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.powermock.api.mockito.PowerMockito.mock;
 
 public class HandTest {
 
-    private final CardPack cp = mock(CardPack.class);
     private Hand<WhiteCard> hand;
-
-    private WhiteCard makeWhiteCard(final String text) {
-        return new WhiteCard(this.cp, text);
-    }
-
-    private List<WhiteCard> makeWhiteCards(final String... texts) {
-        return Arrays.stream(texts).map(this::makeWhiteCard).collect(Collectors.toList());
-    }
 
     @Before
     public void setUp() throws Exception {
@@ -47,7 +35,7 @@ public class HandTest {
         // Should start with no cards
         assertSame(0, this.hand.getSize());
         // Make and add a card
-        final WhiteCard wc = this.makeWhiteCard("Zarthus");
+        final WhiteCard wc = CardHelper.makeWhiteCard("Zarthus");
         this.hand.addCard(wc);
         // Should have one card now
         assertSame(1, this.hand.getSize());
@@ -60,7 +48,7 @@ public class HandTest {
         // Should start with no cards
         assertSame(0, this.hand.getSize());
         // Make and add some cards
-        final List<WhiteCard> cards = this.makeWhiteCards("TheHumanity", "squidicuz", "nasonfish");
+        final List<WhiteCard> cards = CardHelper.makeWhiteCards("TheHumanity", "squidicuz", "nasonfish");
         this.hand.addCards(cards);
         // Should have the same size
         assertSame(cards.size(), this.hand.getSize());
@@ -73,7 +61,7 @@ public class HandTest {
         // Should start with no cards
         assertSame(0, this.hand.getSize());
         // Make and add some cards
-        final List<WhiteCard> cards = this.makeWhiteCards("TheHumanity", "squidicuz", "nasonfish");
+        final List<WhiteCard> cards = CardHelper.makeWhiteCards("TheHumanity", "squidicuz", "nasonfish");
         this.hand.addCards(cards);
         // Should have the same size
         assertSame(cards.size(), this.hand.getSize());
@@ -86,7 +74,7 @@ public class HandTest {
     @Test
     public void testGetCard() throws Exception {
         // Make a card
-        final WhiteCard wc = this.makeWhiteCard("cindy_k");
+        final WhiteCard wc = CardHelper.makeWhiteCard("cindy_k");
         // Add the card
         this.hand.addCard(wc);
         // The card at index 0 should be the same as the card just added
@@ -96,7 +84,7 @@ public class HandTest {
     @Test
     public void testGetCard1() throws Exception {
         // Make a card
-        final WhiteCard wc = this.makeWhiteCard("cindy_k");
+        final WhiteCard wc = CardHelper.makeWhiteCard("cindy_k");
         // Add the card
         this.hand.addCard(wc);
         // The card at index 0 (the first card) should be the same as the card just added
@@ -106,7 +94,7 @@ public class HandTest {
     @Test
     public void testGetCards() throws Exception {
         // Make some cards
-        final List<WhiteCard> cards = this.makeWhiteCards("lol768", "CardAficionado");
+        final List<WhiteCard> cards = CardHelper.makeWhiteCards("lol768", "CardAficionado");
         // Add the cards to the hand
         this.hand.addCards(cards);
         // The hand should have the same list as that which was just added
@@ -118,7 +106,7 @@ public class HandTest {
         // There should be no cards in the hand
         assertSame(0, this.hand.getSize());
         // Make and add a new white card
-        final List<WhiteCard> wcs = this.makeWhiteCards("Kashike", "blha303");
+        final List<WhiteCard> wcs = CardHelper.makeWhiteCards("Kashike", "blha303");
         this.hand.addCards(wcs);
         // There should now cards in the hand
         assertSame(wcs.size(), this.hand.getSize());
@@ -137,7 +125,7 @@ public class HandTest {
         // There should be no cards in the hand
         assertSame(0, this.hand.getSize());
         // Make some cards and add them
-        final List<WhiteCard> cards = this.makeWhiteCards("A really cool unit test", "jkcclemens", "turt2live");
+        final List<WhiteCard> cards = CardHelper.makeWhiteCards("A really cool unit test", "jkcclemens", "turt2live");
         this.hand.addCards(cards);
         // There should now be the amount of made cards in the hand
         assertSame(cards.size(), this.hand.getSize());
@@ -161,7 +149,7 @@ public class HandTest {
             this.hand.toString()
         );
         // Make and add a card
-        this.hand.addCard(this.makeWhiteCard("A really cool unit test"));
+        this.hand.addCard(CardHelper.makeWhiteCard("A really cool unit test"));
         // The hand should now reflect this
         assertEquals(
             ReflectiveToStringHelper.of(this.hand, include).generate(),
