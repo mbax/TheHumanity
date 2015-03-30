@@ -21,15 +21,15 @@ import java.util.jar.Manifest;
 )
 public class VersionCommand extends NoticeableCommand {
 
-    private final TheHumanity plugin;
+    private final TheHumanity humanity;
 
     public VersionCommand(final TheHumanity instance) {
-        this.plugin = instance;
+        this.humanity = instance;
     }
 
     @Nullable
     private Manifest getManifest() {
-        final Class<?> clazz = this.plugin.getClass();
+        final Class<?> clazz = this.humanity.getClass();
         final String className = clazz.getSimpleName() + ".class";
         final String classPath = clazz.getResource(className).toString();
         final String manifestPath = classPath.substring(0, classPath.lastIndexOf("!") + 1) + "/META-INF/MANIFEST.MF";

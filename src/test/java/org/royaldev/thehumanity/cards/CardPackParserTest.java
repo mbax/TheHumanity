@@ -21,7 +21,7 @@ public class CardPackParserTest {
             "'With \\'Extra\\' Quotes, Part Two'"
         };
         // Convert them
-        final List<String> packNames = CardPackParser.getListOfCardPackNames(packArray);
+        final List<String> packNames = CardPackParser.getListOfCardPackNames(packArray, new String[0]);
         // Make sure they turn out correctly
         assertThat(packNames, hasItems(
             "OneWord",

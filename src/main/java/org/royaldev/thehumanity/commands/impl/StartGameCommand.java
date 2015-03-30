@@ -14,7 +14,6 @@ import org.royaldev.thehumanity.commands.IRCCommand.CommandType;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
 import org.royaldev.thehumanity.player.Player;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,41 +43,6 @@ public class StartGameCommand extends NoticeableCommand {
             Arrays.stream(this.humanity.getDefaultPacks()).map(this.humanity::getCardPack).filter(cp -> cp != null).forEach(cardPacks::add);
             if (cardPacks.isEmpty()) cardPacks.addAll(this.humanity.getLoadedCardPacks());
         }
-    }
-
-    /**
-     * Gets the named card packs. If any card pack starts with "cc:", it is assumed to be a Cardcast pack, and an
-     * attempt will be made to fetch and convert it for this game. If TheHumanity was started with the option to keep
-     * Cardcast packs loaded after downloading, the pack will be added to the main list of global packs.
-     * <p/>
-     * If any of the listed packs is titled "default", the default packs listed when TheHumanity was started will be
-     * added.
-     *
-     * @param args List of pack names
-     * @return List of packs
-     */
-    private List<CardPack> getCardPacks(final String[] args) {
-        final List<CardPack> cardPacks = new ArrayList<>();
-        boolean useDefaults = false;
-        for (final String cardPack : CardPackParser.getListOfCardPackNames(args)) {
-            if ("default".equalsIgnoreCase(cardPack)) {
-                useDefaults = true;
-                continue;
-            }
-            final CardPack cp;
-            if (cardPack.toLowerCase().startsWith("cc:")) {
-                cp = this.getCardcastPack(cardPack);
-                if (this.humanity.areCardcastPacksKept() && this.humanity.getCardPack(cp.getName()) == null) {
-                    this.humanity.addCardPack(cp);
-                }
-            } else {
-                cp = this.humanity.getCardPack(cardPack);
-            }
-            if (cp == null) continue;
-            cardPacks.add(cp);
-        }
-        this.addDefaults(cardPacks, useDefaults);
-        return cardPacks;
     }
 
     /**
@@ -125,7 +89,7 @@ public class StartGameCommand extends NoticeableCommand {
             this.notice(u, "You can't be in more than one game at a time!");
             return;
         }
-        final List<CardPack> cardPacks = this.getCardPacks(args);
+        final List<CardPack> cardPacks = this.humanity.getCardPacksFromArguments(args);
         final Game g = new Game(this.humanity, e.getChannel(), cardPacks);
         this.humanity.getGames().put(e.getChannel(), g);
         g.start();

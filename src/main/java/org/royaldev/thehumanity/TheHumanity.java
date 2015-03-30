@@ -29,6 +29,7 @@ import org.kohsuke.args4j.spi.StringOptionHandler;
 import org.royaldev.thehumanity.cards.cardcast.CardcastFetcher;
 import org.royaldev.thehumanity.cards.packs.CardPack;
 import org.royaldev.thehumanity.cards.packs.CardPackParser;
+import org.royaldev.thehumanity.cards.packs.CardcastCardPack;
 import org.royaldev.thehumanity.commands.impl.CardCountsCommand;
 import org.royaldev.thehumanity.commands.impl.CardsCommand;
 import org.royaldev.thehumanity.commands.impl.HelpCommand;
@@ -36,6 +37,7 @@ import org.royaldev.thehumanity.commands.impl.HostCommand;
 import org.royaldev.thehumanity.commands.impl.JoinGameCommand;
 import org.royaldev.thehumanity.commands.impl.KickCommand;
 import org.royaldev.thehumanity.commands.impl.LeaveGameCommand;
+import org.royaldev.thehumanity.commands.impl.LoadCardPackCommand;
 import org.royaldev.thehumanity.commands.impl.NeverHaveIEverCommand;
 import org.royaldev.thehumanity.commands.impl.PacksCommand;
 import org.royaldev.thehumanity.commands.impl.PickCardCommand;
@@ -62,6 +64,7 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @SuppressWarnings({"MismatchedReadAndWriteOfArray", "FieldMayBeFinal"})
 public class TheHumanity {
@@ -162,7 +165,8 @@ public class TheHumanity {
             new HostCommand(this),
             new GameCommand(this),
             new NeverHaveIEverCommand(this),
-            new VersionCommand(this)
+            new VersionCommand(this),
+            new LoadCardPackCommand(this)
         ).forEach(this.getCommandHandler()::register);
     }
 
@@ -237,6 +241,21 @@ public class TheHumanity {
         synchronized (this.loadedCardPacks) {
             return this.loadedCardPacks.stream().filter(cp -> cp.getName().equals(name)).findFirst().orElse(null);
         }
+    }
+
+    @NotNull
+    public List<CardPack> getCardPacksFromArguments(final String[] args) {
+        final List<CardPack> packs = CardPackParser.getListOfCardPackNames(args, this.getDefaultPacks()).stream()
+            .map(this::getOrDownloadCardPack)
+            .filter(cp -> cp != null)
+            .collect(Collectors.toList());
+        if (this.areCardcastPacksKept()) {
+            packs.stream()
+                .filter(pack -> pack instanceof CardcastCardPack)
+                .filter(pack -> !this.getLoadedCardPacks().contains(pack))
+                .forEach(this::addCardPack);
+        }
+        return packs;
     }
 
     @NotNull
@@ -339,6 +358,24 @@ public class TheHumanity {
         Preconditions.checkNotNull(c, "Channel was null");
         Preconditions.checkNotNull(u, "User was null");
         return c.getUserModes(u.getNick()).stream().anyMatch(m -> m.getMode() == mode);
+    }
+
+    @Nullable
+    public CardPack parseOrDownloadCardPack(@NotNull final String name) {
+        Preconditions.checkNotNull(name, "name was null");
+        if (name.toLowerCase().startsWith("cc:")) {
+            final String id = name.substring(3).toUpperCase();
+            CardcastFetcher.invalidateCacheFor(id);
+            return new CardcastFetcher(id).getCardPack();
+        }
+        return new CardPackParser(this).parseCardPack(name);
+    }
+
+    public void removeCardPack(@NotNull final CardPack cp) {
+        Preconditions.checkNotNull(cp, "cp was null");
+        synchronized (this.loadedCardPacks) {
+            this.loadedCardPacks.remove(cp);
+        }
     }
 
     public boolean usersMatch(@NotNull final User u, @NotNull final User u2) {
