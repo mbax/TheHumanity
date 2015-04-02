@@ -6,7 +6,6 @@ import org.kitteh.irc.client.library.event.ActorEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 import org.royaldev.thehumanity.Game;
 import org.royaldev.thehumanity.TheHumanity;
-import org.royaldev.thehumanity.cards.cardcast.CardcastFetcher;
 import org.royaldev.thehumanity.cards.packs.CardPack;
 import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.Command;
@@ -36,23 +35,11 @@ public class StartGameCommand extends NoticeableCommand {
      * Adds default packs to the given list of packs if it is empty of if useDefaults is true.
      *
      * @param cardPacks   List of packs to add to
-     * @param useDefaults Should defaults be added, even if the list is not empty?
      */
-    private void addDefaults(final List<CardPack> cardPacks, final boolean useDefaults) {
-        if (cardPacks.isEmpty() || useDefaults) {
-            Arrays.stream(this.humanity.getDefaultPacks()).map(this.humanity::getCardPack).filter(cp -> cp != null).forEach(cardPacks::add);
-            if (cardPacks.isEmpty()) cardPacks.addAll(this.humanity.getLoadedCardPacks());
-        }
-    }
-
-    /**
-     * Gets a Cardcast pack by its ID.
-     *
-     * @param name ID
-     * @return Pack or null
-     */
-    private CardPack getCardcastPack(final String name) {
-        return new CardcastFetcher(name.substring(3)).getCardPack();
+    private void addDefaults(final List<CardPack> cardPacks) {
+        if (!cardPacks.isEmpty()) return;
+        Arrays.stream(this.humanity.getDefaultPacks()).map(this.humanity::getCardPack).filter(cp -> cp != null).forEach(cardPacks::add);
+        if (cardPacks.isEmpty()) cardPacks.addAll(this.humanity.getLoadedCardPacks());
     }
 
     /**
@@ -90,6 +77,9 @@ public class StartGameCommand extends NoticeableCommand {
             return;
         }
         final List<CardPack> cardPacks = this.humanity.getCardPacksFromArguments(args);
+        if (cardPacks.size() < 1) {
+            this.addDefaults(cardPacks);
+        }
         final Game g = new Game(this.humanity, e.getChannel(), cardPacks);
         this.humanity.getGames().put(e.getChannel(), g);
         g.start();
