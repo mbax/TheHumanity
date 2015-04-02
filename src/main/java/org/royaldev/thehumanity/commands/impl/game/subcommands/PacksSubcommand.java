@@ -1,4 +1,4 @@
-package org.royaldev.thehumanity.commands.impl.game;
+package org.royaldev.thehumanity.commands.impl.game.subcommands;
 
 import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.IRCFormat;

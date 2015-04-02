@@ -1,9 +1,7 @@
 package org.royaldev.thehumanity.cards.packs;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.royaldev.thehumanity.cards.Card;
@@ -32,19 +30,6 @@ public class MemoryCardPack implements CardPack {
     public MemoryCardPack(@NotNull final String name) {
         Preconditions.checkNotNull(name, "name was null");
         this.name = name;
-    }
-
-    /**
-     * Gets the name of a pack from a file name.
-     *
-     * @param fileName File name
-     * @return Pack name
-     */
-    @NotNull
-    public static String getNameFromFileName(@NotNull final String fileName) {
-        Preconditions.checkNotNull(fileName, "fileName was null");
-        final List<String> parts = Splitter.on('.').splitToList(fileName);
-        return Joiner.on('.').join(parts.subList(0, parts.size() - 1));
     }
 
     /**

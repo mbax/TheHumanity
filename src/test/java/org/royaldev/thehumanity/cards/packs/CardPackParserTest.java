@@ -1,11 +1,11 @@
-package org.royaldev.thehumanity.cards;
+package org.royaldev.thehumanity.cards.packs;
 
 import org.junit.Test;
-import org.royaldev.thehumanity.cards.packs.CardPackParser;
 
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.hasItems;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class CardPackParserTest {
@@ -30,5 +30,18 @@ public class CardPackParserTest {
             "With \"Extra\" Quotes",
             "With 'Extra' Quotes, Part Two"
         ));
+    }
+
+    @Test
+    public void testGetNameFromFileName() throws Exception {
+        // The extension should be removed
+        assertEquals(
+            "My.Dog",
+            CardPackParser.getNameFromFileName("My.Dog.cards")
+        );
+        assertEquals(
+            "My.Dog",
+            CardPackParser.getNameFromFileName("My.Dog.derpherp")
+        );
     }
 }

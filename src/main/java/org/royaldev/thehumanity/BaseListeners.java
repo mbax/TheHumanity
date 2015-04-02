@@ -1,6 +1,8 @@
 package org.royaldev.thehumanity;
 
 import com.google.common.base.Splitter;
+import org.kitteh.irc.client.library.element.User;
+import org.kitteh.irc.client.library.event.capabilities.CapabilitiesSupportedListEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelInviteEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelJoinEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelKickEvent;
@@ -9,9 +11,12 @@ import org.kitteh.irc.client.library.event.channel.ChannelPartEvent;
 import org.kitteh.irc.client.library.event.client.ClientConnectedEvent;
 import org.kitteh.irc.client.library.event.client.ClientConnectionClosedEvent;
 import org.kitteh.irc.client.library.event.user.PrivateMessageEvent;
+import org.kitteh.irc.client.library.event.user.UserNickChangeEvent;
 import org.kitteh.irc.lib.net.engio.mbassy.listener.Handler;
 import org.royaldev.thehumanity.commands.CallInfo;
+import org.royaldev.thehumanity.commands.CallInfo.UsageType;
 import org.royaldev.thehumanity.commands.IRCCommand;
+import org.royaldev.thehumanity.ping.WhoX;
 import org.royaldev.thehumanity.util.ConversionHelper;
 
 import java.util.List;
@@ -25,6 +30,26 @@ final class BaseListeners {
 
     BaseListeners(final TheHumanity instance) {
         this.humanity = instance;
+    }
+
+    @Handler
+    public void accountNotify(final CapabilitiesSupportedListEvent e) {
+        if (e.getSupportedCapabilities().stream().filter(cap -> cap.getCapabilityName().equalsIgnoreCase("account-notify")).findFirst().isPresent()) {
+            e.getClient().sendRawLine("CAP REQ :account-notify");
+        }
+    }
+
+    @Handler
+    public void changeNickAccountMapping(final UserNickChangeEvent e) {
+        final User oldUser = e.getUser();
+        final User newUser = e.getNewUser();
+        final WhoX whoX = this.humanity.getWhoX();
+        // Get the account of the user before nick change
+        final String oldAccount = whoX.getAccount(oldUser.getMessagingName());
+        // Remove account mapping for the old nick
+        whoX.remove(oldUser.getMessagingName(), oldAccount);
+        // Set the new nick to the account
+        whoX.addAccount(newUser.getMessagingName(), oldAccount);
     }
 
     @Handler
@@ -124,6 +149,12 @@ final class BaseListeners {
             e.getActor().sendNotice(sb.toString());
             this.humanity.getLogger().warning(sb.toString());
         }
+    }
+
+    @Handler
+    public void whoX(final ChannelJoinEvent e) {
+        if (!e.getActor().getNick().equals(e.getClient().getNick())) return;
+        this.humanity.getWhoX().sendWhoX(e.getChannel());
     }
 
 }

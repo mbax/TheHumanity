@@ -1,4 +1,4 @@
-package org.royaldev.thehumanity.commands.impl.game;
+package org.royaldev.thehumanity.commands.impl.game.subcommands;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;

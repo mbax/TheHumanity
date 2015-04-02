@@ -49,7 +49,11 @@ import org.royaldev.thehumanity.commands.impl.StopGameCommand;
 import org.royaldev.thehumanity.commands.impl.VersionCommand;
 import org.royaldev.thehumanity.commands.impl.WhoCommand;
 import org.royaldev.thehumanity.commands.impl.game.GameCommand;
+import org.royaldev.thehumanity.commands.impl.ping.PingListCommand;
 import org.royaldev.thehumanity.handlers.CommandHandler;
+import org.royaldev.thehumanity.ping.PingRegistry;
+import org.royaldev.thehumanity.ping.WhoX;
+import org.royaldev.thehumanity.ping.task.SavePingRegistryTask;
 import org.royaldev.thehumanity.util.Pair;
 
 import java.io.StringWriter;
@@ -60,6 +64,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
@@ -76,6 +81,8 @@ public class TheHumanity {
     private final Cache<String, Pair<String, String>> gistCache = CacheBuilder.newBuilder().build();
     private final Logger l = Logger.getLogger("org.royaldev.thehumanity");
     private final ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(1);
+    private final PingRegistry pingRegistry;
+    private final WhoX whoX = new WhoX(this);
     @Option(name = "-c", usage = "Channels to join.", required = true, handler = StringArrayOptionHandler.class)
     private String[] channels;
     @Option(name = "-s", usage = "Server to connect to.", required = true, handler = StringOptionHandler.class)
@@ -98,11 +105,16 @@ public class TheHumanity {
     private String[] defaultPacks = new String[0];
     @Option(name = "-k", usage = "Keep Cardcast packs loaded once they are downloaded?", handler = BooleanOptionHandler.class)
     private boolean keepCardcastPacks = false;
+    @Option(name = "-D", usage = "Toggles debug mode.", handler = BooleanOptionHandler.class)
+    private boolean debug = false;
 
     private TheHumanity(@NotNull final String[] args) {
         Preconditions.checkNotNull(args, "args was null");
         this.setUpLogger();
         this.parseArguments(args);
+        this.pingRegistry = PingRegistry.deserializeOrMakePingRegistry();
+        // Schedule a repeatedly running saver task, just in case we're not shut down properly
+        this.stpe.scheduleAtFixedRate(new SavePingRegistryTask(this.pingRegistry), 5L, 10L, TimeUnit.MINUTES);
         this.loadCardPacks();
         this.registerCommands();
         final ClientBuilder cb = new ClientBuilder();
@@ -113,7 +125,11 @@ public class TheHumanity {
             .realName(this.nickname)
             .server(this.server)
             .server(this.serverPort)
-            .secure(this.ssl);
+            .secure(this.ssl)
+            .listenInput(this.whoX);
+        if (this.isDebugMode()) {
+            cb.listenOutput(s -> System.out.println("output = " + s));
+        }
         if (!this.nickserv.isEmpty()) {
             cb.auth(AuthType.NICKSERV, this.nickname, this.nickserv);
         }
@@ -125,10 +141,15 @@ public class TheHumanity {
         final EventManager em = this.bot.getEventManager();
         em.registerEventListener(new BaseListeners(this));
         em.registerEventListener(new GameListeners(this));
+        this.addShutdownHook(); // The shutdown hook relies on everything being made.
     }
 
     public static void main(final String[] args) {
         new TheHumanity(args);
+    }
+
+    private void addShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHook(this)));
     }
 
     private void loadCardPacks() {
@@ -166,7 +187,8 @@ public class TheHumanity {
             new GameCommand(this),
             new NeverHaveIEverCommand(this),
             new VersionCommand(this),
-            new LoadCardPackCommand(this)
+            new LoadCardPackCommand(this),
+            new PingListCommand(this)
         ).forEach(this.getCommandHandler()::register);
     }
 
@@ -309,6 +331,10 @@ public class TheHumanity {
         return new CardcastFetcher(name.substring(3)).getCardPack();
     }
 
+    public PingRegistry getPingRegistry() {
+        return this.pingRegistry;
+    }
+
     public char getPrefix() {
         return this.prefix;
     }
@@ -316,6 +342,10 @@ public class TheHumanity {
     @NotNull
     public ScheduledThreadPoolExecutor getThreadPool() {
         return this.stpe;
+    }
+
+    public WhoX getWhoX() {
+        return this.whoX;
     }
 
     /**
@@ -358,6 +388,10 @@ public class TheHumanity {
         Preconditions.checkNotNull(c, "Channel was null");
         Preconditions.checkNotNull(u, "User was null");
         return c.getUserModes(u.getNick()).stream().anyMatch(m -> m.getMode() == mode);
+    }
+
+    public boolean isDebugMode() {
+        return this.debug;
     }
 
     @Nullable

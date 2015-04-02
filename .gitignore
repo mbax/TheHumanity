@@ -37,3 +37,4 @@ package
 /start.sh
 /dev.sh
 pid
+pingregistry.dat

@@ -1,4 +1,4 @@
-package org.royaldev.thehumanity.commands.impl.game;
+package org.royaldev.thehumanity.commands.impl.game.subcommands;
 
 import com.google.common.base.Joiner;
 import org.jetbrains.annotations.NotNull;
@@ -15,14 +15,13 @@ import org.royaldev.thehumanity.player.Player;
 import org.royaldev.thehumanity.util.ConversionHelper;
 
 @Command(
-    name = "removepack",
-    description = "Removes a card pack from the current game, optionally removing any dealt cards from the pack.",
-    usage = "<command> [pack] (sweep)",
-    aliases = {"rp"}
+    name = "addpack",
+    description = "Adds a card pack to the current game.",
+    aliases = {"ap"}
 )
-public class RemovePackSubcommand extends InGameCommand {
+public class AddPackSubcommand extends InGameCommand {
 
-    public RemovePackSubcommand(final TheHumanity instance) {
+    public AddPackSubcommand(final TheHumanity instance) {
         super(instance);
     }
 
@@ -37,14 +36,11 @@ public class RemovePackSubcommand extends InGameCommand {
             this.notice(u, "Not enough arguments.");
             return;
         }
-        final CardPack cp = game.getDeck().getCardPacks().stream()
-            .filter(c -> c.getName().equalsIgnoreCase(Joiner.on(' ').join(args)))
-            .findFirst()
-            .orElse(null);
+        final CardPack cp = this.humanity.getOrDownloadCardPack(Joiner.on(' ').join(args));
         if (cp == null) {
             this.notice(u, "No such card pack.");
             return;
         }
-        ConversionHelper.respond(event, (game.removeCardPack(cp, args.length > 1 && "sweep".equalsIgnoreCase(args[1])) ? "Removed" : "Could not remove") + " " + IRCFormat.BOLD + cp.getName() + IRCFormat.RESET + " from the game.");
+        ConversionHelper.respond(event, (game.addCardPack(cp) ? "Added" : "Could not add") + " " + IRCFormat.BOLD + cp.getName() + IRCFormat.RESET + " to the game.");
     }
 }

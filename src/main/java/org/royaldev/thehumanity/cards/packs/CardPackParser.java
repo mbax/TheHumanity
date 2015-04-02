@@ -2,6 +2,7 @@ package org.royaldev.thehumanity.cards.packs;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -63,6 +64,19 @@ public class CardPackParser {
     }
 
     /**
+     * Gets the name of a pack from a file name.
+     *
+     * @param fileName File name
+     * @return Pack name
+     */
+    @NotNull
+    public static String getNameFromFileName(@NotNull final String fileName) {
+        Preconditions.checkNotNull(fileName, "fileName was null");
+        final List<String> parts = Splitter.on('.').splitToList(fileName);
+        return Joiner.on('.').join(parts.subList(0, parts.size() - 1));
+    }
+
+    /**
      * Parses one CardPack given the name of the file that contains it. If there is any IOException while processing, or
      * if the file cannot be read, null will be returned.
      *
@@ -81,7 +95,7 @@ public class CardPackParser {
             this.humanity.getLogger().warning("Cannot read " + f.getName() + ".");
             return null;
         }
-        final CardPack cp = new MemoryCardPack(MemoryCardPack.getNameFromFileName(f.getName()));
+        final CardPack cp = new MemoryCardPack(getNameFromFileName(f.getName()));
         try (final BufferedReader br = new BufferedReader(new FileReader(f))) {
             String line;
             ParseStage ps = ParseStage.METADATA;

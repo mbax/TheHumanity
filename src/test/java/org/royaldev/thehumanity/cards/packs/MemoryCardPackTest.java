@@ -1,4 +1,4 @@
-package org.royaldev.thehumanity.cards;
+package org.royaldev.thehumanity.cards.packs;
 
 import org.junit.After;
 import org.junit.Before;
@@ -6,14 +6,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.royaldev.thehumanity.CardHelper;
-import org.royaldev.thehumanity.cards.packs.CardPack;
-import org.royaldev.thehumanity.cards.packs.MemoryCardPack;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
-public class CardPackTest {
+public class MemoryCardPackTest {
 
     private final static String NAME = "Test";
     @Rule
@@ -22,7 +20,7 @@ public class CardPackTest {
 
     @Before
     public void setUp() throws Exception {
-        this.cp = new MemoryCardPack(CardPackTest.NAME);
+        this.cp = new MemoryCardPack(MemoryCardPackTest.NAME);
     }
 
     @After
@@ -82,19 +80,7 @@ public class CardPackTest {
     @Test
     public void testGetName() throws Exception {
         // The name should be what we initialized it with
-        assertEquals(CardPackTest.NAME, this.cp.getName());
+        assertEquals(MemoryCardPackTest.NAME, this.cp.getName());
     }
 
-    @Test
-    public void testGetNameFromFileName() throws Exception {
-        // The extension should be removed
-        assertEquals(
-            "My.Dog",
-            MemoryCardPack.getNameFromFileName("My.Dog.cards")
-        );
-        assertEquals(
-            "My.Dog",
-            MemoryCardPack.getNameFromFileName("My.Dog.derpherp")
-        );
-    }
 }
