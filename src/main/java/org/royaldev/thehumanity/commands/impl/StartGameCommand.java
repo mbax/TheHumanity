@@ -34,7 +34,7 @@ public class StartGameCommand extends NoticeableCommand {
     /**
      * Adds default packs to the given list of packs if it is empty of if useDefaults is true.
      *
-     * @param cardPacks   List of packs to add to
+     * @param cardPacks List of packs to add to
      */
     private void addDefaults(final List<CardPack> cardPacks) {
         if (!cardPacks.isEmpty()) return;
@@ -71,8 +71,7 @@ public class StartGameCommand extends NoticeableCommand {
             this.rush(e, u);
             return;
         }
-        for (final Game game : this.humanity.getGames().values()) {
-            if (!game.hasPlayer(u.getNick())) continue;
+        if (this.humanity.getGameFor(u) != null) {
             this.notice(u, "You can't be in more than one game at a time!");
             return;
         }
