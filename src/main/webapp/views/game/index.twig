@@ -1,0 +1,75 @@
+{% extends '../layouts/info.twig' %}
+
+{% block title %}{% set channelName = game.getChannel.getName %}Game in {{ channelName }}{% endblock %}
+
+{% block left %}
+  {% set round = game.getCurrentRound %}
+  <h1>Game in {{ game.getChannel.getName | escape }}</h1>
+  <p>
+    Status: {{ game.getGameStatus | friendly_enum }}
+  </p>
+  {% if (round is not null) %}
+    <table class="table table-striped">
+      <caption><h2>Round</h2></caption>
+      <tr>
+        <td>Number</td>
+        <td>{{ round.getNumber }}</td>
+      </tr>
+      <tr>
+        <td>Stage</td>
+        <td>{{ round.getCurrentStage | friendly_enum }}</td>
+      </tr>
+    </table>
+  {% else %}
+    <p class="lead">
+      No round has started.
+    </p>
+  {% endif %}
+  <table class="table table-striped">
+    <caption><h2>Players</h2></caption>
+    <thead>
+    <tr>
+      <th>Nickname</th>
+      <th>Role</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for player in game.getPlayers %}
+      <tr>
+        <td>{{ player.getUser.getNick | escape }}</td>
+        <td>{% if (round is null) %}No role{% else %}{% if (round.getCzar.equals(player)) %}Czar{% else %}Player{% endif %}{% endif %}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
+
+{% block right %}
+  <p class="lead">
+    {{ round.getBlackCard | escape }}
+  </p>
+  {% if (round.getCurrentStage.name == "WAITING_FOR_CZAR") %}
+  <table class="table table-striped">
+    <caption><h2>Plays</h2></caption>
+    <thead>
+      <tr>
+        <th>Number</th>
+        <th>Card</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for index in range(0, round.getPlays.size - 1) %}
+      {% set play = round.getPlays.get(index) %}
+      <tr>
+        <td>{{ index + 1 }}</td>
+        <td>
+          <span class="tooltipped tooltipped-n" aria-label="{{ round.getBlackCard.fillInBlanks(play) | remove_irc_formatting | escape }}">
+          {{ play.getWhiteCards | join(', ') | escape }}
+          </span>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+{% endblock %}

@@ -90,6 +90,18 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>com.github.wvengen</groupId>
@@ -112,6 +124,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <skip>true</skip>
                     <includeDependency>true</includeDependency>
                     <proguardInclude>proguard.cfg</proguardInclude>
                     <outjar>${project.name}-${project.version}.jar</outjar>
@@ -151,20 +164,18 @@
     </build>
     <repositories>
         <repository>
-            <id>royal-repo</id>
-            <url>http://minor.royaldev.org:8081/nexus/content/groups/public/</url>
-        </repository>
-        <repository>
             <id>kitteh-repo</id>
             <url>http://repo.kitteh.org/content/groups/public/</url>
         </repository>
     </repositories>
     <dependencies>
+        <!-- IRC -->
         <dependency>
             <groupId>org.kitteh.irc</groupId>
             <artifactId>client-lib</artifactId>
             <version>0.2.2-SNAPSHOT</version>
         </dependency>
+        <!-- Helpful utilities -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -176,15 +187,17 @@
             <version>2.0.31</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-nop</artifactId>
-            <version>1.7.10</version>
-        </dependency>
-        <dependency>
             <groupId>com.mashape.unirest</groupId>
             <artifactId>unirest-java</artifactId>
             <version>1.4.5</version>
         </dependency>
+        <!-- Turn off logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+            <version>1.7.10</version>
+        </dependency>
+        <!-- Annotations -->
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
@@ -195,6 +208,7 @@
             <artifactId>gag</artifactId>
             <version>1.0.1</version>
         </dependency>
+        <!-- Testing -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -212,6 +226,27 @@
             <artifactId>powermock-api-mockito</artifactId>
             <version>1.6.1</version>
             <scope>test</scope>
+        </dependency>
+        <!-- Web -->
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>9.2.10.v20150310</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-webapp</artifactId>
+            <version>9.2.10.v20150310</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>4.1.6.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lyncode</groupId>
+            <artifactId>jtwig-spring</artifactId>
+            <version>3.1.1</version>
         </dependency>
     </dependencies>
     <properties>

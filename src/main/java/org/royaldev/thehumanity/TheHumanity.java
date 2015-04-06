@@ -54,6 +54,8 @@ import org.royaldev.thehumanity.handlers.CommandHandler;
 import org.royaldev.thehumanity.ping.PingRegistry;
 import org.royaldev.thehumanity.ping.WhoX;
 import org.royaldev.thehumanity.ping.task.SavePingRegistryTask;
+import org.royaldev.thehumanity.server.GameServer;
+import org.royaldev.thehumanity.server.configurations.HumanityConfiguration;
 import org.royaldev.thehumanity.util.Pair;
 
 import java.io.StringWriter;
@@ -83,6 +85,7 @@ public class TheHumanity {
     private final ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(1);
     private final PingRegistry pingRegistry;
     private final WhoX whoX = new WhoX(this);
+    private final GameServer gameServer;
     @Option(name = "-c", usage = "Channels to join.", required = true, handler = StringArrayOptionHandler.class)
     private String[] channels;
     @Option(name = "-s", usage = "Server to connect to.", required = true, handler = StringOptionHandler.class)
@@ -107,11 +110,24 @@ public class TheHumanity {
     private boolean keepCardcastPacks = false;
     @Option(name = "-D", usage = "Toggles debug mode.", handler = BooleanOptionHandler.class)
     private boolean debug = false;
+    @Option(name = "-H", usage = "Hostname of the web server", handler = StringOptionHandler.class)
+    private String webServerHostname = "0.0.0.0";
+    @Option(name = "-w", usage = "Port of the web server", handler = IntOptionHandler.class)
+    private int webServerPort = 9012;
+    @Option(name = "-W", usage = "Run only the web server", handler = BooleanOptionHandler.class)
+    private boolean runOnlyWebServer = false;
 
     private TheHumanity(@NotNull final String[] args) {
         Preconditions.checkNotNull(args, "args was null");
+        HumanityConfiguration.setHumanity(this);
         this.setUpLogger();
         this.parseArguments(args);
+        this.gameServer = new GameServer(this.webServerHostname, this.webServerPort);
+        if (this.runOnlyWebServer) {
+            this.bot = null;
+            this.pingRegistry = null;
+            return;
+        }
         this.pingRegistry = PingRegistry.deserializeOrMakePingRegistry();
         // Schedule a repeatedly running saver task, just in case we're not shut down properly
         this.stpe.scheduleAtFixedRate(new SavePingRegistryTask(this.pingRegistry), 5L, 10L, TimeUnit.MINUTES);
