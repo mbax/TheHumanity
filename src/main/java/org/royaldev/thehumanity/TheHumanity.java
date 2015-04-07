@@ -116,17 +116,21 @@ public class TheHumanity {
     private int webServerPort = 9012;
     @Option(name = "-W", usage = "Run only the web server", handler = BooleanOptionHandler.class)
     private boolean runOnlyWebServer = false;
+    @Option(name = "-X", usage = "Do not run the web server.", handler = BooleanOptionHandler.class)
+    private boolean doNotRunWebServer = false;
 
     private TheHumanity(@NotNull final String[] args) {
         Preconditions.checkNotNull(args, "args was null");
-        HumanityConfiguration.setHumanity(this);
         this.setUpLogger();
         this.parseArguments(args);
-        this.gameServer = new GameServer(this.webServerHostname, this.webServerPort);
-        if (this.runOnlyWebServer) {
-            this.bot = null;
-            this.pingRegistry = null;
-            return;
+        if (!this.doNotRunWebServer) {
+            HumanityConfiguration.setHumanity(this);
+            this.gameServer = new GameServer(this.webServerHostname, this.webServerPort);
+            if (this.runOnlyWebServer) {
+                this.bot = null;
+                this.pingRegistry = null;
+                return;
+            }
         }
         this.pingRegistry = PingRegistry.deserializeOrMakePingRegistry();
         // Schedule a repeatedly running saver task, just in case we're not shut down properly
