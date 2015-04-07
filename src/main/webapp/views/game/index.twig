@@ -23,7 +23,9 @@
                         {% set cardpacks = cardpacks.concat(cardpack.getName).concat('<br/>') %}
                     {% endfor %}
                     {% set cardpacks = cardpacks | br2nl %}
-                    <span class="dotted-underline tooltipped tooltipped-left tooltipped-e" aria-label="{{ cardpacks.substring(0, cardpacks.length - 1) }}">Hover</span>
+                    <span class="dotted-underline tooltipped tooltipped-left tooltipped-e" aria-label="{{ cardpacks.substring(0, cardpacks.length - 1) }}">
+                        {{ game.getDeck.getCardPacks.size }}
+                    </span>
                 </td>
             </tr>
             <tr>
@@ -34,7 +36,9 @@
                         {% set houserules = houserules.concat(houserule.getFriendlyName).concat('<br/>') %}
                     {% endfor %}
                     {% set houserules = houserules | br2nl %}
-                    <span class="dotted-underline tooltipped tooltipped-left tooltipped-e" aria-label="{{ houserules.substring(0, houserules.length - 1) }}">Hover</span>
+                    <span class="dotted-underline tooltipped tooltipped-left tooltipped-e" aria-label="{{ houserules.substring(0, houserules.length - 1) }}">
+                        {{ game.getHouseRules.size }}
+                    </span>
                 </td>
             </tr>
         </tbody>
