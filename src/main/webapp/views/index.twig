@@ -28,7 +28,7 @@
                         {% set channels = channels.concat(channel.getName).concat("<br/>") %}
                     {% endfor %}
                     {% set channels = channels | br2nl %}
-                    <span class="dotted-underline tooltipped tooltipped-n" aria-label="{{ channels }}">
+                    <span class="dotted-underline tooltipped tooltipped-n" aria-label="{{ channels.substring(0, channels.length - 1) }}">
                         {{ humanity.getBot.getChannels.size }}
                     </span>
                 </td>
