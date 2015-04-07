@@ -1,35 +1,63 @@
 {% extends 'layouts/info.twig' %}
 
-{% block title %}{% set nick = (humanity.getBot.getNick is null) ? "TheHumanity" : humanity.getBot.getNick %}{{ nick | escape }}{% endblock %}
+{% block title %}{% set nick = humanity.getBot.getNick | default("TheHumanity") %}{{ nick | escape }}{% endblock %}
 
 {% block left %}
-  <h1>{{ nick }}</h1>
+    <h1>{{ nick }}</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Datum</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Version</td>
+                <td>{{ humanity.getVersion | escape }}</td>
+            </tr>
+            <tr>
+                <td>IRC server</td>
+                <td>{{ humanity.getBot.getServerInfo.getNetworkName | escape }}</td>
+            </tr>
+            <tr>
+                <td>Channels</td>
+                <td>{{ humanity.getBot.getChannels.size }}</td>
+            </tr>
+            <tr>
+                <td>Loaded card packs</td>
+                <td>{{ humanity.getLoadedCardPacks.size }}</td>
+            </tr>
+        </tbody>
+    </table>
 {% endblock %}
 
 {% block right %}
-  <h2>Games</h2>
-  {% if (humanity.getGames is empty) %}
-    <p class="lead">There are no current games. Why not start one?</p>
-  {% else %}
-    <table class="table table-striped">
-      <thead>
-      <tr>
-        <th>Channel</th>
-        <th>Players</th>
-        <th>Status</th>
-        <th>Round</th>
-      </tr>
-      </thead>
-      <tbody>
-      {% for channel, game in humanity.getGames %}
-        <tr>
-          <td><a href="/game/{{ channel.getName.substring(1) | escape }}">{{ channel.getName | escape }}</a></td>
-          <td>{{ game.getPlayers.size }}</td>
-          <td>{{ game.getGameStatus | friendly_enum }}</td>
-          <td>{{ (game.getCurrentRound is null) ? "Not started" : game.getCurrentRound.getNumber }}</td>
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  {% endif %}
+    <h2>Games</h2>
+    {% if (humanity.getGames is empty) %}
+        <p class="lead">There are no current games. Why not start one?</p>
+    {% else %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Channel</th>
+                    <th>Players</th>
+                    <th>Status</th>
+                    <th>Round</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for channel, game in humanity.getGames %}
+                    <tr>
+                        <td>
+                            <a href="/game/{{ channel.getName.substring(1) | escape }}">{{ channel.getName | escape }}</a>
+                        </td>
+                        <td>{{ game.getPlayers.size }}</td>
+                        <td>{{ game.getGameStatus | friendly_enum }}</td>
+                        <td>{{ (game.getCurrentRound is null) ? "Not started" : game.getCurrentRound.getNumber }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 {% endblock %}

@@ -58,7 +58,9 @@ import org.royaldev.thehumanity.server.GameServer;
 import org.royaldev.thehumanity.server.configurations.HumanityConfiguration;
 import org.royaldev.thehumanity.util.Pair;
 
+import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -67,6 +69,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
@@ -173,6 +177,19 @@ public class TheHumanity {
 
     private void addShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHook(this)));
+    }
+
+    @Nullable
+    private Manifest getManifest() {
+        final Class<?> clazz = this.getClass();
+        final String className = clazz.getSimpleName() + ".class";
+        final String classPath = clazz.getResource(className).toString();
+        final String manifestPath = classPath.substring(0, classPath.lastIndexOf("!") + 1) + "/META-INF/MANIFEST.MF";
+        try {
+            return new Manifest(new URL(manifestPath).openStream());
+        } catch (final IOException ex) {
+            return null;
+        }
     }
 
     private void loadCardPacks() {
@@ -328,6 +345,11 @@ public class TheHumanity {
         return this.getGames().get(c);
     }
 
+    @Nullable
+    public GameServer getGameServer() {
+        return this.gameServer;
+    }
+
     @NotNull
     public Map<Channel, Game> getGames() {
         return this.games;
@@ -365,6 +387,20 @@ public class TheHumanity {
     @NotNull
     public ScheduledThreadPoolExecutor getThreadPool() {
         return this.stpe;
+    }
+
+    @NotNull
+    public String getVersion() {
+        final Manifest mf = this.getManifest();
+        if (mf == null) return "Error: null Manifest";
+        final Attributes a = mf.getAttributes("Version-Info");
+        if (a == null) return "Error: No Version-Info";
+        return String.format(
+            "%s %s (%s)",
+            a.getValue("Project-Name"),
+            a.getValue("Project-Version"),
+            a.getValue("Git-Describe")
+        );
     }
 
     public WhoX getWhoX() {

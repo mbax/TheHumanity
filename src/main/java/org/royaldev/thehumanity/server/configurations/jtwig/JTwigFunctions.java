@@ -7,6 +7,11 @@ import org.kitteh.irc.client.library.IRCFormat;
 
 public class JTwigFunctions {
 
+    @JtwigFunction(name = "br2nl")
+    public String br2nl(@Parameter String input) {
+        return input.replaceAll("<br/?>", "\n");
+    }
+
     @JtwigFunction(name = "friendly_enum")
     public String friendlyEnum(@Parameter String s) {
         return StringUtils.capitalize(s.replace('_', ' ').toLowerCase());

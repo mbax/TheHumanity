@@ -3,73 +3,128 @@
 {% block title %}{% set channelName = game.getChannel.getName %}Game in {{ channelName }}{% endblock %}
 
 {% block left %}
-  {% set round = game.getCurrentRound %}
-  <h1>Game in {{ game.getChannel.getName | escape }}</h1>
-  <p>
-    Status: {{ game.getGameStatus | friendly_enum }}
-  </p>
-  {% if (round is not null) %}
+    {% set round = game.getCurrentRound %}
+    <h1>Game in {{ game.getChannel.getName | escape }}</h1>
     <table class="table table-striped">
-      <caption><h2>Round</h2></caption>
-      <tr>
-        <td>Number</td>
-        <td>{{ round.getNumber }}</td>
-      </tr>
-      <tr>
-        <td>Stage</td>
-        <td>{{ round.getCurrentStage | friendly_enum }}</td>
-      </tr>
+        <tbody>
+            <tr>
+                <td>Status</td>
+                <td>{{ game.getGameStatus | friendly_enum }}</td>
+            </tr>
+            <tr>
+                <td>Host</td>
+                <td>{{ game.getHost.getUser.getNick | escape }}</td>
+            </tr>
+            <tr>
+                <td>Card packs</td>
+                <td>
+                    {% set cardpacks = "" %}
+                    {% for cardpack in game.getDeck.getCardPacks %}
+                        {% set cardpacks = cardpacks.concat(cardpack.getName).concat('<br/>') %}
+                    {% endfor %}
+                    {% set cardpacks = cardpacks | br2nl %}
+                    <span class="dotted-underline tooltipped tooltipped-left tooltipped-e" aria-label="{{ cardpacks.substring(0, cardpacks.length - 1) }}">Hover</span>
+                </td>
+            </tr>
+            <tr>
+                <td>House rules</td>
+                <td>
+                    {% set houserules = "" %}
+                    {% for houserule in game.getHouseRules %}
+                        {% set houserules = houserules.concat(houserule.getFriendlyName).concat('<br/>') %}
+                    {% endfor %}
+                    {% set houserules = houserules | br2nl %}
+                    <span class="dotted-underline tooltipped tooltipped-left tooltipped-e" aria-label="{{ houserules.substring(0, houserules.length - 1) }}">Hover</span>
+                </td>
+            </tr>
+        </tbody>
     </table>
-  {% else %}
-    <p class="lead">
-      No round has started.
-    </p>
-  {% endif %}
-  <table class="table table-striped">
-    <caption><h2>Players</h2></caption>
-    <thead>
-    <tr>
-      <th>Nickname</th>
-      <th>Role</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for player in game.getPlayers %}
-      <tr>
-        <td>{{ player.getUser.getNick | escape }}</td>
-        <td>{% if (round is null) %}No role{% else %}{% if (round.getCzar.equals(player)) %}Czar{% else %}Player{% endif %}{% endif %}</td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
+    {% if (round is not null) %}
+        <table class="table table-striped">
+            <caption><h2>Round</h2></caption>
+            <tr>
+                <td>Number</td>
+                <td>{{ round.getNumber }}</td>
+            </tr>
+            <tr>
+                <td>Czar</td>
+                <td>{{ round.getCzar.getUser.getNick | escape }}</td>
+            </tr>
+            <tr>
+                <td>Stage</td>
+                <td>{{ round.getCurrentStage | friendly_enum }}</td>
+            </tr>
+        </table>
+    {% else %}
+        <p class="lead">
+            No round has started.
+        </p>
+    {% endif %}
+    <table class="table table-striped">
+        <caption><h2>Players</h2></caption>
+        <thead>
+            <tr>
+                <th>Nickname</th>
+                <th>Role</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for player in game.getPlayers %}
+                <tr>
+                    <td>{{ player.getUser.getNick | escape }}</td>
+                    <td>{% if (round is null) %}No role{% else %}{% if (round.getCzar.equals(player)) %}Czar{% else %}Player{% endif %}{% endif %}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
 
 {% block right %}
-  <p class="lead">
-    {{ round.getBlackCard | escape }}
-  </p>
-  {% if (round.getCurrentStage.name == "WAITING_FOR_CZAR") %}
-  <table class="table table-striped">
-    <caption><h2>Plays</h2></caption>
-    <thead>
-      <tr>
-        <th>Number</th>
-        <th>Card</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for index in range(0, round.getPlays.size - 1) %}
-      {% set play = round.getPlays.get(index) %}
-      <tr>
-        <td>{{ index + 1 }}</td>
-        <td>
-          <span class="tooltipped tooltipped-n" aria-label="{{ round.getBlackCard.fillInBlanks(play) | remove_irc_formatting | escape }}">
+    <p class="lead">
+        {{ round.getBlackCard | escape }}
+    </p>
+    {% if (round.getCurrentStage.name == "WAITING_FOR_CZAR") %}
+        <table class="table table-striped">
+            <caption><h2>Plays</h2></caption>
+            <thead>
+                <tr>
+                    <th>Number</th>
+                    <th>Card</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for index in range(0, round.getPlays.size - 1) %}
+                    {% set play = round.getPlays.get(index) %}
+                    <tr>
+                        <td>{{ index + 1 }}</td>
+                        <td>
+          <span class="dotted-underline tooltipped tooltipped-n" aria-label="{{ round.getBlackCard.fillInBlanks(play) | remove_irc_formatting | escape }}">
           {{ play.getWhiteCards | join(', ') | escape }}
           </span>
-        </td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-  {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% elseif (round.getCurrentStage.name == "WAITING_FOR_PLAYERS") %}
+        <table class="table table-striped">
+            <caption><h2>Players</h2></caption>
+            <thead>
+                <tr>
+                    <th>Nickname</th>
+                    <th>Has played</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for player in game.getPlayers %}
+                {% if not player.equals(round.getCzar) %}
+                <tr>
+                    <td>{{ player.getUser.getNick | escape }}</td>
+                    <td>{{ (round.hasPlayed(player)) ? "Yes" : "No" }}</td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 {% endblock %}

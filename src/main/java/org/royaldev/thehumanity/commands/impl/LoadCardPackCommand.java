@@ -41,9 +41,10 @@ public class LoadCardPackCommand extends NoticeableCommand {
             .map(this.humanity::getCardPack)
             .filter(pack -> pack != null)
             .forEach(this.humanity::removeCardPack);
-        // Download or parse each pack again
+        // Download or parse each pack again, filter out the null packs
         final List<CardPack> packs = names.stream()
             .map(this.humanity::parseOrDownloadCardPack)
+            .filter(pack -> pack != null)
             .collect(Collectors.toList());
         // Re-add them
         packs.forEach(this.humanity::addCardPack);

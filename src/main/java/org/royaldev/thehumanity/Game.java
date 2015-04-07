@@ -2,6 +2,7 @@ package org.royaldev.thehumanity;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.IRCFormat;
@@ -39,7 +40,7 @@ public class Game {
      */
     private final List<Player> historicPlayers = Collections.synchronizedList(new ArrayList<>());
     private final Deck deck;
-    private final List<HouseRule> houseRules = new ArrayList<>();
+    private final List<HouseRule> houseRules = Lists.newArrayList();
     private final Player randoCardrissian = new Player(new FakeUser("Rando Cardrissian"));
     private Channel channel;
     private Round currentRound = null;
@@ -56,16 +57,6 @@ public class Game {
         this.channel = channel;
         this.deck = new Deck(cardPacks);
         this.addHouseRule(HouseRule.REBOOTING_THE_UNIVERSE);
-    }
-
-    /**
-     * Gets a list of {@link HouseRule HouseRules} being used for this game.
-     *
-     * @return House rules
-     */
-    @NotNull
-    private List<HouseRule> getHouseRules() {
-        return this.houseRules;
     }
 
     /**
@@ -103,7 +94,7 @@ public class Game {
         Preconditions.checkNotNull(rule, "rule was null");
         if (this.hasHouseRule(rule)) return false;
         this.processAddingHouseRule(rule);
-        return this.getHouseRules().add(rule);
+        return this.houseRules.add(rule);
     }
 
     /**
@@ -305,6 +296,16 @@ public class Game {
             this.getChannel().newModeCommand().addModeChange(true, 'v', this.getHost().getUser()).execute();
         }
         this.showHost();
+    }
+
+    /**
+     * Gets a list of {@link HouseRule HouseRules} being used for this game.
+     *
+     * @return House rules
+     */
+    @NotNull
+    public List<HouseRule> getHouseRules() {
+        return Collections.unmodifiableList(this.houseRules);
     }
 
     /**
@@ -533,7 +534,7 @@ public class Game {
      * @return true if rule was removed, false if otherwise
      */
     public boolean removeHouseRule(final HouseRule rule) {
-        return this.hasHouseRule(rule) && this.getHouseRules().remove(rule);
+        return this.hasHouseRule(rule) && this.houseRules.remove(rule);
     }
 
     /**

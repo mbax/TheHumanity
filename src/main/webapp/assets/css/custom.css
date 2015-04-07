@@ -10,6 +10,15 @@ caption > h2 {
     border-bottom: none;
 }
 
+.dotted-underline {
+    cursor: help;
+    border-bottom: 1px dotted #333;
+}
+
+.tooltipped-left.tooltipped:after {
+    text-align: left;
+}
+
 /* Bootstrap tables */
 table {
     border-collapse: collapse;
