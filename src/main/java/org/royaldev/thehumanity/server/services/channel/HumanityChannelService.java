@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.server.services.channel;
 
+import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.element.Channel;
 import org.royaldev.thehumanity.TheHumanity;
@@ -14,6 +15,7 @@ public class HumanityChannelService implements ChannelService {
 
     @Override
     public Channel getFromName(@NotNull final String name) {
+        Preconditions.checkNotNull(name, "name was null");
         return this.humanity.getBot().getChannel(name);
     }
 }

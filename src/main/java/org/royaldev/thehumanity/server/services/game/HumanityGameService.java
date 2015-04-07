@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.server.services.game;
 
+import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.element.Channel;
 import org.royaldev.thehumanity.Game;
@@ -18,11 +19,13 @@ public class HumanityGameService implements GameService {
 
     @Override
     public Game getFromChannel(@NotNull final Channel channel) {
+        Preconditions.checkNotNull(channel, "channel was null");
         return this.humanity.getGameFor(channel);
     }
 
     @Override
     public Game getFromChannelName(@NotNull final String channel) {
+        Preconditions.checkNotNull(channel, "channel was null");
         return this.getFromChannel(this.channelService.getFromName(channel));
     }
 }
