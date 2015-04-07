@@ -85,6 +85,7 @@ public class TheHumanity {
     private final ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(1);
     private final PingRegistry pingRegistry;
     private final WhoX whoX = new WhoX(this);
+    @Nullable
     private final GameServer gameServer;
     @Option(name = "-c", usage = "Channels to join.", required = true, handler = StringArrayOptionHandler.class)
     private String[] channels;
@@ -131,6 +132,8 @@ public class TheHumanity {
                 this.pingRegistry = null;
                 return;
             }
+        } else {
+            this.gameServer = null;
         }
         this.pingRegistry = PingRegistry.deserializeOrMakePingRegistry();
         // Schedule a repeatedly running saver task, just in case we're not shut down properly
