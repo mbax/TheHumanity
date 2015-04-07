@@ -17,12 +17,21 @@
                 <td>{{ humanity.getVersion | escape }}</td>
             </tr>
             <tr>
-                <td>IRC server</td>
+                <td>IRC network</td>
                 <td>{{ humanity.getBot.getServerInfo.getNetworkName | escape }}</td>
             </tr>
             <tr>
                 <td>Channels</td>
-                <td>{{ humanity.getBot.getChannels.size }}</td>
+                <td>
+                    {% set channels = "" %}
+                    {% for channel in humanity.getBot.getChannels %}
+                        {% set channels = channels.concat(channel.getName).concat("<br/>") %}
+                    {% endfor %}
+                    {% set channels = channels | br2nl %}
+                    <span class="dotted-underline tooltipped tooltipped-n" aria-label="{{ channels }}">
+                        {{ humanity.getBot.getChannels.size }}
+                    </span>
+                </td>
             </tr>
             <tr>
                 <td>Loaded card packs</td>
@@ -35,7 +44,12 @@
 {% block right %}
     <h2>Games</h2>
     {% if (humanity.getGames is empty) %}
-        <p class="lead">There are no current games. Why not start one?</p>
+        <p class="lead">
+            There are no current games. Why not
+            <a href="https://play.thehumanity.co" class="tooltipped tooltipped-n" aria-label="Use !start in the game channel to start a new game.">
+                start one
+            </a>?
+        </p>
     {% else %}
         <table class="table table-striped">
             <thead>
