@@ -191,6 +191,12 @@
             <artifactId>unirest-java</artifactId>
             <version>1.4.5</version>
         </dependency>
+        <!-- JSON -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.4.4</version>
+        </dependency>
         <!-- Turn off logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
