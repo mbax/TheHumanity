@@ -51,7 +51,7 @@
             <p>
                 <strong>The czar is currently choosing a winning card.</strong>
             </p>
-            {% for index in range(0, round.getPlays.size - 1) %}
+            {% for index in range(0, round.getPlays.size - 1) %} {# TODO: See if this needs shuffling #}
                 {% set play = round.getPlays.get(index) %}
                 <p>
                     {{ index + 1 }}. {{ round.getBlackCard.fillInBlanks(play) | escape | irc_bold }}
