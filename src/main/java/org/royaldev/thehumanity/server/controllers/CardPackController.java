@@ -22,7 +22,7 @@ public class CardPackController {
             return "redirect:/";
         }
         model.addAttribute("pack", cp);
-        return "packs/pack/index";
+        return "packs/pack";
     }
 
     @RequestMapping(value = "/packs", method = RequestMethod.GET)

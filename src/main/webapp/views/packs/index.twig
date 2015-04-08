@@ -1,47 +1,35 @@
-{% extends '../layouts/info.twig' %}
+{% extends '../layouts/slate.twig' %}
 
 {% block title %}Card packs{% endblock %}
 
-{% block left %}
+{% block underbar %}
     <h1>Card packs</h1>
 {% endblock %}
 
-{% block right %}
+{% block slate %}
     {% for pack in packs %}
     {% set name = pack.getName | escape %}
-    <h2 class="anchored"><a href="/pack/{{ name }}">{{ name }}</a></h2>
-    <table class="table table-striped">
+    <h2 class="anchored"><a href="/pack/{{ name }}">{{ name }}</a>{% if pack.getAuthor %} <small>by {{ pack.getAuthor }}</small>{% endif %}</h2>
         {% if pack.getDescription %}
-            <tr>
-                <td>Description</td>
-                <td>{{ pack.getDescription | escape }}</td>
-            </tr>
-        {% endif %}
-        {% if pack.getAuthor %}
-            <tr>
-                <td>Author</td>
-                <td>{{ pack.getAuthor | escape }}</td>
-            </tr>
+            <p>
+                <em>{{ pack.getDescription | escape }}</em>
+            </p>
         {% endif %}
         {% if pack.getID %}
-            <tr>
-                <td>Cardcast ID</td>
-                <td>{{ pack.getID | escape }}</td>
-            </tr>
+            <p>
+                This is a Cardcast pack. Its ID is
+                <a href="http://www.cardcastgame.com/browse/deck/{{ pack.getID | escape }}">{{ pack.getID | escape }}</a>.
+            </p>
         {% endif %}
-        {% set totalcards = pack.getWhiteCards.size + pack.getBlackCards.size %}
-        <tr>
-            <td>Cards</td>
-            <td>{{ totalcards }}</td>
-        </tr>
-        <tr>
-            <td>White cards</td>
-            <td>{{ pack.getWhiteCards.size }} ({{ (pack.getWhiteCards.size / totalcards * 100) | number_format(2, '.', ',') }}%)</td>
-        </tr>
-        <tr>
-            <td>Black cards</td>
-            <td>{{ pack.getBlackCards.size }} ({{ (pack.getBlackCards.size / totalcards * 100) | number_format(2, '.', ',') }}%)</td>
-        </tr>
-    </table>
+        {% set whitecards = pack.getWhiteCards.size %}
+        {% set blackcards = pack.getBlackCards.size %}
+        {% set totalcards = whitecards + blackcards %}
+        <p>
+            This pack has a total of {{ totalcards }} {{ plural("card", totalcards) }}, {{ whitecards }}
+            ({{ (whitecards / totalcards * 100) | number_format(2, '.', ',') }}%) of which
+            {{ (whitecards == 1) ? "is a" : "are" }} white {{ plural("card", whitecards) }}, and {{ blackcards }}
+            ({{ (blackcards / totalcards * 100) | number_format(2, '.', ',') }}%) of which
+            {{ (blackcards == 1) ? "is a" : "are" }} black {{ plural("card", blackcards) }}.
+        </p>
     {% endfor %}
 {% endblock %}

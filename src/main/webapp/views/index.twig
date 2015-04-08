@@ -1,75 +1,33 @@
-{% extends 'layouts/info.twig' %}
+{% extends 'layouts/slate.twig' %}
 
-{% block title %}{% set nick = humanity.getBot.getNick | default("TheHumanity") %}{{ nick | escape }}{% endblock %}
+{% block title %}{{ nick }}{% endblock %}
 
-{% block left %}
-    <h1>{{ nick }}</h1>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Datum</th>
-                <th>Value</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Version</td>
-                <td>{{ humanity.getVersion | escape }}</td>
-            </tr>
-            <tr>
-                <td>IRC network</td>
-                <td>{{ humanity.getBot.getServerInfo.getNetworkName | escape }}</td>
-            </tr>
-            <tr>
-                <td>Channels</td>
-                <td>
-                    {% set channels = "" %}
-                    {% for channel in humanity.getBot.getChannels %}
-                        {% set channels = channels.concat(channel.getName).concat("<br/>") %}
-                    {% endfor %}
-                    {% set channels = channels | br2nl %}
-                    <span class="dotted-underline tooltipped tooltipped-left tooltipped-e" aria-label="{{ channels.substring(0, channels.length - 1) }}">
-                        {{ humanity.getBot.getChannels.size }}
-                    </span>
-                </td>
-            </tr>
-            <tr>
-                <td>Loaded card packs</td>
-                <td><a href="/packs">{{ humanity.getLoadedCardPacks.size }}</a></td>
-            </tr>
-        </tbody>
-    </table>
+{% block underbar %}
+    <h1>{{ nick }} <small>{{ humanity.getVersion | escape }}</small></h1>
 {% endblock %}
 
-{% block right %}
-    <h2>Games</h2>
-    {% if (humanity.getGames is empty) %}
-        <p class="lead">
-            There are no current games. Why not
-            <a href="https://play.thehumanity.co" class="tooltipped tooltipped-left tooltipped-n" aria-label="Use !start in the game channel to start a new game.">start one</a>?
-        </p>
-    {% else %}
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Channel</th>
-                    <th>Players</th>
-                    <th>Status</th>
-                    <th>Round</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for channel, game in humanity.getGames %}
-                    <tr>
-                        <td>
-                            <a href="/game/{{ channel.getName.substring(1) | escape }}">{{ channel.getName | escape }}</a>
-                        </td>
-                        <td>{{ game.getPlayers.size }}</td>
-                        <td>{{ game.getGameStatus | friendly_enum }}</td>
-                        <td>{{ (game.getCurrentRound is null) ? "Not started" : game.getCurrentRound.getNumber }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+{% block slate %}
+    <h2>Currently...</h2>
+    <p>
+        {{ nick }} is connected to
+        <strong>{{ humanity.getBot.getServerInfo.getNetworkName | default("an unknown network") }}</strong>.
+    </p>
+    {% set channels = humanity.getBot.getChannels.size %}
+    <p>
+        {{ nick }} is residing in
+        <strong>{{ channels }}</strong>
+        {{ plural("channel", channels) }}.
+    </p>
+    {% set games = humanity.getGames.size %}
+    <p>
+        {{ nick }} is facilitating
+        <strong>{{ games }}</strong>
+        {{ plural("game", games) }}.
+    </p>
+    {% set packs = humanity.getLoadedCardPacks.size %}
+    <p>
+        {{ nick }} has
+        <strong>{{ packs }}</strong>
+        loaded card {{ plural("pack", packs) }}.
+    </p>
 {% endblock %}

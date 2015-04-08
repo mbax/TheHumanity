@@ -1,3 +1,4 @@
+{% set nick = (humanity.getBot.getNick | default('TheHumanity')) | escape %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -6,8 +7,12 @@
   <link rel="stylesheet" type="text/css" href="/assets/css/primer.css"/>
   <link rel="stylesheet" type="text/css" href="/assets/css/custom.css"/>
   <link rel="stylesheet" type="text/css" href="/assets/css/anchor.css"/>
+  <link rel="stylesheet" type="text/css" href="/assets/octicons/octicons.css"/>
 </head>
 <body onload="addAnchors('.anchored')">
+<div class="pre-content">
+  {% include '../includes/top-bar.twig' %}
+</div>
 <div class="container">
   {% block content %}{% endblock %}
 </div>

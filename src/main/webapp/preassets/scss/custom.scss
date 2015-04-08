@@ -1,0 +1,77 @@
+/* Top bar */
+.top-bar {
+  $background-color: #000;
+  $color: #fff;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid lighten($background-color, 10%);
+  background-color: $background-color;
+  color: $color;
+
+  .title {
+    margin-right: 1em;
+    &, & > * {
+      color: $color;
+    }
+    a {
+      padding: 0;
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
+
+  a {
+    color: #d9d9d9;
+    padding: 0 .5em;
+    &:hover {
+      text-decoration: none;
+      color: #fff;
+    }
+  }
+}
+
+.under-bar {
+  $background-color: rgba(0, 0, 0, 0.8);
+  $color: darken(#fff, 15%);
+  background-color: $background-color;
+  color: $color;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+  border-bottom: lighten($background-color, 10%);
+
+  h1, h2, h3, h4, h5, h6 {
+    border-bottom: 0;
+  }
+
+  .separated > * {
+    margin-left: 1em;
+  }
+}
+
+h1, h2, h3, h4, h5, h6 {
+  & > small {
+    font-size: .5em;
+    color: #909090;
+  }
+}
+
+.blankslate {
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.05) inset;
+  background-color: #050505;
+  border: 1px solid #1A1A1A;
+}
+
+.slate {
+  position: relative;
+  padding: 30px;
+  border-radius: 3px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.05) inset;
+  background-color: #050505;
+  border: 1px solid #1A1A1A;
+
+  .mega-octicon {
+    color: #707070;
+  }
+}

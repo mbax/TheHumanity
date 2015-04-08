@@ -1,5 +1,5 @@
 body {
-    background: #181818 url('/assets/img/background.png');
+    background-color: #1a1a1a;
     color: #c0c0c0;
 }
 
@@ -27,6 +27,81 @@ caption > h2 {
 .tooltipped-left.tooltipped:after {
     text-align: left;
 }
+
+.text-center {
+    text-align: center;
+}
+
+/* Top bar */
+.top-bar {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #1a1a1a;
+    background-color: black;
+    color: white;
+}
+.top-bar .title {
+    margin-right: 1em;
+}
+.top-bar .title, .top-bar .title > * {
+    color: white;
+}
+.top-bar .title a {
+    padding: 0;
+}
+.top-bar .title a:hover {
+    text-decoration: none;
+}
+.top-bar a {
+    color: #d9d9d9;
+    padding: 0 .5em;
+}
+.top-bar a:hover {
+    text-decoration: none;
+    color: #fff;
+}
+
+.under-bar {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #d9d9d9;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    border-bottom: rgba(26, 26, 26, 0.8);
+}
+.under-bar h1, .under-bar h2, .under-bar h3, .under-bar h4, .under-bar h5, .under-bar h6 {
+    border-bottom: 0;
+}
+
+.under-bar .separated > * {
+    margin-left: 1em;
+}
+
+h1 > small, h2 > small, h3 > small, h4 > small, h5 > small, h6 > small {
+    font-size: .5em;
+    color: #909090;
+}
+
+.blankslate {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.05) inset;
+    background-color: #050505;
+    border: 1px solid #1A1A1A;
+}
+
+.slate {
+    position: relative;
+    padding: 30px;
+    border-radius: 3px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.05) inset;
+    background-color: #050505;
+    border: 1px solid #1A1A1A;
+}
+.slate .mega-octicon {
+    color: #707070;
+}
+
+
+/* Tooltip inversion */
 
 .tooltipped:after {
     color: #000;
@@ -292,7 +367,7 @@ table th[class*="col-"] {
         margin-bottom: 15px;
         overflow-y: hidden;
         -ms-overflow-style: -ms-autohiding-scrollbar;
-        border: 1px solid #dddddd;
+        border: 1px solid #343434;
     }
 
     .table-responsive > .table {

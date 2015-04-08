@@ -10,20 +10,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
-@RequestMapping("/game/{channel}")
 public class GameController {
 
     @Autowired
     private GameService gameService;
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(value = "/game/{channel}", method = RequestMethod.GET)
     public String gameInChannel(@PathVariable final String channel, final Model model) {
         final Game g = this.gameService.getFromChannelName("#" + channel);
         if (g == null) {
             return "redirect:/";
         }
         model.addAttribute("game", g);
-        return "game/index";
+        return "games/game";
+    }
+
+    @RequestMapping(value = "/games", method = RequestMethod.GET)
+    public String viewGames(final Model model) {
+        model.addAttribute("games", this.gameService.getAll());
+        return "games/index";
     }
 
 }

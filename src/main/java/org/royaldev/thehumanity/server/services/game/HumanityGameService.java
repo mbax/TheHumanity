@@ -9,6 +9,8 @@ import org.royaldev.thehumanity.server.services.channel.ChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 public class HumanityGameService implements GameService {
 
@@ -16,6 +18,11 @@ public class HumanityGameService implements GameService {
     private TheHumanity humanity;
     @Autowired
     private ChannelService channelService;
+
+    @Override
+    public Map<Channel, Game> getAll() {
+        return this.humanity.getGames();
+    }
 
     @Override
     public Game getFromChannel(@NotNull final Channel channel) {
