@@ -1,0 +1,24 @@
+{% extends '../layouts/slate.twig' %}
+
+{% block title %}Channels{% endblock %}
+
+{% block underbar %}
+    <h1>Channels <small>{{ channels.size }} of them</small></h1>
+{% endblock %}
+
+{% block slate %}
+    {% if channels.size <= 0 %}
+        <div class="text-center">
+            <span class="mega-octicon octicon-alert"></span>
+            <p class="lead">
+                Not connected to any channels.
+            </p>
+        </div>
+    {% else %}
+        {% for channel in channels %}
+            {% set amount_nicks = channel.getNicknames.size %}
+            {% set name = channel.getName | escape %}
+            <h2><a href="/channel/{{ name.substring(1) }}">{{ name }}</a> <small>{{ amount_nicks }} {{ plural("user", amount_nicks) }}</small></h2>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

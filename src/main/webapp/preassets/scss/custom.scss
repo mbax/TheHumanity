@@ -1,4 +1,15 @@
-/* Responsive container */
+@import "primer";
+@import "tooltips";
+@import "anchor";
+@import "bootstrap-tables";
+
+// Background
+body {
+  background-color: #1a1a1a;
+  color: #c0c0c0;
+}
+
+// Responsive container
 .container {
   @media (max-width: 979px) {
     margin: 0 2%;
@@ -6,7 +17,7 @@
   }
 }
 
-/* Top bar */
+// Top bar
 .top-bar {
   $background-color: #000;
   $color: #fff;
@@ -39,6 +50,7 @@
   }
 }
 
+// Under bar
 .under-bar {
   $background-color: rgba(0, 0, 0, 0.8);
   $color: darken(#fff, 15%);
@@ -58,6 +70,7 @@
   }
 }
 
+// Small inside headers
 h1, h2, h3, h4, h5, h6 {
   & > small {
     font-size: .5em;
@@ -65,21 +78,57 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+// Changing blankslate colors
 .blankslate {
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.05) inset;
-  background-color: #050505;
-  border: 1px solid #1A1A1A;
-}
-
-.slate {
-  position: relative;
-  padding: 30px;
-  border-radius: 3px;
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.05) inset;
   background-color: #050505;
   border: 1px solid #1A1A1A;
 
   .mega-octicon {
     color: #707070;
+  }
+}
+
+// Fixing lead margins in slates
+.blankslate {
+  p.lead {
+    margin-bottom: 0;
+  }
+}
+
+// Making a copy of blankslate without text-align: center
+.slate {
+  @extend .blankslate;
+  text-align: initial;
+}
+
+// Utilities
+.dotted-underline {
+  cursor: help;
+  border-bottom: 1px dotted #c0c0c0;
+}
+
+.text-center {
+  text-align: center;
+}
+
+// Fixing colors
+.lead {
+  color: #c0c0c0;
+}
+
+a {
+  color: #4183C4;
+}
+
+// Add border to headers
+h1, h2, h3, h4, h5, h6 {
+  border-bottom: 1px solid #343434;
+}
+
+// Remove border from captioned headers
+caption {
+  h1, h2, h3, h4, h5, h6 {
+    border-bottom: none;
   }
 }

@@ -38,3 +38,6 @@ package
 /dev.sh
 pid
 pingregistry.dat
+
+# SASS
+.sass-cache

@@ -7,11 +7,18 @@ import org.royaldev.thehumanity.TheHumanity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 @Service
 public class HumanityChannelService implements ChannelService {
 
     @Autowired
     private TheHumanity humanity;
+
+    @Override
+    public Set<Channel> getAll() {
+        return this.humanity.getBot().getChannels();
+    }
 
     @Override
     public Channel getFromName(@NotNull final String name) {
