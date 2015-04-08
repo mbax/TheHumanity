@@ -150,7 +150,8 @@ public class Game {
     @NotNull
     public String antiPing(@NotNull String message) {
         Preconditions.checkNotNull(message, "message was null");
-        for (final String nickname : this.channel.getNicknames()) {
+        for (final User user : this.channel.getUsers()) { // TODO: Use nicknames when it's not stupid (non-lowercase)
+            final String nickname = user.getNick();
             if (nickname.length() <= 1) continue;
             message = message.replace(nickname, nickname.substring(0, 1) + "\u200b" + nickname.substring(1));
         }
