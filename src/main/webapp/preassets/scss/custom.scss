@@ -1,3 +1,11 @@
+/* Responsive container */
+.container {
+  @media (max-width: 979px) {
+    margin: 0 2%;
+    width: 96%;
+  }
+}
+
 /* Top bar */
 .top-bar {
   $background-color: #000;

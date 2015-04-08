@@ -3,6 +3,14 @@ body {
     color: #c0c0c0;
 }
 
+/* Responsive container */
+@media (max-width: 979px) {
+    .container {
+        margin: 0 2%;
+        width: 96%;
+    }
+}
+
 .lead {
     color: #c0c0c0;
 }
