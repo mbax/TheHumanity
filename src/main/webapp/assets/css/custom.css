@@ -2634,6 +2634,7 @@ table th[class*="col-"] {
 body {
   background-color: #1a1a1a;
   color: #c0c0c0;
+  font-family: "Lato", "Helvetica", "Arial", sans-serif;
 }
 
 @media (max-width: 979px) {
