@@ -1,0 +1,47 @@
+{% extends '../layouts/info.twig' %}
+
+{% block title %}Card packs{% endblock %}
+
+{% block left %}
+    <h1>Card packs</h1>
+{% endblock %}
+
+{% block right %}
+    {% for pack in packs %}
+    {% set name = pack.getName | escape %}
+    <h2 class="anchored"><a href="/pack/{{ name }}">{{ name }}</a></h2>
+    <table class="table table-striped">
+        {% if pack.getDescription %}
+            <tr>
+                <td>Description</td>
+                <td>{{ pack.getDescription | escape }}</td>
+            </tr>
+        {% endif %}
+        {% if pack.getAuthor %}
+            <tr>
+                <td>Author</td>
+                <td>{{ pack.getAuthor | escape }}</td>
+            </tr>
+        {% endif %}
+        {% if pack.getID %}
+            <tr>
+                <td>Cardcast ID</td>
+                <td>{{ pack.getID | escape }}</td>
+            </tr>
+        {% endif %}
+        {% set totalcards = pack.getWhiteCards.size + pack.getBlackCards.size %}
+        <tr>
+            <td>Cards</td>
+            <td>{{ totalcards }}</td>
+        </tr>
+        <tr>
+            <td>White cards</td>
+            <td>{{ pack.getWhiteCards.size }} ({{ (pack.getWhiteCards.size / totalcards * 100) | number_format(2, '.', ',') }}%)</td>
+        </tr>
+        <tr>
+            <td>Black cards</td>
+            <td>{{ pack.getBlackCards.size }} ({{ (pack.getBlackCards.size / totalcards * 100) | number_format(2, '.', ',') }}%)</td>
+        </tr>
+    </table>
+    {% endfor %}
+{% endblock %}

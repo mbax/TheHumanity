@@ -1,0 +1,15 @@
+{% extends 'master.twig' %}
+
+{% block content %}
+    <div class="columns">
+        <div class="one-third column">
+            {% block left %}{% endblock %}
+        </div>
+        <div class="one-third column">
+            {% block middle %}{% endblock %}
+        </div>
+        <div class="one-third column">
+            {% block right %}{% endblock %}
+        </div>
+    </div>
+{% endblock %}
