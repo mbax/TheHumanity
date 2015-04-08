@@ -2732,3 +2732,13 @@ h1, h2, h3, h4, h5, h6 {
 caption h1, caption h2, caption h3, caption h4, caption h5, caption h6 {
   border-bottom: none;
 }
+
+.octicon.fixed-width-octicon {
+  width: 16px;
+  text-align: center;
+}
+
+.mega-octicon.fixed-width-octicon {
+  width: 32px;
+  text-align: center;
+}

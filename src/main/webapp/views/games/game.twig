@@ -42,7 +42,7 @@
             {% for player in game.getPlayers %}
                 {% if not player.equals(round.getCzar) %}
                     <p>
-                        <span class="octicon octicon-{% if round.hasPlayed(player) %}check{% else %}x{% endif %}"></span>
+                        <span class="octicon fixed-width-octicon octicon-{% if round.hasPlayed(player) %}check{% else %}x{% endif %}"></span>
                         {{ player.getUser.getNick | escape }}
                     </p>
                 {% endif %}

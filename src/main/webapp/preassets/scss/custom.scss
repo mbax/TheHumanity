@@ -132,3 +132,18 @@ caption {
     border-bottom: none;
   }
 }
+
+// Fixed-width octicons
+.octicon {
+  &.fixed-width-octicon {
+    width: 16px;
+    text-align: center;
+  }
+}
+
+.mega-octicon {
+  &.fixed-width-octicon {
+    width: 32px;
+    text-align: center;
+  }
+}
