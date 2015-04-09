@@ -1,4 +1,4 @@
-package org.royaldev.thehumanity;
+package org.royaldev.thehumanity.game;
 
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;

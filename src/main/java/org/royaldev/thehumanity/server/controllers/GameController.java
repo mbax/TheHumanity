@@ -4,11 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONWriter;
 import org.kitteh.irc.client.library.element.Channel;
-import org.royaldev.thehumanity.Game;
-import org.royaldev.thehumanity.HouseRule;
-import org.royaldev.thehumanity.Round;
-import org.royaldev.thehumanity.Round.RoundStage;
-import org.royaldev.thehumanity.cards.Play;
+import org.royaldev.thehumanity.game.round.CurrentRound;
+import org.royaldev.thehumanity.game.Game;
+import org.royaldev.thehumanity.game.HouseRule;
+import org.royaldev.thehumanity.game.round.Round.RoundStage;
+import org.royaldev.thehumanity.cards.play.Play;
 import org.royaldev.thehumanity.cards.packs.CardPack;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
 import org.royaldev.thehumanity.player.Player;
@@ -62,7 +62,7 @@ public class GameController {
             .key("gameStatus")
             .value(g.getGameStatus())
             .key("currentRound");
-        final Round round = g.getCurrentRound();
+        final CurrentRound round = g.getCurrentRound();
         if (round == null) {
             jw.value(null);
         } else {

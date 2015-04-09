@@ -50,6 +50,7 @@ import org.royaldev.thehumanity.commands.impl.VersionCommand;
 import org.royaldev.thehumanity.commands.impl.WhoCommand;
 import org.royaldev.thehumanity.commands.impl.game.GameCommand;
 import org.royaldev.thehumanity.commands.impl.ping.PingListCommand;
+import org.royaldev.thehumanity.game.Game;
 import org.royaldev.thehumanity.handlers.CommandHandler;
 import org.royaldev.thehumanity.ping.PingRegistry;
 import org.royaldev.thehumanity.ping.WhoX;

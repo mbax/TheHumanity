@@ -3,7 +3,7 @@ package org.royaldev.thehumanity.server.services.game;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.element.Channel;
-import org.royaldev.thehumanity.Game;
+import org.royaldev.thehumanity.game.Game;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.server.services.channel.ChannelService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package org.royaldev.thehumanity;
+package org.royaldev.thehumanity.game.round;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
@@ -8,10 +8,14 @@ import com.google.common.collect.Multisets;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.IRCFormat;
-import org.royaldev.thehumanity.cards.Play;
+import org.royaldev.thehumanity.cards.play.Play;
 import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
+import org.royaldev.thehumanity.game.Game;
+import org.royaldev.thehumanity.game.HouseRule;
 import org.royaldev.thehumanity.player.Player;
+import org.royaldev.thehumanity.util.Snapshottable;
+import org.royaldev.thehumanity.util.json.JSONSerializable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +29,7 @@ import java.util.stream.Collectors;
 /**
  * Represents a single round of the game.
  */
-public class Round {
+public class CurrentRound implements Round, JSONSerializable, Snapshottable<RoundSnapshot> {
 
     private final Game game;
     private final int number;
@@ -37,6 +41,8 @@ public class Round {
     private final Set<Player> voters = new HashSet<>();
     private ScheduledFuture reminderTask;
     private RoundStage currentStage = RoundStage.IDLE;
+    private Play winningPlay;
+    private long startTime, endTime;
 
     /**
      * Creates a new round for the given game.
@@ -46,7 +52,7 @@ public class Round {
      * @param blackCard The black card used for this round
      * @param czar      The czar, or null if playing a mode with no czar
      */
-    Round(@NotNull final Game game, final int number, @NotNull final BlackCard blackCard, @Nullable final Player czar) {
+    public CurrentRound(@NotNull final Game game, final int number, @NotNull final BlackCard blackCard, @Nullable final Player czar) {
         Preconditions.checkNotNull(game, "game was null");
         Preconditions.checkNotNull(blackCard, "blackCard was null");
         this.game = game;
@@ -102,6 +108,7 @@ public class Round {
         if (!this.getGame().hasEnoughPlayers()) return;
         switch (this.currentStage) {
             case WAITING_FOR_PLAYERS:
+                this.startTime = System.currentTimeMillis();
                 this.processHouseRules();
                 this.game.showCards();
                 break;
@@ -119,6 +126,7 @@ public class Round {
                 this.reminderTask = this.makeReminderTask();
                 break;
             case ENDED:
+                this.endTime = System.currentTimeMillis();
                 this.getGame().advanceStage();
                 break;
         }
@@ -199,7 +207,7 @@ public class Round {
         this.cancelReminderTask();
         index--;
         if (index < 0 || index >= this.getPlays().size()) return;
-        final Play p = this.getPlays().get(index);
+        final Play p = this.winningPlay = this.getPlays().get(index);
         p.getPlayer().addWin(this.getBlackCard());
         this.getGame().sendMessage(IRCFormat.RESET + "Play " + IRCFormat.BOLD + (index + 1) + IRCFormat.RESET + " by " + IRCFormat.BOLD + p.getPlayer().getUser().getNick() + IRCFormat.RESET + " wins!");
         this.advanceStage();
@@ -231,19 +239,10 @@ public class Round {
      *
      * @return Black card
      */
+    @Override
     @NotNull
     public BlackCard getBlackCard() {
         return this.blackCard;
-    }
-
-    /**
-     * Gets the current stage this round is in.
-     *
-     * @return RoundStage
-     */
-    @NotNull
-    public RoundStage getCurrentStage() {
-        return this.currentStage;
     }
 
     /**
@@ -251,19 +250,10 @@ public class Round {
      *
      * @return Czar
      */
+    @Override
     @Nullable
     public Player getCzar() {
         return this.czar;
-    }
-
-    /**
-     * Gets the game that this round is associated with.
-     *
-     * @return Game
-     */
-    @NotNull
-    public Game getGame() {
-        return this.game;
     }
 
     /**
@@ -272,6 +262,7 @@ public class Round {
      *
      * @return Play that had the highest amount of votes
      */
+    @Override
     public Play getMostVoted() {
         return Multisets.copyHighestCountFirst(this.votes).iterator().next();
     }
@@ -281,6 +272,7 @@ public class Round {
      *
      * @return Number
      */
+    @Override
     public int getNumber() {
         return this.number;
     }
@@ -291,6 +283,7 @@ public class Round {
      *
      * @return Cloned list of plays
      */
+    @Override
     @NotNull
     public List<Play> getPlays() {
         synchronized (this.plays) {
@@ -304,11 +297,32 @@ public class Round {
      *
      * @return List of skipped players
      */
+    @Override
     @NotNull
     public Set<Player> getSkippedPlayers() {
         synchronized (this.skippedPlayers) {
             return this.skippedPlayers;
         }
+    }
+
+    /**
+     * Gets the current stage this round is in.
+     *
+     * @return RoundStage
+     */
+    @NotNull
+    public RoundStage getCurrentStage() {
+        return this.currentStage;
+    }
+
+    /**
+     * Gets the game that this round is associated with.
+     *
+     * @return Game
+     */
+    @NotNull
+    public Game getGame() {
+        return this.game;
     }
 
     /**
@@ -388,6 +402,30 @@ public class Round {
         return true;
     }
 
+    @NotNull
+    @Override
+    public RoundSnapshot takeSnapshot() {
+        return new RoundSnapshot(
+            this.getNumber(),
+            this.startTime,
+            this.endTime,
+            this.getBlackCard().getText(),
+            this.getCzar() == null ? null : this.getCzar().getUser().getNick(),
+            this.winningPlay == null ? null : this.winningPlay.getPlayer().getUser().getNick(),
+            "SUCCESSFUL", this.getPlays().stream().map(Play::takeSnapshot).collect(Collectors.toList()),
+            this.getGame().getPlayers().stream().map(p -> p.getUser().getNick()).collect(Collectors.toSet()),
+            this.getSkippedPlayers().stream().map(p -> p.getUser().getNick()).collect(Collectors.toSet()),
+            this.getGame().getHistoricPlayers().stream().collect(Collectors.toMap(p -> p.getUser().getNick(), p -> p.equals(this.winningPlay.getPlayer()) ? 1 : 0)),
+            this.votes.stream().collect(Collectors.toMap(play -> play.getPlayer().getUser().getNick(), this.votes::count))
+        );
+    }
+
+    @NotNull
+    @Override
+    public String toJSON() {
+        return this.takeSnapshot().toJSON();
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -397,25 +435,6 @@ public class Round {
             .add("czar", this.czar)
             .add("currentStage", this.currentStage)
             .toString();
-    }
-
-    public enum RoundStage {
-        /**
-         * This round has not started.
-         */
-        IDLE,
-        /**
-         * The players are submitting their cards for this round.
-         */
-        WAITING_FOR_PLAYERS,
-        /**
-         * The czar is choosing a winner for this round.
-         */
-        WAITING_FOR_CZAR,
-        /**
-         * This round has ended.
-         */
-        ENDED
     }
 
 }

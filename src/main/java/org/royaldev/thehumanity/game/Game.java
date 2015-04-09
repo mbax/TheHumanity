@@ -1,4 +1,4 @@
-package org.royaldev.thehumanity;
+package org.royaldev.thehumanity.game;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
@@ -8,16 +8,21 @@ import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.kitteh.irc.client.library.element.Channel;
 import org.kitteh.irc.client.library.element.User;
-import org.royaldev.thehumanity.Round.RoundStage;
+import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.cards.Deck;
 import org.royaldev.thehumanity.cards.packs.CardPack;
 import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
 import org.royaldev.thehumanity.exceptions.MissingCzarException;
+import org.royaldev.thehumanity.game.round.CurrentRound;
+import org.royaldev.thehumanity.game.round.Round;
+import org.royaldev.thehumanity.game.round.Round.RoundStage;
 import org.royaldev.thehumanity.player.Hand;
 import org.royaldev.thehumanity.player.Player;
 import org.royaldev.thehumanity.util.DescendingValueComparator;
 import org.royaldev.thehumanity.util.FakeUser;
+import org.royaldev.thehumanity.util.Snapshottable;
+import org.royaldev.thehumanity.util.json.JSONSerializable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,8 +32,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
-public class Game {
+public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
 
     private final TheHumanity humanity;
     /**
@@ -43,11 +49,12 @@ public class Game {
     private final List<HouseRule> houseRules = Lists.newArrayList();
     private final Player randoCardrissian = new Player(new FakeUser("Rando Cardrissian"));
     private Channel channel;
-    private Round currentRound = null;
+    private CurrentRound currentRound = null;
     private Player host = null;
     private ScheduledFuture countdownTask;
     private GameStatus gameStatus = GameStatus.IDLE;
     private boolean hostWasVoiced = false;
+    private long startTime, endTime;
 
     public Game(@NotNull final TheHumanity humanity, @NotNull final Channel channel, @NotNull final List<CardPack> cardPacks) {
         Preconditions.checkNotNull(humanity, "humanity was null");
@@ -231,7 +238,7 @@ public class Game {
      * @return Round
      */
     @Nullable
-    public Round getCurrentRound() {
+    public CurrentRound getCurrentRound() {
         return this.currentRound;
     }
 
@@ -458,6 +465,7 @@ public class Game {
         }
         switch (newStatus) {
             case JOINING:
+                this.startTime = System.currentTimeMillis();
                 final StringBuilder sb = new StringBuilder();
                 sb.append(IRCFormat.BOLD).append("Card packs for this game:").append(IRCFormat.RESET).append(" ");
                 this.getDeck().getCardPacks().stream().forEach(cp -> sb.append(cp.getName()).append(", "));
@@ -468,7 +476,7 @@ public class Game {
                 break;
             case PLAYING:
                 if (!this.hasEnoughPlayers()) return;
-                final Round currentRound = this.getCurrentRound();
+                final CurrentRound currentRound = this.getCurrentRound();
                 final boolean hadRound = currentRound != null;
                 if (hadRound) {
                     this.showScores();
@@ -490,7 +498,7 @@ public class Game {
                     }
                 } while (blackCard.getBlanks() > 10 || blackCard.getBlanks() < 1);
                 if (hadRound) currentRound.cancelReminderTask();
-                this.currentRound = new Round(this, !hadRound ? 1 : currentRound.getNumber() + 1, blackCard, this.hasHouseRule(HouseRule.GOD_IS_DEAD) ? null : this.getPlayers().get(index));
+                this.currentRound = new CurrentRound(this, !hadRound ? 1 : currentRound.getNumber() + 1, blackCard, this.hasHouseRule(HouseRule.GOD_IS_DEAD) ? null : this.getPlayers().get(index));
                 this.deal();
                 this.sendMessage(" ");
                 this.sendMessage(IRCFormat.BOLD + "Round " + this.getCurrentRound().getNumber() + IRCFormat.RESET + "!");
@@ -703,7 +711,32 @@ public class Game {
             this.sendMessage(IRCFormat.BOLD + "The game has ended.");
             if (this.gameStatus != GameStatus.JOINING) this.showScores();
         }
+        this.endTime = System.currentTimeMillis();
         this.gameStatus = GameStatus.ENDED;
+    }
+
+    @NotNull
+    @Override
+    public GameSnapshot takeSnapshot() {
+        return new GameSnapshot(
+            this.getChannel().getName(),
+            "NOT_ENOUGH_PLAYERS", // TODO: Implement
+            this.startTime,
+            this.endTime,
+            this.getPlayers().stream().map(p -> p.getUser().getNick()).collect(Collectors.toList()),
+            this.getHistoricPlayers().stream().map(p -> p.getUser().getNick()).collect(Collectors.toList()),
+            this.getHouseRules().stream().map(HouseRule::getFriendlyName).collect(Collectors.toList()),
+            this.getDeck().getCardPacks().stream().map(CardPack::getName).collect(Collectors.toList()),
+            this.getHistoricPlayers().stream().collect(Collectors.toMap(p -> p.getUser().getNick(), Player::getScore)),
+            this.getHost().getUser().getNick(),
+            this.getCurrentRound() == null ? 0 : this.getCurrentRound().getNumber()
+        );
+    }
+
+    @NotNull
+    @Override
+    public String toJSON() {
+        return this.takeSnapshot().toJSON();
     }
 
     @Override
