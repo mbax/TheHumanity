@@ -13,8 +13,9 @@
     {% for user in channel.getUsers %} {# TODO: Use getNicknames when it's fixed #}
         {# TODO: Style this #}
         <p>
-            <strong>{{ user.getNick | escape }}</strong> is connected under the username {{ user.getUser | escape }}
-            from the host {{ user.getHost | escape }}.
+            <span class="tooltipped tooltipped-n" aria-label="{{ user.getNick | escape }}!{{ user.getUser | escape }}@{{ user.getHost | escape }}">
+                {{ user.getNick | escape }}
+            </span>
         </p>
     {% endfor %}
 {% endblock %}
