@@ -7,29 +7,38 @@
 {% endblock %}
 
 {% block slate %}
-    {% for pack in packs %}
-    {% set name = pack.getName | escape %}
-    <h2 class="anchored"><a href="/pack/{{ name }}">{{ name }}</a>{% if pack.getAuthor %} <small>by {{ pack.getAuthor }}</small>{% endif %}</h2>
-        {% if pack.getDescription %}
-            <p>
-                <em>{{ pack.getDescription | escape }}</em>
+    {% if packs.size <= 0 %}
+        <div class="center">
+            <span class="mega-octicon octicon-alert"></span>
+            <p class="lead">
+                There are no loaded card packs.
             </p>
-        {% endif %}
-        {% if pack.getID %}
+        </div>
+    {% else %}
+        {% for pack in packs %}
+        {% set name = pack.getName | escape %}
+        <h2 class="anchored"><a href="/pack/{{ name }}">{{ name }}</a>{% if pack.getAuthor %} <small>by {{ pack.getAuthor }}</small>{% endif %}</h2>
+            {% if pack.getDescription %}
+                <p>
+                    <em>{{ pack.getDescription | escape }}</em>
+                </p>
+            {% endif %}
+            {% if pack.getID %}
+                <p>
+                    This is a Cardcast pack. Its ID is
+                    <a href="http://www.cardcastgame.com/browse/deck/{{ pack.getID | escape }}">{{ pack.getID | escape }}</a>.
+                </p>
+            {% endif %}
+            {% set whitecards = pack.getWhiteCards.size %}
+            {% set blackcards = pack.getBlackCards.size %}
+            {% set totalcards = whitecards + blackcards %}
             <p>
-                This is a Cardcast pack. Its ID is
-                <a href="http://www.cardcastgame.com/browse/deck/{{ pack.getID | escape }}">{{ pack.getID | escape }}</a>.
+                This pack has a total of {{ totalcards }} {{ plural("card", totalcards) }}, {{ whitecards }}
+                ({{ (whitecards / totalcards * 100) | number_format(2, '.', ',') }}%) of which
+                {{ (whitecards == 1) ? "is a" : "are" }} white {{ plural("card", whitecards) }}, and {{ blackcards }}
+                ({{ (blackcards / totalcards * 100) | number_format(2, '.', ',') }}%) of which
+                {{ (blackcards == 1) ? "is a" : "are" }} black {{ plural("card", blackcards) }}.
             </p>
-        {% endif %}
-        {% set whitecards = pack.getWhiteCards.size %}
-        {% set blackcards = pack.getBlackCards.size %}
-        {% set totalcards = whitecards + blackcards %}
-        <p>
-            This pack has a total of {{ totalcards }} {{ plural("card", totalcards) }}, {{ whitecards }}
-            ({{ (whitecards / totalcards * 100) | number_format(2, '.', ',') }}%) of which
-            {{ (whitecards == 1) ? "is a" : "are" }} white {{ plural("card", whitecards) }}, and {{ blackcards }}
-            ({{ (blackcards / totalcards * 100) | number_format(2, '.', ',') }}%) of which
-            {{ (blackcards == 1) ? "is a" : "are" }} black {{ plural("card", blackcards) }}.
-        </p>
-    {% endfor %}
+        {% endfor %}
+    {% endif %}
 {% endblock %}
