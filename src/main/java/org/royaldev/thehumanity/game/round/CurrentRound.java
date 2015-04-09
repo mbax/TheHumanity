@@ -43,6 +43,7 @@ public class CurrentRound implements Round, JSONSerializable, Snapshottable<Roun
     private RoundStage currentStage = RoundStage.IDLE;
     private Play winningPlay;
     private long startTime, endTime;
+    private RoundEndCause endCause = RoundEndCause.NOT_ENDED;
 
     /**
      * Creates a new round for the given game.
@@ -210,6 +211,7 @@ public class CurrentRound implements Round, JSONSerializable, Snapshottable<Roun
         final Play p = this.winningPlay = this.getPlays().get(index);
         p.getPlayer().addWin(this.getBlackCard());
         this.getGame().sendMessage(IRCFormat.RESET + "Play " + IRCFormat.BOLD + (index + 1) + IRCFormat.RESET + " by " + IRCFormat.BOLD + p.getPlayer().getUser().getNick() + IRCFormat.RESET + " wins!");
+        this.setEndCause(RoundEndCause.CZAR_CHOSE_WINNER);
         this.advanceStage();
     }
 
@@ -315,6 +317,16 @@ public class CurrentRound implements Round, JSONSerializable, Snapshottable<Roun
         return this.currentStage;
     }
 
+    @NotNull
+    public RoundEndCause getEndCause() {
+        return this.endCause;
+    }
+
+    public void setEndCause(@NotNull final RoundEndCause endCause) {
+        Preconditions.checkNotNull(endCause, "endCause was null");
+        this.endCause = endCause;
+    }
+
     /**
      * Gets the game that this round is associated with.
      *
@@ -395,6 +407,7 @@ public class CurrentRound implements Round, JSONSerializable, Snapshottable<Roun
                 if (p.equals(this.getCzar())) {
                     this.getGame().sendMessage(IRCFormat.BOLD + "The czar has been skipped!" + IRCFormat.RESET + " Returning your cards and starting a new round.");
                     this.returnCards();
+                    this.setEndCause(RoundEndCause.CZAR_SKIPPED);
                     this.advanceStage();
                 }
                 break;
@@ -412,7 +425,8 @@ public class CurrentRound implements Round, JSONSerializable, Snapshottable<Roun
             this.getBlackCard().getText(),
             this.getCzar() == null ? null : this.getCzar().getUser().getNick(),
             this.winningPlay == null ? null : this.winningPlay.getPlayer().getUser().getNick(),
-            "SUCCESSFUL", this.getPlays().stream().map(Play::takeSnapshot).collect(Collectors.toList()),
+            this.endCause.name(),
+            this.getPlays().stream().map(Play::takeSnapshot).collect(Collectors.toList()),
             this.getGame().getPlayers().stream().map(p -> p.getUser().getNick()).collect(Collectors.toSet()),
             this.getSkippedPlayers().stream().map(p -> p.getUser().getNick()).collect(Collectors.toSet()),
             this.getGame().getHistoricPlayers().stream().collect(Collectors.toMap(p -> p.getUser().getNick(), p -> p.equals(this.winningPlay.getPlayer()) ? 1 : 0)),

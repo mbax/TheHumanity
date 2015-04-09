@@ -45,4 +45,12 @@ public interface Round {
          */
         ENDED
     }
+
+    enum RoundEndCause {
+        NOT_ENDED,
+        CZAR_CHOSE_WINNER,
+        CZAR_LEFT,
+        CZAR_SKIPPED,
+        GAME_ENDED
+    }
 }

@@ -16,6 +16,7 @@ import org.royaldev.thehumanity.cards.types.WhiteCard;
 import org.royaldev.thehumanity.exceptions.MissingCzarException;
 import org.royaldev.thehumanity.game.round.CurrentRound;
 import org.royaldev.thehumanity.game.round.Round;
+import org.royaldev.thehumanity.game.round.Round.RoundEndCause;
 import org.royaldev.thehumanity.game.round.Round.RoundStage;
 import org.royaldev.thehumanity.player.Hand;
 import org.royaldev.thehumanity.player.Player;
@@ -575,6 +576,7 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
             if (p.equals(this.getCurrentRound().getCzar())) {
                 this.sendMessage(IRCFormat.BOLD + "The czar has left!" + IRCFormat.RESET + " Returning your cards and starting a new round.");
                 this.getCurrentRound().returnCards();
+                this.getCurrentRound().setEndCause(RoundEndCause.CZAR_LEFT);
                 this.advanceStage();
                 return;
             }
@@ -710,6 +712,9 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
      */
     public void stop(@NotNull final GameEndCause endCause) {
         this.setEndCause(endCause);
+        if (this.getCurrentRound() != null) {
+            this.getCurrentRound().setEndCause(RoundEndCause.GAME_ENDED);
+        }
         this.humanity.getGames().remove(this.channel);
         if (this.host != null && !this.hostWasVoiced) {
             this.getChannel().newModeCommand().addModeChange(false, 'v', this.host.getUser()).execute();
