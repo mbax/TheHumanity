@@ -135,6 +135,7 @@ public class RoundSnapshot implements Serializable, JSONSerializable {
 
     public static class IndividualPlaySnapshot implements Serializable, JSONSerializable {
 
+        private static final long serialVersionUID = 51L;
         private String text;
         private int handIndex;
 

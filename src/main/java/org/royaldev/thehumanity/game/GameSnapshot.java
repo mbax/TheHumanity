@@ -70,8 +70,9 @@ public class GameSnapshot implements Serializable, JSONSerializable {
         return timestamps;
     }
 
-    public static class Timestamps {
+    public static class Timestamps implements Serializable, JSONSerializable {
 
+        private static final long serialVersionUID = 50L;
         private long started, ended;
 
         public Timestamps() {}
