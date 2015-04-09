@@ -55,6 +55,7 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
     private GameStatus gameStatus = GameStatus.IDLE;
     private boolean hostWasVoiced = false;
     private long startTime, endTime;
+    private GameEndCause endCause = GameEndCause.NOT_ENDED;
 
     public Game(@NotNull final TheHumanity humanity, @NotNull final Channel channel, @NotNull final List<CardPack> cardPacks) {
         Preconditions.checkNotNull(humanity, "humanity was null");
@@ -125,7 +126,7 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
         final int totalCards = this.getDeck().getCardPacks().stream().mapToInt(cp -> cp.getWhiteCards().size()).sum();
         if (this.players.size() * 10 >= totalCards) {
             this.sendMessage(IRCFormat.BOLD + "Not enough white cards to play!");
-            this.stop();
+            this.stop(GameEndCause.NOT_ENOUGH_WHITE_CARDS);
             return;
         }
         this.deal(player);
@@ -250,6 +251,16 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
     @NotNull
     public Deck getDeck() {
         return this.deck;
+    }
+
+    @NotNull
+    public GameEndCause getEndCause() {
+        return this.endCause;
+    }
+
+    public void setEndCause(@NotNull final GameEndCause endCause) {
+        Preconditions.checkNotNull(endCause, "endCause was null");
+        this.endCause = endCause;
     }
 
     /**
@@ -403,7 +414,7 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
     public boolean hasEnoughPlayers() {
         if (this.getPlayers().size() < 3) {
             this.sendMessage(IRCFormat.BOLD + "Not enough players to continue!");
-            this.stop();
+            this.stop(GameEndCause.NOT_ENOUGH_PLAYERS);
             return false;
         }
         return true;
@@ -493,7 +504,7 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
                     if (blackCard == null) {
                         this.sendMessage(" ");
                         this.sendMessage(IRCFormat.BOLD + "There are no more black cards!");
-                        this.stop();
+                        this.stop(GameEndCause.RAN_OUT_OF_BLACK_CARDS);
                         return;
                     }
                 } while (blackCard.getBlanks() > 10 || blackCard.getBlanks() < 1);
@@ -697,7 +708,8 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
     /**
      * Stops the game.
      */
-    public void stop() {
+    public void stop(@NotNull final GameEndCause endCause) {
+        this.setEndCause(endCause);
         this.humanity.getGames().remove(this.channel);
         if (this.host != null && !this.hostWasVoiced) {
             this.getChannel().newModeCommand().addModeChange(false, 'v', this.host.getUser()).execute();
@@ -720,7 +732,7 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
     public GameSnapshot takeSnapshot() {
         return new GameSnapshot(
             this.getChannel().getName(),
-            "NOT_ENOUGH_PLAYERS", // TODO: Implement
+            this.endCause.name(),
             this.startTime,
             this.endTime,
             this.getPlayers().stream().map(p -> p.getUser().getNick()).collect(Collectors.toList()),
@@ -809,6 +821,14 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
         ENDED
     }
 
+    public enum GameEndCause {
+        NOT_ENDED,
+        NOT_ENOUGH_PLAYERS,
+        RAN_OUT_OF_BLACK_CARDS,
+        NOT_ENOUGH_WHITE_CARDS,
+        STOPPED_BY_COMMAND
+    }
+
     private class GameCountdown implements Runnable {
 
         private int runCount = 3; // 3 default
@@ -824,7 +844,7 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
                     Game.this.advanceStage();
                 } else {
                     Game.this.sendMessage(IRCFormat.BOLD + "Not enough players." + IRCFormat.RESET + " At least three people are required for the game to begin.");
-                    Game.this.stop();
+                    Game.this.stop(GameEndCause.NOT_ENOUGH_PLAYERS);
                 }
                 Game.this.countdownTask.cancel(true);
             }

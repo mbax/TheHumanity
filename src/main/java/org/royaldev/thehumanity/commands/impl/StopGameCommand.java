@@ -4,12 +4,13 @@ import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
-import org.royaldev.thehumanity.game.Game;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.Command;
 import org.royaldev.thehumanity.commands.IRCCommand.CommandType;
 import org.royaldev.thehumanity.commands.NoticeableCommand;
+import org.royaldev.thehumanity.game.Game;
+import org.royaldev.thehumanity.game.Game.GameEndCause;
 import org.royaldev.thehumanity.player.Player;
 
 @Command(
@@ -41,6 +42,6 @@ public class StopGameCommand extends NoticeableCommand {
             this.notice(u, "You're not an op or the host!");
             return;
         }
-        g.stop();
+        g.stop(GameEndCause.STOPPED_BY_COMMAND);
     }
 }
