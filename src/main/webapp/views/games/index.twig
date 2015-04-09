@@ -30,7 +30,7 @@
                     <tr>
                         <td><a href="/game/{{ channel.getName.substring(1) | escape }}">{{ channel.getName | escape }}</a></td>
                         <td>{{ game.getPlayers.size }}</td>
-                        <td>{{ game.getCurrentRound.getNumber }}</td>
+                        <td>{{ game.getCurrentRound.getNumber | default("No round started") }}</td>
                         <td>{{ game.getGameStatus | friendly_enum }}</td>
                     </tr>
                 {% endfor %}
