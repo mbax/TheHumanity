@@ -2231,6 +2231,7 @@ a.tabnav-extra:hover {
 .tooltipped:after {
   color: #000;
   background: rgba(255, 255, 255, 0.8);
+  font-family: "Lato", "Helvetica", "Arial", sans-serif;
 }
 
 .tooltipped .tooltipped-s:before, .tooltipped .tooltipped-se:before, .tooltipped .tooltipped-sw:before {
