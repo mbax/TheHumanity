@@ -41,7 +41,6 @@ public class GameController {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return APIHelper.makeError("No such game.");
         }
-
         final StringWriter sw = new StringWriter();
         final JSONWriter jw = new JSONWriter(sw);
         jw
@@ -62,8 +61,7 @@ public class GameController {
             .value(g.getDeck().getCardPacks().stream().map(CardPack::getName).collect(Collectors.toList()))
             .key("gameStatus")
             .value(g.getGameStatus())
-            .key("currentRound")
-        ;
+            .key("currentRound");
         final Round round = g.getCurrentRound();
         if (round == null) {
             jw.value(null);
@@ -93,8 +91,7 @@ public class GameController {
                 .value(round.getSkippedPlayers().stream().map(p -> p.getUser().getNick()).collect(Collectors.toList()))
                 .endObject();
         }
-        jw
-            .endObject();
+        jw.endObject();
         return sw.toString();
     }
 
