@@ -3,7 +3,7 @@
 {% block title %}{% set channelname = channel.getName | escape %}{{ channelname }}{% endblock %}
 
 {% block underbar %}
-    <h1>{{ channelname }}</h1>
+    <h1>{{ channelname }} <small>{{ channel.getUsers.size }} {{ plural("user", channel.getUsers.size) }}</small></h1>
 {% endblock %}
 
 {# TODO: Topics #}
@@ -13,7 +13,7 @@
     {% for user in channel.getUsers %} {# TODO: Use getNicknames when it's fixed #}
         {# TODO: Style this #}
         <p>
-            <span class="tooltipped tooltipped-n" aria-label="{{ user.getNick | escape }}!{{ user.getUser | escape }}@{{ user.getHost | escape }}">
+            <span class="dotted-underline tooltipped tooltipped-n" aria-label="{{ user.getNick | escape }}!{{ user.getUser | escape }}@{{ user.getHost | escape }}">
                 {{ user.getNick | escape }}
             </span>
         </p>
