@@ -707,7 +707,7 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
         if (this.countdownTask == null || this.countdownTask.isCancelled() || this.countdownTask.isDone()) return false;
         if (this.getPlayers().size() < 3) return false;
         this.advanceStage();
-        this.countdownTask.cancel(true);
+        this.countdownTask.cancel(false);
         return true;
     }
 
@@ -731,7 +731,7 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
         if (this.host != null && !this.hostWasVoiced) {
             this.getChannel().newModeCommand().addModeChange(false, 'v', this.host.getUser()).execute();
         }
-        if (this.countdownTask != null) this.countdownTask.cancel(true);
+        if (this.countdownTask != null) this.countdownTask.cancel(false);
         if (this.getCurrentRound() != null) {
             this.getCurrentRound().cancelReminderTask();
         }
@@ -866,7 +866,7 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
                     Game.this.sendMessage(IRCFormat.BOLD + "Not enough players." + IRCFormat.RESET + " At least three people are required for the game to begin.");
                     Game.this.stop(GameEndCause.NOT_ENOUGH_PLAYERS);
                 }
-                Game.this.countdownTask.cancel(true);
+                Game.this.countdownTask.cancel(false);
             }
         }
     }
