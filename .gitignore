@@ -36,8 +36,9 @@ package
 # Files for testing
 /start.sh
 /dev.sh
-pid
-pingregistry.dat
+/pid
+/pingregistry.dat
+/history
 
 # SASS
 .sass-cache
