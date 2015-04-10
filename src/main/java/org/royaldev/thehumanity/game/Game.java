@@ -733,6 +733,7 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
     public void stop(@NotNull final GameEndCause endCause) {
         this.setEndCause(endCause);
         if (this.getCurrentRound() != null) {
+            this.getCurrentRound().setEndTime(System.currentTimeMillis());
             this.getCurrentRound().setEndCause(RoundEndCause.GAME_ENDED);
             this.previousRounds.add(this.getCurrentRound().takeSnapshot());
         }

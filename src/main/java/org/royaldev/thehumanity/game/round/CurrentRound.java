@@ -383,6 +383,14 @@ public class CurrentRound implements Round, JSONSerializable, Snapshottable<Roun
         this.getPlays().stream().forEach(p -> p.getWhiteCards().stream().forEach(p.getPlayer().getHand()::addCard));
     }
 
+    public void setEndTime(final long endTime) {
+        this.endTime = endTime;
+    }
+
+    public void setStartTime(final long startTime) {
+        this.startTime = startTime;
+    }
+
     /**
      * Skips a player. A skipped player will not need to submit a play in order for the stage to advance.
      *
