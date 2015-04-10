@@ -429,7 +429,7 @@ public class CurrentRound implements Round, JSONSerializable, Snapshottable<Roun
             this.getPlays().stream().map(Play::takeSnapshot).collect(Collectors.toList()),
             this.getGame().getPlayers().stream().map(p -> p.getUser().getNick()).collect(Collectors.toSet()),
             this.getSkippedPlayers().stream().map(p -> p.getUser().getNick()).collect(Collectors.toSet()),
-            this.getGame().getHistoricPlayers().stream().collect(Collectors.toMap(p -> p.getUser().getNick(), p -> p.equals(this.winningPlay.getPlayer()) ? 1 : 0)),
+            this.getGame().getHistoricPlayers().stream().collect(Collectors.toMap(p -> p.getUser().getNick(), p -> this.winningPlay == null ? 0 : p.equals(this.winningPlay.getPlayer()) ? 1 : 0)),
             this.votes.stream().collect(Collectors.toMap(play -> play.getPlayer().getUser().getNick(), this.votes::count))
         );
     }
