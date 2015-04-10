@@ -17,12 +17,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class History {
 
     private final TheHumanity humanity;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final Cache<String, GameSnapshot> cache = CacheBuilder.newBuilder().build();
+    private final Cache<String, GameSnapshot> cache = CacheBuilder.newBuilder()
+        .expireAfterAccess(1L, TimeUnit.HOURS)
+        .build();
     private final Object saveLock = new Object();
 
     public History(@NotNull final TheHumanity humanity) {
@@ -130,7 +133,9 @@ public class History {
             return null;
         }
         try {
-            return this.objectMapper.readValue(json, GameSnapshot.class);
+            final GameSnapshot gs = this.objectMapper.readValue(json, GameSnapshot.class);
+            this.cache.put(cacheKey, gs);
+            return gs;
         } catch (final IOException ex) {
             throw new RuntimeException(ex);
         }
