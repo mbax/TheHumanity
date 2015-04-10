@@ -266,6 +266,10 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
         this.endCause = endCause;
     }
 
+    public long getEndTime() {
+        return this.endTime;
+    }
+
     /**
      * Gets the current status of this game.
      *
@@ -416,6 +420,10 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
     public Player getRandoCardrissian() {
         if (!this.hasHouseRule(HouseRule.RANDO_CARDRISSIAN)) return null;
         return this.randoCardrissian;
+    }
+
+    public long getStartTime() {
+        return this.startTime;
     }
 
     /**

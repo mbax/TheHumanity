@@ -23,6 +23,7 @@ public class History {
     private final TheHumanity humanity;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Cache<String, GameSnapshot> cache = CacheBuilder.newBuilder().build();
+    private final Object saveLock = new Object();
 
     public History(@NotNull final TheHumanity humanity) {
         Preconditions.checkNotNull(humanity, "humanity was null");
@@ -48,41 +49,11 @@ public class History {
         this.createFolder(this.getHistoryFolder());
     }
 
-    @NotNull
-    private File getChannelFolder(@NotNull final String channel) {
-        Preconditions.checkNotNull(channel, "channel was null");
-        return new File(this.getHistoryFolder(), channel);
-    }
-
-    @NotNull
-    private File getGameSnapshotFile(@NotNull final String channel, final int number) {
-        Preconditions.checkNotNull(channel, "channel was null");
-        return new File(this.getChannelFolder(channel), number + ".json");
-    }
-
-    private File getHistoryFolder() {
-        return new File("history");
-    }
-
-    private int getLastGameSnapshotNumber(@NotNull final String channel) {
-        Preconditions.checkNotNull(channel, "channel was null");
-        final File channelFolder = this.getChannelFolder(channel);
-        if (!channelFolder.exists()) return 0;
-        if (!channelFolder.isDirectory()) throw new IllegalStateException("channel folder is not a directory");
-        return Arrays.stream(channelFolder.list()).mapToInt(name -> {
-            try {
-                return Integer.parseInt(name.split("\\.")[0]);
-            } catch (final NumberFormatException ex) {
-                return -1;
-            }
-        }).filter(number -> number > 0).max().orElse(0);
-    }
-
     @Nullable
     private String loadGameSnapshotJSON(@NotNull final String channel, final int number) {
         Preconditions.checkNotNull(channel, "channel was null");
         final File gameLocation = this.getGameSnapshotFile(channel, number);
-        if (gameLocation.exists()) return null;
+        if (!gameLocation.exists()) return null;
         final List<String> lines;
         try {
             lines = Files.readAllLines(gameLocation.toPath());
@@ -90,6 +61,41 @@ public class History {
             throw new RuntimeException(ex);
         }
         return Joiner.on('\n').join(lines);
+    }
+
+    public int[] getAllGameNumbers(@NotNull final String channel) {
+        Preconditions.checkNotNull(channel, "channel was null");
+        final File channelFolder = this.getChannelFolder(channel);
+        if (!channelFolder.exists()) return new int[0];
+        if (!channelFolder.isDirectory()) throw new IllegalStateException("channel folder is not a directory");
+        return Arrays.stream(channelFolder.list()).mapToInt(name -> {
+            try {
+                return Integer.parseInt(name.split("\\.")[0]);
+            } catch (final NumberFormatException ex) {
+                return -1;
+            }
+        }).filter(number -> number > 0).toArray();
+    }
+
+    @NotNull
+    public File getChannelFolder(@NotNull final String channel) {
+        Preconditions.checkNotNull(channel, "channel was null");
+        return new File(this.getHistoryFolder(), channel.toLowerCase());
+    }
+
+    @NotNull
+    public File getGameSnapshotFile(@NotNull final String channel, final int number) {
+        Preconditions.checkNotNull(channel, "channel was null");
+        return new File(this.getChannelFolder(channel), number + ".json");
+    }
+
+    public File getHistoryFolder() {
+        return new File("history");
+    }
+
+    public int getLastGameSnapshotNumber(@NotNull final String channel) {
+        Preconditions.checkNotNull(channel, "channel was null");
+        return Arrays.stream(this.getAllGameNumbers(channel)).max().orElse(0);
     }
 
     /**
@@ -110,7 +116,7 @@ public class History {
         if (number < 0) {
             throw new IllegalArgumentException("Game number was negative");
         }
-        if (number == 0) {
+        if (number == 0) { // TODO: Remove (use current game API)
             final Game currentGame = this.humanity.getGameFor(this.humanity.getBot().getChannel(channel));
             return currentGame != null ? currentGame.takeSnapshot() : null;
         }
@@ -131,13 +137,16 @@ public class History {
     }
 
     public void saveGameSnapshot(@NotNull final GameSnapshot gameSnapshot) {
-        Preconditions.checkNotNull(gameSnapshot, "gameSnapshot was null");
-        final String channel = gameSnapshot.getChannel();
-        final File gameLocation = this.getGameSnapshotFile(channel, this.getLastGameSnapshotNumber(channel));
-        try {
-            Files.write(gameLocation.toPath(), gameSnapshot.toJSON().getBytes(StandardCharsets.UTF_8));
-        } catch (final IOException ex) {
-            throw new RuntimeException(ex);
+        synchronized (this.saveLock) {
+            Preconditions.checkNotNull(gameSnapshot, "gameSnapshot was null");
+            final String channel = gameSnapshot.getChannel();
+            final File gameLocation = this.getGameSnapshotFile(channel, this.getLastGameSnapshotNumber(channel) + 1);
+            this.createFile(gameLocation);
+            try {
+                Files.write(gameLocation.toPath(), gameSnapshot.toJSON().getBytes(StandardCharsets.UTF_8));
+            } catch (final IOException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 }
