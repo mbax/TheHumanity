@@ -18,6 +18,7 @@ import org.royaldev.thehumanity.game.round.CurrentRound;
 import org.royaldev.thehumanity.game.round.Round;
 import org.royaldev.thehumanity.game.round.Round.RoundEndCause;
 import org.royaldev.thehumanity.game.round.Round.RoundStage;
+import org.royaldev.thehumanity.game.round.RoundSnapshot;
 import org.royaldev.thehumanity.player.Hand;
 import org.royaldev.thehumanity.player.Player;
 import org.royaldev.thehumanity.util.DescendingValueComparator;
@@ -48,6 +49,7 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
     private final List<Player> historicPlayers = Collections.synchronizedList(new ArrayList<>());
     private final Deck deck;
     private final List<HouseRule> houseRules = Lists.newArrayList();
+    private final List<RoundSnapshot> previousRounds = Lists.newArrayList();
     private final Player randoCardrissian = new Player(new FakeUser("Rando Cardrissian"));
     private Channel channel;
     private CurrentRound currentRound = null;
@@ -397,6 +399,15 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
     }
 
     /**
+     * Gets an unmodifiable list of previous rounds as snapshots.
+     *
+     * @return Unmodifiable list of previous round snapshots
+     */
+    public List<RoundSnapshot> getPreviousRounds() {
+        return Collections.unmodifiableList(this.previousRounds);
+    }
+
+    /**
      * Gets the Player that represents Rando Cardrissian. If Rando Cardrissian is not enabled, this will return null.
      *
      * @return Player or null
@@ -491,6 +502,7 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
                 final CurrentRound currentRound = this.getCurrentRound();
                 final boolean hadRound = currentRound != null;
                 if (hadRound) {
+                    this.previousRounds.add(currentRound.takeSnapshot());
                     this.showScores();
                     this.showCardCounts();
                 }
@@ -730,6 +742,7 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
         }
         this.endTime = System.currentTimeMillis();
         this.gameStatus = GameStatus.ENDED;
+        this.humanity.getHistory().saveGameSnapshot(this.takeSnapshot());
     }
 
     @NotNull
@@ -744,6 +757,7 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
             this.getHistoricPlayers().stream().map(p -> p.getUser().getNick()).collect(Collectors.toList()),
             this.getHouseRules().stream().map(HouseRule::getFriendlyName).collect(Collectors.toList()),
             this.getDeck().getCardPacks().stream().map(CardPack::getName).collect(Collectors.toList()),
+            this.getPreviousRounds(),
             this.getHistoricPlayers().stream().collect(Collectors.toMap(p -> p.getUser().getNick(), Player::getScore)),
             this.getHost().getUser().getNick(),
             this.getCurrentRound() == null ? 0 : this.getCurrentRound().getNumber()
@@ -831,7 +845,8 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
         NOT_ENOUGH_PLAYERS,
         RAN_OUT_OF_BLACK_CARDS,
         NOT_ENOUGH_WHITE_CARDS,
-        STOPPED_BY_COMMAND
+        STOPPED_BY_COMMAND,
+        JAVA_SHUTDOWN
     }
 
     private class GameCountdown implements Runnable {

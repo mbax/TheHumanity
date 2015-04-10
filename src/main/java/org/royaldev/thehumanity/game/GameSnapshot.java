@@ -1,5 +1,6 @@
 package org.royaldev.thehumanity.game;
 
+import org.royaldev.thehumanity.game.round.RoundSnapshot;
 import org.royaldev.thehumanity.util.json.JSONSerializable;
 
 import java.io.Serializable;
@@ -10,6 +11,7 @@ public class GameSnapshot implements Serializable, JSONSerializable {
 
     private static final long serialVersionUID = 45L;
     private List<String> players, historicPlayers, houseRules, cardPacks;
+    private List<RoundSnapshot> previousRounds;
     private Map<String, Integer> scores;
     private String channel, endCause, host;
     private Timestamps timestamps;
@@ -17,13 +19,14 @@ public class GameSnapshot implements Serializable, JSONSerializable {
 
     public GameSnapshot() {}
 
-    public GameSnapshot(final String channel, final String endCause, final long startTime, final long endTime, final List<String> players, final List<String> historicPlayers, final List<String> houseRules, final List<String> cardPacks, final Map<String, Integer> scores, final String host, final int rounds) {
+    public GameSnapshot(final String channel, final String endCause, final long startTime, final long endTime, final List<String> players, final List<String> historicPlayers, final List<String> houseRules, final List<String> cardPacks, final List<RoundSnapshot> previousRounds, final Map<String, Integer> scores, final String host, final int rounds) {
         this.players = players;
         this.historicPlayers = historicPlayers;
         this.houseRules = houseRules;
         this.cardPacks = cardPacks;
         this.channel = channel;
         this.endCause = endCause;
+        this.previousRounds = previousRounds;
         this.host = host;
         this.timestamps = new Timestamps(startTime, endTime);
         this.scores = scores;
@@ -56,6 +59,10 @@ public class GameSnapshot implements Serializable, JSONSerializable {
 
     public List<String> getPlayers() {
         return this.players;
+    }
+
+    public List<RoundSnapshot> getPreviousRounds() {
+        return this.previousRounds;
     }
 
     public int getRounds() {

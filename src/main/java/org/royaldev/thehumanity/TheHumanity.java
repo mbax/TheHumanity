@@ -52,6 +52,7 @@ import org.royaldev.thehumanity.commands.impl.game.GameCommand;
 import org.royaldev.thehumanity.commands.impl.ping.PingListCommand;
 import org.royaldev.thehumanity.game.Game;
 import org.royaldev.thehumanity.handlers.CommandHandler;
+import org.royaldev.thehumanity.history.History;
 import org.royaldev.thehumanity.ping.PingRegistry;
 import org.royaldev.thehumanity.ping.WhoX;
 import org.royaldev.thehumanity.ping.task.SavePingRegistryTask;
@@ -90,6 +91,7 @@ public class TheHumanity {
     private final ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(1);
     private final PingRegistry pingRegistry;
     private final WhoX whoX = new WhoX(this);
+    private final History history = new History(this);
     @Nullable
     private final GameServer gameServer;
     @Option(name = "-c", usage = "Channels to join.", required = true, handler = StringArrayOptionHandler.class)
@@ -354,6 +356,10 @@ public class TheHumanity {
     @NotNull
     public Map<Channel, Game> getGames() {
         return this.games;
+    }
+
+    public History getHistory() {
+        return this.history;
     }
 
     @NotNull
