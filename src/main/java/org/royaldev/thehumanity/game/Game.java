@@ -726,6 +726,7 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
         this.setEndCause(endCause);
         if (this.getCurrentRound() != null) {
             this.getCurrentRound().setEndCause(RoundEndCause.GAME_ENDED);
+            this.previousRounds.add(this.getCurrentRound().takeSnapshot());
         }
         this.humanity.getGames().remove(this.channel);
         if (this.host != null && !this.hostWasVoiced) {
