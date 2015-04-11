@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -67,7 +66,9 @@ public class GameController {
             if (round == null) {
                 jw.value(null);
             } else {
-                final List<List<String>> plays = round.getPlays().stream()
+                final List<List<String>> plays = round.getCurrentStage() != RoundStage.WAITING_FOR_CZAR
+                    ? null
+                    : round.getPlays().stream()
                     .map(Play::getWhiteCards) // Convert each Play to a List<WhiteCard>
                     .map(
                         list -> list.stream() // Stream each WhiteCard
@@ -75,7 +76,8 @@ public class GameController {
                             .collect(Collectors.toList()) // Collect the Strings into a List<String>
                     ) // Map the List<WhiteCard> to List<String>
                     .collect(Collectors.toList()); // Collect the lists into a List<List<String>>
-                Collections.shuffle(plays); // shuffle for anonymity
+                // There is no need to shuffle, as these are only shown during the WAITING_FOR_CZAR stage, in which the
+                // plays are shuffled automatically. Keeping them unshuffled allows for index detection.
                 jw
                     .object()
                     .key("number")
