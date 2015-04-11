@@ -4,6 +4,18 @@
 
 {% block underbar %}
     <p class="right separated">
+        {% set players = "" %}
+        {% for player in game.getPlayers %}
+            {% set players = players.concat(player.getUser.getNick).concat('<br/>') %}
+        {% endfor %}
+        {% set players = players | br2nl %}
+        <span class="dotted-underline tooltipped tooltipped-left tooltipped-s" aria-label="{{ players }}">Players</span>
+        {% set scores = "" %}
+        {% for player in game.getHistoricPlayers %}
+            {% set scores = scores.concat(player.getUser.getNick).concat(': ').concat(player.getScore | number_format(0, '.', ',')).concat('<br/>') %}
+        {% endfor %}
+        {% set scores = scores | br2nl %}
+        <span class="dotted-underline tooltipped tooltipped-right tooltipped-s" aria-label="{{ scores }}">Scores</span>
         {% set cardpacks = "" %}
         {% for cardpack in game.getDeck.getCardPacks %}
             {% set cardpacks = cardpacks.concat(cardpack.getName).concat('<br/>') %}
