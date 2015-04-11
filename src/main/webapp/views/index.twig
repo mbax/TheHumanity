@@ -8,26 +8,25 @@
 
 {% block slate %}
     <h2>Currently...</h2>
-    <p>
-        {{ nick }} is connected to
-        <strong>{{ humanity.getBot.getServerInfo.getNetworkName | default("an unknown network") }}</strong>.
-    </p>
-    {% set channels = humanity.getBot.getChannels.size %}
-    <p>
-        {{ nick }} is residing in
-        <strong>{{ channels }}</strong>
-        {{ plural("channel", channels) }}.
-    </p>
-    {% set games = humanity.getGames.size %}
-    <p>
-        {{ nick }} is facilitating
-        <strong>{{ games }}</strong>
-        {{ plural("game", games) }}.
-    </p>
-    {% set packs = humanity.getLoadedCardPacks.size %}
-    <p>
-        {{ nick }} has
-        <strong>{{ packs }}</strong>
-        loaded card {{ plural("pack", packs) }}.
-    </p>
+    <div class="stats">
+        <div class="stat stat-1">
+            <h1>{{ humanity.getBot.getServerInfo.getNetworkName | default("an unknown network") }}</h1>
+            network
+        </div>
+        {% set channels = humanity.getBot.getChannels.size %}
+        <div class="stat stat-2">
+            <h1>{{ channels }}</h1>
+            {{ plural("channel", channels) }}
+        </div>
+        {% set games = humanity.getGames.size %}
+        <div class="stat stat-3">
+            <h1>{{ games }}</h1>
+            {{ plural("game", games) }}
+        </div>
+        {% set packs = humanity.getLoadedCardPacks.size %}
+        <div class="stat stat-4">
+            <h1>{{ packs }}</h1>
+            {{ plural("pack", packs) }}
+        </div>
+    </div>
 {% endblock %}

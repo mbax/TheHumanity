@@ -2748,3 +2748,43 @@ caption h1, caption h2, caption h3, caption h4, caption h5, caption h6 {
   width: 32px;
   text-align: center;
 }
+
+.stats {
+  display: flex;
+  justify-content: space-around;
+}
+.stats .stat-1 {
+  order: 1;
+}
+.stats .stat-2 {
+  order: 2;
+}
+.stats .stat-3 {
+  order: 3;
+}
+.stats .stat-4 {
+  order: 4;
+}
+.stats .stat-5 {
+  order: 5;
+}
+.stats .stat-6 {
+  order: 6;
+}
+.stats .stat-7 {
+  order: 7;
+}
+.stats .stat-8 {
+  order: 8;
+}
+.stats .stat-9 {
+  order: 9;
+}
+.stats .stat {
+  text-align: center;
+}
+.stats .stat h1, .stats .stat h2, .stats .stat h3, .stats .stat h4, .stats .stat h5, .stats .stat h6 {
+  border: none;
+  margin: 0;
+  padding: 0;
+}

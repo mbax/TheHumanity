@@ -148,3 +148,22 @@ caption {
     text-align: center;
   }
 }
+
+// Stats
+.stats {
+  display: flex;
+  justify-content: space-around;
+  @for $i from 1 to 10 {
+    .stat-#{$i} {
+      order: $i;
+    }
+  }
+  .stat {
+    text-align: center;
+    h1, h2, h3, h4, h5, h6 {
+      border: none;
+      margin: 0;
+      padding: 0;
+    }
+  }
+}

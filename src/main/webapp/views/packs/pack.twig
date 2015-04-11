@@ -13,22 +13,29 @@
             <em>{{ pack.getDescription | escape }}</em>
         </p>
     {% endif %}
-    {% if pack.getID %}
-        <p>
-            This is a Cardcast pack. Its ID is
-            <a href="http://www.cardcastgame.com/browse/deck/{{ pack.getID | escape }}">{{ pack.getID | escape }}</a>.
-        </p>
-    {% endif %}
     {% set whitecards = pack.getWhiteCards.size %}
     {% set blackcards = pack.getBlackCards.size %}
     {% set totalcards = whitecards + blackcards %}
-    <p>
-        This pack has a total of {{ totalcards }} {{ plural("card", totalcards) }}, {{ whitecards }}
-        ({{ (whitecards / totalcards * 100) | number_format(2, '.', ',') }}%) of which
-        {{ (whitecards == 1) ? "is a" : "are" }} white {{ plural("card", whitecards) }}, and {{ blackcards }}
-        ({{ (blackcards / totalcards * 100) | number_format(2, '.', ',') }}%) of which
-        {{ (blackcards == 1) ? "is a" : "are" }} black {{ plural("card", blackcards) }}.
-    </p>
+    <div class="stats">
+        <div class="stat stat-1">
+            <h2>{{ totalcards }}</h2>
+            total cards
+        </div>
+        <div class="stat stat-2">
+            <h2>{{ whitecards }} ({{ (whitecards / totalcards * 100) | number_format(2, '.', ',') }}%)</h2>
+            white cards
+        </div>
+        <div class="stat stat-3">
+            <h2>{{ blackcards }} ({{ (blackcards / totalcards * 100) | number_format(2, '.', ',') }}%)</h2>
+            black cards
+        </div>
+        {% if pack.getID %}
+            <div class="stat stat-4">
+                <h2><a href="http://www.cardcastgame.com/browse/deck/{{ pack.getID | escape }}">{{ pack.getID | escape }}</a></h2>
+                Cardcast ID
+            </div>
+        {% endif %}
+    </div>
     <div class="columns">
         <div class="one-half column">
             <h2>Black cards</h2>
