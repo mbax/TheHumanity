@@ -82,7 +82,7 @@ Gets a previous round by its numeric ID from the current game in the channel.
     ],
     "CahBotzie_Dev": [
       {
-        "text": "A Bop Itâ„¢",
+        "text": "A Bop It®",
         "handIndex": 2
       }
     ]
@@ -182,7 +182,7 @@ Gets a round of a previous game.
     ],
     "CahBotzie_Dev": [
       {
-        "text": "A Bop Itâ„¢",
+        "text": "A Bop It®",
         "handIndex": 2
       }
     ]
