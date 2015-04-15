@@ -8,7 +8,6 @@ import com.google.common.cache.CacheBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.royaldev.thehumanity.TheHumanity;
-import org.royaldev.thehumanity.game.Game;
 import org.royaldev.thehumanity.game.GameSnapshot;
 
 import java.io.File;
@@ -118,10 +117,6 @@ public class History {
         Preconditions.checkNotNull(channel, "channel was null");
         if (number < 0) {
             throw new IllegalArgumentException("Game number was negative");
-        }
-        if (number == 0) { // TODO: Remove (use current game API)
-            final Game currentGame = this.humanity.getGameFor(this.humanity.getBot().getChannel(channel));
-            return currentGame != null ? currentGame.takeSnapshot() : null;
         }
         final String cacheKey = channel.toLowerCase() + ":" + number;
         final GameSnapshot cached = this.cache.getIfPresent(cacheKey);
