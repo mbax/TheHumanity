@@ -234,6 +234,7 @@
             <scope>test</scope>
         </dependency>
         <!-- Web -->
+        <!-- Server -->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
@@ -244,11 +245,13 @@
             <artifactId>jetty-webapp</artifactId>
             <version>9.2.10.v20150310</version>
         </dependency>
+        <!-- Framework -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
             <version>4.1.6.RELEASE</version>
         </dependency>
+        <!-- Templating -->
         <dependency>
             <groupId>com.lyncode</groupId>
             <artifactId>jtwig-spring</artifactId>
