@@ -29,7 +29,7 @@ public class GameController {
     private GameService gameService;
 
     @ResponseBody
-    @RequestMapping(value = "/api/game/{channel}", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+    @RequestMapping(value = "/api/game/{channel}", method = RequestMethod.GET, produces = APIHelper.PRODUCES)
     public String apiViewGame(@PathVariable String channel, final HttpServletResponse response) {
         final Game g = this.gameService.getFromChannelName("#" + channel);
         if (g == null) {
@@ -99,7 +99,7 @@ public class GameController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/api/game/{channel}/{round}", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+    @RequestMapping(value = "/api/game/{channel}/{round}", method = RequestMethod.GET, produces = APIHelper.PRODUCES)
     public String apiViewGameRound(@PathVariable String channel, @PathVariable int round, final HttpServletResponse response) {
         final Game g = this.gameService.getFromChannelName("#" + channel);
         if (g == null) {
@@ -115,7 +115,7 @@ public class GameController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/api/games", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+    @RequestMapping(value = "/api/games", method = RequestMethod.GET, produces = APIHelper.PRODUCES)
     public String apiViewGames(final HttpServletResponse response) {
         return APIHelper.makeObjectMapperJSON(response, om -> om.writeValueAsString(this.gameService.getAll().keySet().stream().map(Channel::getName).collect(Collectors.toList())));
     }

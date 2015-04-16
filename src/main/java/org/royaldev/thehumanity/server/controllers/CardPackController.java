@@ -26,7 +26,7 @@ public class CardPackController {
     private CardPackService cardPackService;
 
     @ResponseBody
-    @RequestMapping(value = "/api/pack/{name}", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+    @RequestMapping(value = "/api/pack/{name}", method = RequestMethod.GET, produces = APIHelper.PRODUCES)
     public String apiPack(@PathVariable String name, final HttpServletResponse response) {
         final CardPack cp = this.cardPackService.getFromName(name);
         if (cp == null) {
@@ -44,7 +44,7 @@ public class CardPackController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/api/packs", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+    @RequestMapping(value = "/api/packs", method = RequestMethod.GET, produces = APIHelper.PRODUCES)
     public String apiPacks(final HttpServletResponse response) {
         final ObjectMapper om = new ObjectMapper();
         try {
