@@ -2,7 +2,6 @@ package org.royaldev.thehumanity.server.controllers;
 
 import org.kitteh.irc.client.library.element.Channel;
 import org.kitteh.irc.client.library.element.User;
-import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.server.services.channel.ChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,8 +19,6 @@ public class ChannelController {
 
     @Autowired
     private ChannelService channelService;
-    @Autowired
-    private TheHumanity humanity;
 
     @ResponseBody
     @RequestMapping(value = "/api/channels", method = RequestMethod.GET, produces = APIHelper.PRODUCES)
@@ -36,7 +33,7 @@ public class ChannelController {
     @RequestMapping(value = "/api/channel/{channel}", method = RequestMethod.GET, produces = APIHelper.PRODUCES)
     public String apiViewChannel(@PathVariable final String channel, final HttpServletResponse response) {
         final Channel c = this.channelService.getFromName("#" + channel);
-        if (c == null || !this.humanity.getBot().getChannels().contains(c)) {
+        if (c == null || !this.channelService.getAll().contains(c)) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return APIHelper.makeError("No such channel.");
         }
@@ -66,7 +63,7 @@ public class ChannelController {
     @RequestMapping(value = "/channel/{name}", method = RequestMethod.GET)
     public String viewChannel(@PathVariable String name, final Model model) {
         final Channel channel = this.channelService.getFromName("#" + name);
-        if (channel == null || !this.humanity.getBot().getChannels().contains(channel)) {
+        if (channel == null || !this.channelService.getAll().contains(channel)) {
             return "redirect:/";
         }
         model.addAttribute("channel", channel);
