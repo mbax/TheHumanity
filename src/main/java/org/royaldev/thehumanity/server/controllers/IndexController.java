@@ -28,7 +28,7 @@ public class IndexController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String index(final Model model) {
-        model.addAttribute("humanity", this.humanity);
+        model.addAttribute("humanityVersion", this.humanity.getVersion());
         model.addAttribute("serverInfo", this.serverInfoService.getServerInfo());
         model.addAttribute("channels", this.channelService.getAll());
         model.addAttribute("games", this.gameService.getAll());
