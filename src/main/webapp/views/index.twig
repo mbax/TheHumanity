@@ -23,7 +23,7 @@
             <h1>{{ games }}</h1>
             {{ plural("game", games) }}
         </div>
-        {% set packs = humanity.getLoadedCardPacks.size %}
+        {% set packs = cardPacks.size %}
         <div class="stat stat-4">
             <h1>{{ packs }}</h1>
             {{ plural("pack", packs) }}
