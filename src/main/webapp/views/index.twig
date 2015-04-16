@@ -10,15 +10,15 @@
     <h2>Currently...</h2>
     <div class="stats">
         <div class="stat stat-1">
-            <h1>{{ humanity.getBot.getServerInfo.getNetworkName | default("an unknown network") }}</h1>
+            <h1>{{ serverInfo.getNetworkName | default("an unknown network") }}</h1>
             network
         </div>
-        {% set channels = humanity.getBot.getChannels.size %}
+        {% set channels = channels.size %}
         <div class="stat stat-2">
             <h1>{{ channels }}</h1>
             {{ plural("channel", channels) }}
         </div>
-        {% set games = humanity.getGames.size %}
+        {% set games = games.size %}
         <div class="stat stat-3">
             <h1>{{ games }}</h1>
             {{ plural("game", games) }}
