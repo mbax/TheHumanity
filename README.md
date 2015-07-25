@@ -31,6 +31,13 @@ The flags are as follows:
 | -p | No | 6667 | The port of the server to connect to. |
 | -z | No | ! | The prefix to use for bot commands. |
 
+#### Example startup script
+This uses the directory cardpacks for the cards.
+```
+#!/bin/bash
+java -jar TheHumanity.jar  -C $(cd cardpacks && ls -1 | tr "\\n" " ") -c "#TheHumanity" -s foo.foobar.net -N password -n TheHumanity
+```
+
 ## Playing
 
 Once the bot is in a channel, a game can be started using the startgame command. The person starting the game will
