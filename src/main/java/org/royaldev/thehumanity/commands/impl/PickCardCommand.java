@@ -4,13 +4,14 @@ import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
-import org.royaldev.thehumanity.Game;
-import org.royaldev.thehumanity.Game.GameStatus;
-import org.royaldev.thehumanity.HouseRule;
-import org.royaldev.thehumanity.Round;
-import org.royaldev.thehumanity.Round.RoundStage;
+import org.royaldev.thehumanity.game.round.CurrentRound;
+import org.royaldev.thehumanity.game.Game;
+import org.royaldev.thehumanity.game.Game.GameStatus;
+import org.royaldev.thehumanity.game.HouseRule;
+import org.royaldev.thehumanity.game.round.Round;
+import org.royaldev.thehumanity.game.round.Round.RoundStage;
 import org.royaldev.thehumanity.TheHumanity;
-import org.royaldev.thehumanity.cards.Play;
+import org.royaldev.thehumanity.cards.play.Play;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
 import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.Command;
@@ -42,7 +43,7 @@ public class PickCardCommand extends InGameCommand {
      * @param args Arguments supplied
      */
     private void czarPick(final Game g, final User u, final Player p, final String[] args) {
-        final Round r = g.getCurrentRound();
+        final CurrentRound r = g.getCurrentRound();
         if (r == null) {
             this.notice(u, "No round to play in.");
             return;
@@ -87,7 +88,7 @@ public class PickCardCommand extends InGameCommand {
      * @param args Arguments supplied
      */
     private void playerPick(final Game g, final User u, final Player p, final String[] args) {
-        final Round r = g.getCurrentRound();
+        final CurrentRound r = g.getCurrentRound();
         if (r == null) {
             this.notice(u, "No round to play in.");
             return;
@@ -145,7 +146,7 @@ public class PickCardCommand extends InGameCommand {
     }
 
     private void vote(final Game g, final User u, final Player p, final String[] args) {
-        final Round r = g.getCurrentRound();
+        final CurrentRound r = g.getCurrentRound();
         if (r == null) {
             this.notice(u, "No round to vote in.");
             return;
@@ -177,7 +178,7 @@ public class PickCardCommand extends InGameCommand {
             this.notice(u, "The game has not started!");
             return;
         }
-        final Round r = game.getCurrentRound();
+        final CurrentRound r = game.getCurrentRound();
         if (r == null) {
             this.notice(u, "No round to play in.");
             return;

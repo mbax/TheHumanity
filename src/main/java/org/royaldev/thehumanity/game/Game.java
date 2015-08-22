@@ -1,22 +1,30 @@
-package org.royaldev.thehumanity;
+package org.royaldev.thehumanity.game;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.kitteh.irc.client.library.element.Channel;
 import org.kitteh.irc.client.library.element.User;
-import org.royaldev.thehumanity.Round.RoundStage;
-import org.royaldev.thehumanity.cards.packs.CardPack;
+import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.cards.Deck;
+import org.royaldev.thehumanity.cards.packs.CardPack;
 import org.royaldev.thehumanity.cards.types.BlackCard;
 import org.royaldev.thehumanity.cards.types.WhiteCard;
 import org.royaldev.thehumanity.exceptions.MissingCzarException;
+import org.royaldev.thehumanity.game.round.CurrentRound;
+import org.royaldev.thehumanity.game.round.Round;
+import org.royaldev.thehumanity.game.round.Round.RoundEndCause;
+import org.royaldev.thehumanity.game.round.Round.RoundStage;
+import org.royaldev.thehumanity.game.round.RoundSnapshot;
 import org.royaldev.thehumanity.player.Hand;
 import org.royaldev.thehumanity.player.Player;
 import org.royaldev.thehumanity.util.DescendingValueComparator;
 import org.royaldev.thehumanity.util.FakeUser;
+import org.royaldev.thehumanity.util.Snapshottable;
+import org.royaldev.thehumanity.util.json.JSONSerializable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,8 +34,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
-public class Game {
+public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
 
     private final TheHumanity humanity;
     /**
@@ -39,14 +48,17 @@ public class Game {
      */
     private final List<Player> historicPlayers = Collections.synchronizedList(new ArrayList<>());
     private final Deck deck;
-    private final List<HouseRule> houseRules = new ArrayList<>();
+    private final List<HouseRule> houseRules = Lists.newArrayList();
+    private final List<RoundSnapshot> previousRounds = Lists.newArrayList();
     private final Player randoCardrissian = new Player(new FakeUser("Rando Cardrissian"));
     private Channel channel;
-    private Round currentRound = null;
+    private CurrentRound currentRound = null;
     private Player host = null;
     private ScheduledFuture countdownTask;
     private GameStatus gameStatus = GameStatus.IDLE;
     private boolean hostWasVoiced = false;
+    private long startTime, endTime;
+    private GameEndCause endCause = GameEndCause.NOT_ENDED;
 
     public Game(@NotNull final TheHumanity humanity, @NotNull final Channel channel, @NotNull final List<CardPack> cardPacks) {
         Preconditions.checkNotNull(humanity, "humanity was null");
@@ -56,16 +68,6 @@ public class Game {
         this.channel = channel;
         this.deck = new Deck(cardPacks);
         this.addHouseRule(HouseRule.REBOOTING_THE_UNIVERSE);
-    }
-
-    /**
-     * Gets a list of {@link HouseRule HouseRules} being used for this game.
-     *
-     * @return House rules
-     */
-    @NotNull
-    private List<HouseRule> getHouseRules() {
-        return this.houseRules;
     }
 
     /**
@@ -103,7 +105,7 @@ public class Game {
         Preconditions.checkNotNull(rule, "rule was null");
         if (this.hasHouseRule(rule)) return false;
         this.processAddingHouseRule(rule);
-        return this.getHouseRules().add(rule);
+        return this.houseRules.add(rule);
     }
 
     /**
@@ -127,7 +129,7 @@ public class Game {
         final int totalCards = this.getDeck().getCardPacks().stream().mapToInt(cp -> cp.getWhiteCards().size()).sum();
         if (this.players.size() * 10 >= totalCards) {
             this.sendMessage(IRCFormat.BOLD + "Not enough white cards to play!");
-            this.stop();
+            this.stop(GameEndCause.NOT_ENOUGH_WHITE_CARDS);
             return;
         }
         this.deal(player);
@@ -239,7 +241,7 @@ public class Game {
      * @return Round
      */
     @Nullable
-    public Round getCurrentRound() {
+    public CurrentRound getCurrentRound() {
         return this.currentRound;
     }
 
@@ -251,6 +253,20 @@ public class Game {
     @NotNull
     public Deck getDeck() {
         return this.deck;
+    }
+
+    @NotNull
+    public GameEndCause getEndCause() {
+        return this.endCause;
+    }
+
+    public void setEndCause(@NotNull final GameEndCause endCause) {
+        Preconditions.checkNotNull(endCause, "endCause was null");
+        this.endCause = endCause;
+    }
+
+    public long getEndTime() {
+        return this.endTime;
     }
 
     /**
@@ -305,6 +321,16 @@ public class Game {
             this.getChannel().newModeCommand().addModeChange(true, 'v', this.getHost().getUser()).execute();
         }
         this.showHost();
+    }
+
+    /**
+     * Gets a list of {@link HouseRule HouseRules} being used for this game.
+     *
+     * @return House rules
+     */
+    @NotNull
+    public List<HouseRule> getHouseRules() {
+        return Collections.unmodifiableList(this.houseRules);
     }
 
     /**
@@ -376,6 +402,15 @@ public class Game {
     }
 
     /**
+     * Gets an unmodifiable list of previous rounds as snapshots.
+     *
+     * @return Unmodifiable list of previous round snapshots
+     */
+    public List<RoundSnapshot> getPreviousRounds() {
+        return Collections.unmodifiableList(this.previousRounds);
+    }
+
+    /**
      * Gets the Player that represents Rando Cardrissian. If Rando Cardrissian is not enabled, this will return null.
      *
      * @return Player or null
@@ -386,6 +421,10 @@ public class Game {
         return this.randoCardrissian;
     }
 
+    public long getStartTime() {
+        return this.startTime;
+    }
+
     /**
      * Checks to see if the game has enough players to continue. If it does not, the game will end.
      *
@@ -394,7 +433,7 @@ public class Game {
     public boolean hasEnoughPlayers() {
         if (this.getPlayers().size() < 3) {
             this.sendMessage(IRCFormat.BOLD + "Not enough players to continue!");
-            this.stop();
+            this.stop(GameEndCause.NOT_ENOUGH_PLAYERS);
             return false;
         }
         return true;
@@ -456,6 +495,7 @@ public class Game {
         }
         switch (newStatus) {
             case JOINING:
+                this.startTime = System.currentTimeMillis();
                 final StringBuilder sb = new StringBuilder();
                 sb.append(IRCFormat.BOLD).append("Card packs for this game:").append(IRCFormat.RESET).append(" ");
                 this.getDeck().getCardPacks().stream().forEach(cp -> sb.append(cp.getName()).append(", "));
@@ -466,9 +506,10 @@ public class Game {
                 break;
             case PLAYING:
                 if (!this.hasEnoughPlayers()) return;
-                final Round currentRound = this.getCurrentRound();
+                final CurrentRound currentRound = this.getCurrentRound();
                 final boolean hadRound = currentRound != null;
                 if (hadRound) {
+                    this.previousRounds.add(currentRound.takeSnapshot());
                     this.showScores();
                     this.showCardCounts();
                 }
@@ -483,12 +524,12 @@ public class Game {
                     if (blackCard == null) {
                         this.sendMessage(" ");
                         this.sendMessage(IRCFormat.BOLD + "There are no more black cards!");
-                        this.stop();
+                        this.stop(GameEndCause.RAN_OUT_OF_BLACK_CARDS);
                         return;
                     }
                 } while (blackCard.getBlanks() > 10 || blackCard.getBlanks() < 1);
                 if (hadRound) currentRound.cancelReminderTask();
-                this.currentRound = new Round(this, !hadRound ? 1 : currentRound.getNumber() + 1, blackCard, this.hasHouseRule(HouseRule.GOD_IS_DEAD) ? null : this.getPlayers().get(index));
+                this.currentRound = new CurrentRound(this, !hadRound ? 1 : currentRound.getNumber() + 1, blackCard, this.hasHouseRule(HouseRule.GOD_IS_DEAD) ? null : this.getPlayers().get(index));
                 this.deal();
                 this.sendMessage(" ");
                 this.sendMessage(IRCFormat.BOLD + "Round " + this.getCurrentRound().getNumber() + IRCFormat.RESET + "!");
@@ -533,7 +574,7 @@ public class Game {
      * @return true if rule was removed, false if otherwise
      */
     public boolean removeHouseRule(final HouseRule rule) {
-        return this.hasHouseRule(rule) && this.getHouseRules().remove(rule);
+        return this.hasHouseRule(rule) && this.houseRules.remove(rule);
     }
 
     /**
@@ -554,6 +595,7 @@ public class Game {
             if (p.equals(this.getCurrentRound().getCzar())) {
                 this.sendMessage(IRCFormat.BOLD + "The czar has left!" + IRCFormat.RESET + " Returning your cards and starting a new round.");
                 this.getCurrentRound().returnCards();
+                this.getCurrentRound().setEndCause(RoundEndCause.CZAR_LEFT);
                 this.advanceStage();
                 return;
             }
@@ -672,7 +714,7 @@ public class Game {
         if (this.countdownTask == null || this.countdownTask.isCancelled() || this.countdownTask.isDone()) return false;
         if (this.getPlayers().size() < 3) return false;
         this.advanceStage();
-        this.countdownTask.cancel(true);
+        this.countdownTask.cancel(false);
         return true;
     }
 
@@ -687,12 +729,18 @@ public class Game {
     /**
      * Stops the game.
      */
-    public void stop() {
+    public void stop(@NotNull final GameEndCause endCause) {
+        this.setEndCause(endCause);
+        if (this.getCurrentRound() != null) {
+            this.getCurrentRound().setEndTime(System.currentTimeMillis());
+            this.getCurrentRound().setEndCause(RoundEndCause.GAME_ENDED);
+            this.previousRounds.add(this.getCurrentRound().takeSnapshot());
+        }
         this.humanity.getGames().remove(this.channel);
         if (this.host != null && !this.hostWasVoiced) {
             this.getChannel().newModeCommand().addModeChange(false, 'v', this.host.getUser()).execute();
         }
-        if (this.countdownTask != null) this.countdownTask.cancel(true);
+        if (this.countdownTask != null) this.countdownTask.cancel(false);
         if (this.getCurrentRound() != null) {
             this.getCurrentRound().cancelReminderTask();
         }
@@ -701,7 +749,34 @@ public class Game {
             this.sendMessage(IRCFormat.BOLD + "The game has ended.");
             if (this.gameStatus != GameStatus.JOINING) this.showScores();
         }
+        this.endTime = System.currentTimeMillis();
         this.gameStatus = GameStatus.ENDED;
+        this.humanity.getHistory().saveGameSnapshot(this.takeSnapshot());
+    }
+
+    @NotNull
+    @Override
+    public GameSnapshot takeSnapshot() {
+        return new GameSnapshot(
+            this.getChannel().getName(),
+            this.endCause.name(),
+            this.startTime,
+            this.endTime,
+            this.getPlayers().stream().map(p -> p.getUser().getNick()).collect(Collectors.toList()),
+            this.getHistoricPlayers().stream().map(p -> p.getUser().getNick()).collect(Collectors.toList()),
+            this.getHouseRules().stream().map(HouseRule::getFriendlyName).collect(Collectors.toList()),
+            this.getDeck().getCardPacks().stream().map(CardPack::getName).collect(Collectors.toList()),
+            this.getPreviousRounds(),
+            this.getHistoricPlayers().stream().collect(Collectors.toMap(p -> p.getUser().getNick(), Player::getScore)),
+            this.getHost().getUser().getNick(),
+            this.getCurrentRound() == null ? 0 : this.getCurrentRound().getNumber()
+        );
+    }
+
+    @NotNull
+    @Override
+    public String toJSON() {
+        return this.takeSnapshot().toJSON();
     }
 
     @Override
@@ -774,6 +849,15 @@ public class Game {
         ENDED
     }
 
+    public enum GameEndCause {
+        NOT_ENDED,
+        NOT_ENOUGH_PLAYERS,
+        RAN_OUT_OF_BLACK_CARDS,
+        NOT_ENOUGH_WHITE_CARDS,
+        STOPPED_BY_COMMAND,
+        JAVA_SHUTDOWN
+    }
+
     private class GameCountdown implements Runnable {
 
         private int runCount = 3; // 3 default
@@ -789,9 +873,9 @@ public class Game {
                     Game.this.advanceStage();
                 } else {
                     Game.this.sendMessage(IRCFormat.BOLD + "Not enough players." + IRCFormat.RESET + " At least three people are required for the game to begin.");
-                    Game.this.stop();
+                    Game.this.stop(GameEndCause.NOT_ENOUGH_PLAYERS);
                 }
-                Game.this.countdownTask.cancel(true);
+                Game.this.countdownTask.cancel(false);
             }
         }
     }

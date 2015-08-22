@@ -1,0 +1,40 @@
+{% extends '../layouts/slate.twig' %}
+
+{% block title %}Games{% endblock %}
+
+{% block underbar %}
+    <h1>Games</h1>
+{% endblock %}
+
+{% block slate %}
+    {% if games.size <= 0 %}
+        <div class="text-center">
+            <span class="mega-octicon octicon-alert"></span>
+            <p class="lead">
+                There are no current games. Why not
+                <a class="tooltipped tooltipped-n" href="https://play.thehumanity.co/" aria-label="Use !start in the game channel to start a new game.">start one</a>?
+            </p>
+        </div>
+    {% else %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Channel</th>
+                    <th>Players</th>
+                    <th>Round</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for channel, game in games %}
+                    <tr>
+                        <td><a href="/game/{{ channel.getName.substring(1) | escape }}">{{ channel.getName | escape }}</a></td>
+                        <td>{{ game.getPlayers.size }}</td>
+                        <td>{{ game.getCurrentRound.getNumber | default("No round started") }}</td>
+                        <td>{{ game.getGameStatus | friendly_enum }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}

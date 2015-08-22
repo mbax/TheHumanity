@@ -50,13 +50,19 @@ import org.royaldev.thehumanity.commands.impl.VersionCommand;
 import org.royaldev.thehumanity.commands.impl.WhoCommand;
 import org.royaldev.thehumanity.commands.impl.game.GameCommand;
 import org.royaldev.thehumanity.commands.impl.ping.PingListCommand;
+import org.royaldev.thehumanity.game.Game;
 import org.royaldev.thehumanity.handlers.CommandHandler;
+import org.royaldev.thehumanity.history.History;
 import org.royaldev.thehumanity.ping.PingRegistry;
 import org.royaldev.thehumanity.ping.WhoX;
 import org.royaldev.thehumanity.ping.task.SavePingRegistryTask;
+import org.royaldev.thehumanity.server.GameServer;
+import org.royaldev.thehumanity.server.configurations.HumanityConfiguration;
 import org.royaldev.thehumanity.util.Pair;
 
+import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -65,6 +71,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
@@ -83,6 +91,9 @@ public class TheHumanity {
     private final ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(1);
     private final PingRegistry pingRegistry;
     private final WhoX whoX = new WhoX(this);
+    private final History history = new History(this);
+    @Nullable
+    private final GameServer gameServer;
     @Option(name = "-c", usage = "Channels to join.", required = true, handler = StringArrayOptionHandler.class)
     private String[] channels;
     @Option(name = "-s", usage = "Server to connect to.", required = true, handler = StringOptionHandler.class)
@@ -107,11 +118,30 @@ public class TheHumanity {
     private boolean keepCardcastPacks = false;
     @Option(name = "-D", usage = "Toggles debug mode.", handler = BooleanOptionHandler.class)
     private boolean debug = false;
+    @Option(name = "-H", usage = "Hostname of the web server", handler = StringOptionHandler.class)
+    private String webServerHostname = "0.0.0.0";
+    @Option(name = "-w", usage = "Port of the web server", handler = IntOptionHandler.class)
+    private int webServerPort = 9012;
+    @Option(name = "-W", usage = "Run only the web server", handler = BooleanOptionHandler.class)
+    private boolean runOnlyWebServer = false;
+    @Option(name = "-X", usage = "Do not run the web server.", handler = BooleanOptionHandler.class)
+    private boolean doNotRunWebServer = false;
 
     private TheHumanity(@NotNull final String[] args) {
         Preconditions.checkNotNull(args, "args was null");
         this.setUpLogger();
         this.parseArguments(args);
+        if (!this.doNotRunWebServer) {
+            HumanityConfiguration.setHumanity(this);
+            this.gameServer = new GameServer(this.webServerHostname, this.webServerPort);
+            if (this.runOnlyWebServer) {
+                this.bot = null;
+                this.pingRegistry = null;
+                return;
+            }
+        } else {
+            this.gameServer = null;
+        }
         this.pingRegistry = PingRegistry.deserializeOrMakePingRegistry();
         // Schedule a repeatedly running saver task, just in case we're not shut down properly
         this.stpe.scheduleAtFixedRate(new SavePingRegistryTask(this.pingRegistry), 5L, 10L, TimeUnit.MINUTES);
@@ -150,6 +180,19 @@ public class TheHumanity {
 
     private void addShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHook(this)));
+    }
+
+    @Nullable
+    private Manifest getManifest() {
+        final Class<?> clazz = this.getClass();
+        final String className = clazz.getSimpleName() + ".class";
+        final String classPath = clazz.getResource(className).toString();
+        final String manifestPath = classPath.substring(0, classPath.lastIndexOf("!") + 1) + "/META-INF/MANIFEST.MF";
+        try {
+            return new Manifest(new URL(manifestPath).openStream());
+        } catch (final IOException ex) {
+            return null;
+        }
     }
 
     private void loadCardPacks() {
@@ -305,9 +348,18 @@ public class TheHumanity {
         return this.getGames().get(c);
     }
 
+    @Nullable
+    public GameServer getGameServer() {
+        return this.gameServer;
+    }
+
     @NotNull
     public Map<Channel, Game> getGames() {
         return this.games;
+    }
+
+    public History getHistory() {
+        return this.history;
     }
 
     @NotNull
@@ -342,6 +394,20 @@ public class TheHumanity {
     @NotNull
     public ScheduledThreadPoolExecutor getThreadPool() {
         return this.stpe;
+    }
+
+    @NotNull
+    public String getVersion() {
+        final Manifest mf = this.getManifest();
+        if (mf == null) return "Error: null Manifest";
+        final Attributes a = mf.getAttributes("Version-Info");
+        if (a == null) return "Error: No Version-Info";
+        return String.format(
+            "%s %s (%s)",
+            a.getValue("Project-Name"),
+            a.getValue("Project-Version"),
+            a.getValue("Git-Describe")
+        );
     }
 
     public WhoX getWhoX() {

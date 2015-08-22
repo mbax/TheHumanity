@@ -15,19 +15,19 @@ public interface CardPack {
     @Nullable
     String getAuthor();
 
+    void setAuthor(@Nullable String author);
+
     @NotNull
     List<BlackCard> getBlackCards();
 
     @Nullable
     String getDescription();
 
+    void setDescription(@Nullable String description);
+
     @NotNull
     String getName();
 
     @NotNull
     List<WhiteCard> getWhiteCards();
-
-    void setAuthor(@Nullable String author);
-
-    void setDescription(@Nullable String description);
 }

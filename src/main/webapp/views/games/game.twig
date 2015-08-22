@@ -1,0 +1,78 @@
+{% extends '../layouts/slate.twig' %}
+
+{% block title %}{% set channelName = game.getChannel.getName | escape %}Game in {{ channelName }}{% endblock %}
+
+{% block underbar %}
+    <p class="right separated">
+        {% set players = "" %}
+        {% for player in game.getPlayers %}
+            {% set players = players.concat(player.getUser.getNick).concat('<br/>') %}
+        {% endfor %}
+        {% set players = players | br2nl %}
+        <span class="dotted-underline tooltipped tooltipped-left tooltipped-s" aria-label="{{ players }}">Players</span>
+        {% set scores = "" %}
+        {% for player in game.getHistoricPlayers %}
+            {% set scores = scores.concat(player.getUser.getNick).concat(': ').concat(player.getScore | number_format(0, '.', ',')).concat('<br/>') %}
+        {% endfor %}
+        {% set scores = scores | br2nl %}
+        <span class="dotted-underline tooltipped tooltipped-right tooltipped-s" aria-label="{{ scores }}">Scores</span>
+        {% set cardpacks = "" %}
+        {% for cardpack in game.getDeck.getCardPacks %}
+            {% set cardpacks = cardpacks.concat(cardpack.getName).concat('<br/>') %}
+        {% endfor %}
+        {% set cardpacks = cardpacks | br2nl %}
+        <span class="dotted-underline tooltipped tooltipped-left tooltipped-s" aria-label="{{ cardpacks }}">Card packs</span>
+        {% set houserules = "" %}
+        {% for houserule in game.getHouseRules %}
+            {% set houserules = houserules.concat(houserule.getFriendlyName).concat('<br/>') %}
+        {% endfor %}
+        {% set houserules = houserules | br2nl %}
+        <span class="dotted-underline tooltipped tooltipped-left tooltipped-s" aria-label="{{ houserules }}">House rules</span>
+    </p>
+    <h1>Game in {{ channelName }} <small>Hosted by {{ game.getHost.getUser.getNick | escape }}</small></h1>
+{% endblock %}
+
+{% block slate %}
+    {% set round = game.getCurrentRound %}
+    {% if round is null %}
+        <div class="text-center">
+            <span class="mega-octicon octicon-alert"></span>
+            <p class="lead">
+                A round hasn't started yet.
+            </p>
+        </div>
+    {% else %}
+        <h2>Round {{ round.getNumber }}{% if round.getCzar is not null %} <small>{{ round.getCzar.getUser.getNick | escape }} is the czar</small>{% endif %}</h2>
+        <p class="lead">
+            {{ round.getBlackCard | escape }}
+        </p>
+        {% set stage = round.getCurrentStage.name %}
+        {% if (stage == "WAITING_FOR_PLAYERS") %}
+            <p>
+                <strong>Players are currently submitting cards.</strong>
+            </p>
+            {% for player in game.getPlayers %}
+                {% if not player.equals(round.getCzar) %}
+                    <p>
+                        <span class="octicon fixed-width-octicon octicon-{% if round.hasPlayed(player) %}check{% else %}x{% endif %}"></span>
+                        {{ player.getUser.getNick | escape }}
+                    </p>
+                {% endif %}
+            {% endfor %}
+        {% elseif (stage == "WAITING_FOR_CZAR") %}
+            <p>
+                <strong>The czar is currently choosing a winning card.</strong>
+            </p>
+            {% for index in range(0, round.getPlays.size - 1) %} {# TODO: See if this needs shuffling #}
+                {% set play = round.getPlays.get(index) %}
+                <p>
+                    {{ index + 1 }}. {{ round.getBlackCard.fillInBlanks(play) | escape | irc_bold }}
+                </p>
+            {% endfor %}
+        {% else %}
+            <p>
+                <strong>The round is {{ stage | friendly_enum }}.</strong>
+            </p>
+        {% endif %}
+    {% endif %}
+{% endblock %}

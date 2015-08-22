@@ -6,9 +6,9 @@ import org.kitteh.irc.client.library.IRCFormat;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
-import org.royaldev.thehumanity.Game;
-import org.royaldev.thehumanity.Round;
-import org.royaldev.thehumanity.Round.RoundStage;
+import org.royaldev.thehumanity.game.round.CurrentRound;
+import org.royaldev.thehumanity.game.Game;
+import org.royaldev.thehumanity.game.round.Round.RoundStage;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.Command;
@@ -37,7 +37,7 @@ public class WhoCommand extends NoticeableCommand {
     @NotNull
     private String getStatusString(@NotNull final Game g) {
         Preconditions.checkNotNull(g, "g was null");
-        final Round r = g.getCurrentRound();
+        final CurrentRound r = g.getCurrentRound();
         if (r == null) {
             return "No round in progress.";
         }
@@ -66,7 +66,7 @@ public class WhoCommand extends NoticeableCommand {
             this.notice(u, isChannelMessage ? "No game in progress." : "You're not in a game.");
             return;
         }
-        final Round r = game.getCurrentRound();
+        final CurrentRound r = game.getCurrentRound();
         if (r == null || r.getCurrentStage() != RoundStage.WAITING_FOR_CZAR && r.getCurrentStage() != RoundStage.WAITING_FOR_PLAYERS) {
             this.notice(u, "The game has not yet started.");
             return;

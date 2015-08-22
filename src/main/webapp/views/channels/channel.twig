@@ -1,0 +1,27 @@
+{% extends '../layouts/slate.twig' %}
+
+{% block title %}{% set channelname = channel.getName | escape %}{{ channelname }}{% endblock %}
+
+{% block underbar %}
+    <h1>{{ channelname }} <small>{{ channel.getUsers.size }} {{ plural("user", channel.getUsers.size) }}</small></h1>
+{% endblock %}
+
+{% block slate %}
+    <h2>Topic</h2>
+    <p class="lead">
+    {% if channel.getTopic.getTopic %}
+        {{ channel.getTopic.getTopic | remove_irc_formatting | remove_irc_colors | escape }}
+    {% else %}
+        <em>No topic.</em>
+    {% endif %}
+    </p>
+    <h2>Users</h2>
+    {% for user in channel.getUsers %}
+        {# TODO: Style this #}
+        <p>
+            <span class="dotted-underline tooltipped tooltipped-n" aria-label="{{ user.getNick | escape }}!{{ user.getUser | escape }}@{{ user.getHost | escape }}">
+                {{ user.getNick | escape }}
+            </span>
+        </p>
+    {% endfor %}
+{% endblock %}

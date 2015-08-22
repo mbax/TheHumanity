@@ -3,8 +3,8 @@ package org.royaldev.thehumanity.commands.impl;
 import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.event.ActorEvent;
-import org.royaldev.thehumanity.Game;
-import org.royaldev.thehumanity.Round;
+import org.royaldev.thehumanity.game.round.CurrentRound;
+import org.royaldev.thehumanity.game.Game;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.Command;
@@ -34,7 +34,7 @@ public class SkipCommand extends InGameCommand {
             this.notice(u, "That person is not playing in this game.");
             return;
         }
-        final Round r = game.getCurrentRound();
+        final CurrentRound r = game.getCurrentRound();
         if (r == null) {
             this.notice(u, "No round to skip in.");
             return;
