@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.kitteh.irc.client.library.element.User;
-import org.kitteh.irc.client.library.event.ActorEvent;
+import org.kitteh.irc.client.library.event.helper.ActorEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 import org.royaldev.thehumanity.game.round.CurrentRound;
 import org.royaldev.thehumanity.game.Game;

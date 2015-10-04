@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.element.User;
-import org.kitteh.irc.client.library.event.ActorEvent;
+import org.kitteh.irc.client.library.event.helper.ActorEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;

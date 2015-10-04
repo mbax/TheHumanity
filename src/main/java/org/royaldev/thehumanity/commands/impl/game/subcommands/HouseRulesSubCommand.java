@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.kitteh.irc.client.library.element.User;
-import org.kitteh.irc.client.library.event.ActorEvent;
+import org.kitteh.irc.client.library.event.helper.ActorEvent;
 import org.royaldev.thehumanity.game.Game;
 import org.royaldev.thehumanity.game.HouseRule;
 import org.royaldev.thehumanity.TheHumanity;

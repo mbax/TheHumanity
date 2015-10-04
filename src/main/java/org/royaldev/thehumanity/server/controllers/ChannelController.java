@@ -45,7 +45,7 @@ public class ChannelController {
                     .key("nickname")
                     .value(user.getNick())
                     .key("user")
-                    .value(user.getUser())
+                    .value(user.getUserString())
                     .key("hostname")
                     .value(user.getHost())
                     .endObject();

@@ -39,7 +39,7 @@ public class JTwigFunctions {
 
     @JtwigFunction(name = "remove_irc_formatting")
     public String removeIRCFormatting(@Parameter final String input) {
-        return IRCFormat.stripFormating(input);
+        return IRCFormat.stripFormatting(input);
     }
 
 }

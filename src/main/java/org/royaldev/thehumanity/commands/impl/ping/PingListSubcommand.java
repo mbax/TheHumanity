@@ -2,7 +2,7 @@ package org.royaldev.thehumanity.commands.impl.ping;
 
 import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.element.User;
-import org.kitteh.irc.client.library.event.ActorEvent;
+import org.kitteh.irc.client.library.event.helper.ActorEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 import org.royaldev.thehumanity.commands.CallInfo;
 import org.royaldev.thehumanity.commands.NoticeableCommand;

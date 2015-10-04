@@ -12,11 +12,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONWriter;
-import org.kitteh.irc.client.library.AuthType;
 import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.ClientBuilder;
 import org.kitteh.irc.client.library.EventManager;
+import org.kitteh.irc.client.library.auth.protocol.NickServ;
 import org.kitteh.irc.client.library.element.Channel;
+import org.kitteh.irc.client.library.element.ChannelUserMode;
 import org.kitteh.irc.client.library.element.User;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -69,6 +70,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.jar.Attributes;
@@ -147,7 +150,7 @@ public class TheHumanity {
         this.stpe.scheduleAtFixedRate(new SavePingRegistryTask(this.pingRegistry), 5L, 10L, TimeUnit.MINUTES);
         this.loadCardPacks();
         this.registerCommands();
-        final ClientBuilder cb = new ClientBuilder();
+        final ClientBuilder cb = Client.builder();
         cb
             .nick(this.nickname)
             .user(this.nickname)
@@ -161,7 +164,7 @@ public class TheHumanity {
             cb.listenOutput(s -> System.out.println("output = " + s));
         }
         if (!this.nickserv.isEmpty()) {
-            cb.auth(AuthType.NICKSERV, this.nickname, this.nickserv);
+            cb.after(client -> client.getAuthManager().addProtocol(new NickServ(client, this.nickname, this.nickserv)));
         }
         if (!this.serverPassword.isEmpty()) {
             cb.serverPassword(this.serverPassword);
@@ -453,7 +456,8 @@ public class TheHumanity {
     public boolean hasChannelMode(@NotNull final Channel c, @NotNull final User u, final char mode) {
         Preconditions.checkNotNull(c, "Channel was null");
         Preconditions.checkNotNull(u, "User was null");
-        return c.getUserModes(u.getNick()).stream().anyMatch(m -> m.getMode() == mode);
+        Optional<Set<ChannelUserMode>> set = c.getUserModes(u.getNick());
+        return set.isPresent() && set.get().stream().anyMatch(m -> m.getChar() == mode);
     }
 
     public boolean isDebugMode() {

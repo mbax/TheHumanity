@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.kitteh.irc.client.library.element.Channel;
+import org.kitteh.irc.client.library.element.ChannelUserMode;
 import org.kitteh.irc.client.library.element.User;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.cards.Deck;
@@ -59,6 +60,7 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
     private boolean hostWasVoiced = false;
     private long startTime, endTime;
     private GameEndCause endCause = GameEndCause.NOT_ENDED;
+    private final ChannelUserMode voice;
 
     public Game(@NotNull final TheHumanity humanity, @NotNull final Channel channel, @NotNull final List<CardPack> cardPacks) {
         Preconditions.checkNotNull(humanity, "humanity was null");
@@ -67,6 +69,7 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
         this.humanity = humanity;
         this.channel = channel;
         this.deck = new Deck(cardPacks);
+        this.voice = this.humanity.getBot().getServerInfo().getChannelUserMode('v').get();
         this.addHouseRule(HouseRule.REBOOTING_THE_UNIVERSE);
     }
 
@@ -318,7 +321,7 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
         this.host = host;
         this.hostWasVoiced = this.humanity.hasChannelMode(this.channel, this.getHost().getUser(), 'v');
         if (!this.hostWasVoiced) {
-            this.getChannel().newModeCommand().addModeChange(true, 'v', this.getHost().getUser()).execute();
+            this.getChannel().newModeCommand().add(true, this.voice, this.getHost().getUser()).execute();
         }
         this.showHost();
     }
@@ -474,7 +477,7 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
      */
     public void nextHost() {
         if (this.host != null && !this.hostWasVoiced) {
-            this.getChannel().newModeCommand().addModeChange(false, 'v', this.host.getUser()).execute();
+            this.getChannel().newModeCommand().add(false, this.voice, this.host.getUser()).execute();
             this.host = null;
         }
         synchronized (this.players) {
@@ -738,7 +741,7 @@ public class Game implements JSONSerializable, Snapshottable<GameSnapshot> {
         }
         this.humanity.getGames().remove(this.channel);
         if (this.host != null && !this.hostWasVoiced) {
-            this.getChannel().newModeCommand().addModeChange(false, 'v', this.host.getUser()).execute();
+            this.getChannel().newModeCommand().add(false, this.voice, this.host.getUser()).execute();
         }
         if (this.countdownTask != null) this.countdownTask.cancel(false);
         if (this.getCurrentRound() != null) {

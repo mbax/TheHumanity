@@ -23,6 +23,6 @@ public class HumanityChannelService implements ChannelService {
     @Override
     public Channel getFromName(@NotNull final String name) {
         Preconditions.checkNotNull(name, "name was null");
-        return this.humanity.getBot().getChannel(name);
+        return this.humanity.getBot().getChannel(name).orElse(null);
     }
 }

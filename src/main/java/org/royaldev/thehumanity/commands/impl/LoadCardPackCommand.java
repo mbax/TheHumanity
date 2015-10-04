@@ -2,7 +2,7 @@ package org.royaldev.thehumanity.commands.impl;
 
 import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.element.User;
-import org.kitteh.irc.client.library.event.ActorEvent;
+import org.kitteh.irc.client.library.event.helper.ActorEvent;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.cards.packs.CardPack;
 import org.royaldev.thehumanity.cards.packs.CardPackParser;

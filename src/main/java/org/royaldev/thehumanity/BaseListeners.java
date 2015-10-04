@@ -34,7 +34,7 @@ final class BaseListeners {
 
     @Handler
     public void accountNotify(final CapabilitiesSupportedListEvent e) {
-        if (e.getSupportedCapabilities().stream().filter(cap -> cap.getCapabilityName().equalsIgnoreCase("account-notify")).findFirst().isPresent()) {
+        if (e.getSupportedCapabilities().stream().filter(cap -> cap.getName().equalsIgnoreCase("account-notify")).findFirst().isPresent()) {
             e.getClient().sendRawLine("CAP REQ :account-notify");
         }
     }

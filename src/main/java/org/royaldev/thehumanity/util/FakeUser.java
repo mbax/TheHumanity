@@ -3,6 +3,8 @@ package org.royaldev.thehumanity.util;
 import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.element.User;
 
+import javax.annotation.Nonnull;
+import java.util.Optional;
 import java.util.Set;
 
 public class FakeUser implements User {
@@ -11,6 +13,12 @@ public class FakeUser implements User {
 
     public FakeUser(final String nick) {
         this.nick = nick;
+    }
+
+    @Nonnull
+    @Override
+    public Optional<String> getAccount() {
+        return null;
     }
 
     @Override
@@ -28,9 +36,27 @@ public class FakeUser implements User {
         return this.nick;
     }
 
+    @Nonnull
     @Override
-    public String getUser() {
+    public Optional<String> getRealName() {
         return null;
+    }
+
+    @Nonnull
+    @Override
+    public Optional<String> getServer() {
+        return null;
+    }
+
+    @Nonnull
+    @Override
+    public String getUserString() {
+        return null;
+    }
+
+    @Override
+    public boolean isAway() {
+        return false;
     }
 
     @Override
@@ -66,5 +92,10 @@ public class FakeUser implements User {
     @Override
     public void sendNotice(final String s) {
 
+    }
+
+    @Override
+    public boolean isStale() {
+        return false;
     }
 }

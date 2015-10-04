@@ -1,9 +1,9 @@
 package org.royaldev.thehumanity.util;
 
 import org.kitteh.irc.client.library.element.User;
-import org.kitteh.irc.client.library.event.ActorChannelEvent;
-import org.kitteh.irc.client.library.event.ActorEvent;
-import org.kitteh.irc.client.library.event.ActorMessageEvent;
+import org.kitteh.irc.client.library.event.helper.ActorEvent;
+import org.kitteh.irc.client.library.event.helper.ChannelEvent;
+import org.kitteh.irc.client.library.event.helper.MessageEvent;
 
 public final class ConversionHelper {
 
@@ -13,8 +13,8 @@ public final class ConversionHelper {
      * @param ace     Event to respond to
      * @param message Message to send
      */
-    public static void respond(final ActorChannelEvent<User> ace, final String message) {
-        ace.getChannel().sendMessage(ace.getActor().getNick() + ": " + message);
+    public static void respondChannel(final ChannelEvent ace, final String message) {
+        ace.getChannel().sendMessage(((ActorEvent<User>)ace).getActor().getNick() + ": " + message);
     }
 
     /**
@@ -23,7 +23,7 @@ public final class ConversionHelper {
      * @param ame     Event to respond to
      * @param message Message to send
      */
-    public static void respond(final ActorMessageEvent<User> ame, final String message) {
+    public static void respondActor(final ActorEvent<User> ame, final String message) {
         ame.getActor().sendMessage(message);
     }
 
@@ -34,10 +34,10 @@ public final class ConversionHelper {
      * @param message Message to send
      */
     public static void respond(final ActorEvent<User> ae, final String message) {
-        if (ae instanceof ActorChannelEvent) {
-            ConversionHelper.respond((ActorChannelEvent<User>) ae, message);
-        } else if (ae instanceof ActorMessageEvent) {
-            ConversionHelper.respond((ActorMessageEvent<User>) ae, message);
+        if (ae instanceof ChannelEvent) {
+            ConversionHelper.respondChannel((ChannelEvent) ae, message);
+        } else if (ae instanceof MessageEvent) {
+            ConversionHelper.respondActor(ae, message);
         } else {
             throw new IllegalArgumentException("Invalid event type.");
         }

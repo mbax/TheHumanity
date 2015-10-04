@@ -4,7 +4,7 @@ import com.google.common.base.Joiner;
 import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.IRCFormat;
 import org.kitteh.irc.client.library.element.User;
-import org.kitteh.irc.client.library.event.ActorEvent;
+import org.kitteh.irc.client.library.event.helper.ActorEvent;
 import org.royaldev.thehumanity.game.Game;
 import org.royaldev.thehumanity.TheHumanity;
 import org.royaldev.thehumanity.cards.packs.CardPack;
